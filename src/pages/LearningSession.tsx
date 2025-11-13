@@ -147,48 +147,48 @@ export const LearningSession: React.FC<LearningSessionProps> = ({ onComplete, on
     const percentage = Math.round((score / questions.length) * 100);
     
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-dark-base flex items-center justify-center p-4">
         <Card className="p-8 max-w-2xl w-full text-center">
-          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
-            <Icon icon={CheckCircle} size="xl" className="text-white" />
+          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-silver-base/20 to-silver-dark/20 border border-silver-base/30 rounded-full flex items-center justify-center silver-glow">
+            <Icon icon={CheckCircle} size="xl" className="text-silver-light" />
           </div>
           
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+          <h1 className="text-3xl font-display font-bold text-text-primary mb-4">
             Session Complete!
           </h1>
           
-          <p className="text-gray-600 dark:text-gray-300 mb-8">
+          <p className="text-text-secondary mb-8">
             Congratulations! You've completed your learning session.
           </p>
 
           {/* Results */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="text-center">
-              <div className={`text-3xl font-bold mb-2 ${getScoreColor()}`}>
+            <div className="text-center glass p-6 rounded-xl border border-silver-dark/20">
+              <div className="text-3xl font-bold text-shimmer mb-2">
                 {percentage}%
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Score</div>
+              <div className="text-sm text-text-tertiary">Score</div>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-2">
+            <div className="text-center glass p-6 rounded-xl border border-silver-dark/20">
+              <div className="text-3xl font-bold text-shimmer mb-2">
                 {score}/{questions.length}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Correct</div>
+              <div className="text-sm text-text-tertiary">Correct</div>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600 mb-2">
+            <div className="text-center glass p-6 rounded-xl border border-silver-dark/20">
+              <div className="text-3xl font-bold text-shimmer mb-2">
                 {formatTime(timeElapsed)}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Time</div>
+              <div className="text-sm text-text-tertiary">Time</div>
             </div>
           </div>
 
           {/* Performance Feedback */}
-          <div className="mb-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+          <div className="mb-8 p-4 glass rounded-lg border border-silver-dark/20">
+            <h3 className="font-semibold text-silver-light mb-2">
               {percentage >= 80 ? 'Excellent Work!' : percentage >= 60 ? 'Good Progress!' : 'Keep Learning!'}
             </h3>
-            <p className="text-blue-800 dark:text-blue-200 text-sm">
+            <p className="text-text-secondary text-sm">
               {percentage >= 80 
                 ? 'You have a strong understanding of the material. Ready for advanced topics!'
                 : percentage >= 60 
@@ -218,28 +218,28 @@ export const LearningSession: React.FC<LearningSessionProps> = ({ onComplete, on
   const progress = ((currentQuestion + 1) / questions.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-dark-base">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+      <header className="glass-strong border-b border-silver-dark/20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <button
                 onClick={onHome}
-                className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                className="text-silver-medium hover:text-silver-light transition-colors"
               >
                 <Icon icon={Home} size="sm" />
               </button>
-              <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h1 className="text-lg font-display font-semibold text-text-primary">
                 Learning Session: Cognitive Science Basics
               </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="flex items-center text-gray-600 dark:text-gray-400">
+              <div className="flex items-center text-silver-base">
                 <Icon icon={Clock} size="sm" className="mr-1" />
                 {formatTime(timeElapsed)}
               </div>
-              <div className="flex items-center text-gray-600 dark:text-gray-400">
+              <div className="flex items-center text-silver-base">
                 <Icon icon={Target} size="sm" className="mr-1" />
                 {currentQuestion + 1}/{questions.length}
               </div>
@@ -252,24 +252,26 @@ export const LearningSession: React.FC<LearningSessionProps> = ({ onComplete, on
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-600 dark:text-gray-400">Progress</span>
-            <span className="text-sm text-gray-600 dark:text-gray-400">{Math.round(progress)}%</span>
+            <span className="text-sm text-text-tertiary">Progress</span>
+            <span className="text-sm text-silver-base">{Math.round(progress)}%</span>
           </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+          <div className="w-full bg-dark-elevated rounded-full h-2 border border-silver-dark/20">
             <div 
-              className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+              className="bg-shimmer h-2 rounded-full relative overflow-hidden transition-all duration-300"
               style={{ width: `${progress}%` }}
-            />
+            >
+              <div className="absolute inset-0 bg-shimmer animate-shimmer"></div>
+            </div>
           </div>
         </div>
 
         {/* Question Card */}
         <Card className="p-8 mb-8">
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-2xl font-display font-bold text-text-primary mb-4">
               Question {currentQuestion + 1}
             </h2>
-            <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+            <p className="text-lg text-text-secondary leading-relaxed">
               {currentQ.question}
             </p>
           </div>
@@ -285,12 +287,12 @@ export const LearningSession: React.FC<LearningSessionProps> = ({ onComplete, on
                   selectedAnswer === index
                     ? showResult
                       ? index === currentQ.correctAnswer
-                        ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
-                        : 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
-                      : 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
+                        ? 'border-green-500/50 bg-green-500/10 text-green-400'
+                        : 'border-red-500/50 bg-red-500/10 text-red-400'
+                      : 'border-silver-base/50 bg-silver-base/10 text-silver-light'
                     : showResult && index === currentQ.correctAnswer
-                    ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
-                    : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300'
+                    ? 'border-green-500/50 bg-green-500/10 text-green-400'
+                    : 'border-silver-dark/30 hover:border-silver-base/50 text-text-secondary hover:text-text-primary bg-dark-surface/50'
                 }`}
               >
                 <div className="flex items-center">
@@ -301,9 +303,9 @@ export const LearningSession: React.FC<LearningSessionProps> = ({ onComplete, on
                   {showResult && (
                     <div className="ml-auto">
                       {index === currentQ.correctAnswer ? (
-                        <Icon icon={CheckCircle} size="sm" className="text-green-600" />
+                        <Icon icon={CheckCircle} size="sm" className="text-green-400" />
                       ) : selectedAnswer === index ? (
-                        <Icon icon={XCircle} size="sm" className="text-red-600" />
+                        <Icon icon={XCircle} size="sm" className="text-red-400" />
                       ) : null}
                     </div>
                   )}
@@ -314,9 +316,9 @@ export const LearningSession: React.FC<LearningSessionProps> = ({ onComplete, on
 
           {/* Explanation */}
           {showResult && (
-            <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">Explanation:</h4>
-              <p className="text-blue-800 dark:text-blue-200">{currentQ.explanation}</p>
+            <div className="mb-6 p-4 glass rounded-lg border border-silver-dark/20">
+              <h4 className="font-semibold text-silver-light mb-2">Explanation:</h4>
+              <p className="text-text-secondary">{currentQ.explanation}</p>
             </div>
           )}
 

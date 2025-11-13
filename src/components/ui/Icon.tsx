@@ -23,7 +23,7 @@ export const Icon: React.FC<IconProps> = ({
   };
   
   const gradientClasses = gradient 
-    ? 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600'
+    ? 'text-transparent bg-clip-text bg-silver-gradient'
     : '';
   
   return (

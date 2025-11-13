@@ -50,12 +50,12 @@ export const SignIn: React.FC<SignInProps> = ({ onSignIn, onBack }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-dark-base flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Back Button */}
         <button
           onClick={onBack}
-          className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-8 transition-colors"
+          className="flex items-center text-silver-medium hover:text-silver-light mb-8 transition-colors"
         >
           <Icon icon={ArrowLeft} size="sm" className="mr-2" />
           Back to Home
@@ -64,18 +64,18 @@ export const SignIn: React.FC<SignInProps> = ({ onSignIn, onBack }) => {
         <Card className="p-8">
           {/* Logo */}
           <div className="flex items-center justify-center mb-8">
-            <div className="w-12 h-12 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center mr-3">
-              <Icon icon={Brain} size="lg" className="text-white" />
+            <div className="w-12 h-12 bg-gradient-to-br from-silver-base/20 to-silver-dark/20 border border-silver-base/30 rounded-xl flex items-center justify-center mr-3">
+              <Icon icon={Brain} size="lg" className="text-silver-light" />
             </div>
-            <span className="text-2xl font-bold text-gray-900 dark:text-white">NeuroAscend</span>
+            <span className="text-2xl font-display font-bold text-shimmer">NeuroAscend</span>
           </div>
 
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-2xl font-display font-bold text-text-primary mb-2">
               Welcome Back
             </h1>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-text-secondary">
               Sign in to continue your learning journey
             </p>
           </div>
@@ -84,50 +84,50 @@ export const SignIn: React.FC<SignInProps> = ({ onSignIn, onBack }) => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-silver-base mb-2">
                 Email Address
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Icon icon={Mail} size="sm" className="text-gray-400" />
+                  <Icon icon={Mail} size="sm" className="text-silver-medium" />
                 </div>
                 <input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
+                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus-silver transition-all duration-300 ${
                     errors.email 
-                      ? 'border-red-300 dark:border-red-600' 
-                      : 'border-gray-300 dark:border-gray-600'
-                  } bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400`}
+                      ? 'border-red-500/50 bg-red-500/5' 
+                      : 'border-silver-dark/30 bg-dark-surface/50'
+                  } text-text-primary placeholder-text-tertiary focus:border-silver-base/50 focus:bg-dark-surface`}
                   placeholder="Enter your email"
                 />
               </div>
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>
+                <p className="mt-1 text-sm text-red-400">{errors.email}</p>
               )}
             </div>
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-silver-base mb-2">
                 Password
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Icon icon={Lock} size="sm" className="text-gray-400" />
+                  <Icon icon={Lock} size="sm" className="text-silver-medium" />
                 </div>
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
+                  className={`block w-full pl-10 pr-10 py-3 border rounded-lg focus-silver transition-all duration-300 ${
                     errors.password 
-                      ? 'border-red-300 dark:border-red-600' 
-                      : 'border-gray-300 dark:border-gray-600'
-                  } bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400`}
+                      ? 'border-red-500/50 bg-red-500/5' 
+                      : 'border-silver-dark/30 bg-dark-surface/50'
+                  } text-text-primary placeholder-text-tertiary focus:border-silver-base/50 focus:bg-dark-surface`}
                   placeholder="Enter your password"
                 />
                 <button
@@ -138,27 +138,27 @@ export const SignIn: React.FC<SignInProps> = ({ onSignIn, onBack }) => {
                   <Icon 
                     icon={showPassword ? EyeOff : Eye} 
                     size="sm" 
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" 
+                    className="text-silver-medium hover:text-silver-light transition-colors" 
                   />
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password}</p>
+                <p className="mt-1 text-sm text-red-400">{errors.password}</p>
               )}
             </div>
 
             {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between">
-              <label className="flex items-center">
+              <label className="flex items-center cursor-pointer">
                 <input
                   type="checkbox"
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-silver-base focus:ring-silver-base border-silver-dark/30 rounded bg-dark-surface/50"
                 />
-                <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">Remember me</span>
+                <span className="ml-2 text-sm text-text-secondary">Remember me</span>
               </label>
               <button
                 type="button"
-                className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300"
+                className="text-sm text-silver-base hover:text-silver-light transition-colors"
               >
                 Forgot password?
               </button>
@@ -177,9 +177,9 @@ export const SignIn: React.FC<SignInProps> = ({ onSignIn, onBack }) => {
           </form>
 
           {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <p className="text-sm text-blue-800 dark:text-blue-200 font-medium mb-2">Demo Credentials:</p>
-            <p className="text-sm text-blue-700 dark:text-blue-300">
+          <div className="mt-6 p-4 glass rounded-lg border border-silver-dark/20">
+            <p className="text-sm text-silver-light font-medium mb-2">Demo Credentials:</p>
+            <p className="text-sm text-text-secondary">
               Email: demo@neuroascend.com<br />
               Password: demo123
             </p>
@@ -187,9 +187,9 @@ export const SignIn: React.FC<SignInProps> = ({ onSignIn, onBack }) => {
 
           {/* Sign Up Link */}
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-300">
+            <p className="text-sm text-text-secondary">
               Don't have an account?{' '}
-              <button className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-medium">
+              <button className="text-silver-base hover:text-silver-light font-medium transition-colors">
                 Sign up for free
               </button>
             </p>

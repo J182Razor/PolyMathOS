@@ -5,26 +5,41 @@ interface CardProps {
   className?: string;
   hover?: boolean;
   gradient?: boolean;
+  glass?: boolean;
 }
 
 export const Card: React.FC<CardProps> = ({
   children,
   className = '',
   hover = false,
-  gradient = false
+  gradient = false,
+  glass = true
 }) => {
-  const baseClasses = 'rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300';
-  const backgroundClasses = gradient 
-    ? 'bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900'
-    : 'bg-white dark:bg-gray-800';
+  const baseClasses = 'rounded-xl transition-all duration-300 transform-gpu relative overflow-hidden';
+  
+  const backgroundClasses = glass
+    ? 'glass'
+    : gradient
+    ? 'bg-gradient-to-br from-dark-surface to-dark-elevated'
+    : 'bg-dark-surface';
+  
+  const borderClasses = glass
+    ? ''
+    : 'border border-silver-dark/20';
+  
   const hoverClasses = hover 
-    ? 'hover:shadow-xl hover:scale-105 hover:border-indigo-300 dark:hover:border-indigo-600'
+    ? `
+      hover:shadow-silver-lg hover:scale-[1.02]
+      hover:border-silver-base/40
+      before:absolute before:inset-0 before:bg-shimmer before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:pointer-events-none
+    `
     : '';
-  const shadowClasses = 'shadow-lg';
+  
+  const shadowClasses = glass ? '' : 'shadow-glass';
   
   return (
-    <div className={`${baseClasses} ${backgroundClasses} ${shadowClasses} ${hoverClasses} ${className}`}>
-      {children}
+    <div className={`${baseClasses} ${backgroundClasses} ${borderClasses} ${shadowClasses} ${hoverClasses} ${className}`}>
+      <div className="relative z-10">{children}</div>
     </div>
   );
 };

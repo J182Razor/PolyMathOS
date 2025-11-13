@@ -65,39 +65,39 @@ export const Pricing: React.FC<PricingProps> = ({ onGetStarted }) => {
   ];
 
   return (
-    <section id="pricing" className="py-20 bg-gray-50 dark:bg-gray-800">
+    <section id="pricing" className="py-20 bg-dark-base">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-display font-bold text-text-primary mb-4">
             Simple, Transparent Pricing
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
+          <p className="text-xl text-text-secondary max-w-3xl mx-auto mb-8">
             Choose the plan that fits your learning goals. All plans include our core AI-powered features.
           </p>
 
           {/* Billing Toggle */}
           <div className="flex items-center justify-center space-x-4">
-            <span className={`text-sm ${!isAnnual ? 'text-gray-900 dark:text-white font-semibold' : 'text-gray-500'}`}>
+            <span className={`text-sm ${!isAnnual ? 'text-text-primary font-semibold' : 'text-text-tertiary'}`}>
               Monthly
             </span>
             <button
               onClick={() => setIsAnnual(!isAnnual)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                isAnnual ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
+                isAnnual ? 'bg-silver-base' : 'bg-dark-elevated border border-silver-dark/30'
               }`}
             >
               <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                className={`inline-block h-4 w-4 transform rounded-full bg-dark-base transition-transform ${
                   isAnnual ? 'translate-x-6' : 'translate-x-1'
                 }`}
               />
             </button>
-            <span className={`text-sm ${isAnnual ? 'text-gray-900 dark:text-white font-semibold' : 'text-gray-500'}`}>
+            <span className={`text-sm ${isAnnual ? 'text-text-primary font-semibold' : 'text-text-tertiary'}`}>
               Annual
             </span>
             {isAnnual && (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium glass border border-silver-base/30 text-silver-light">
                 Save 20%
               </span>
             )}
@@ -109,15 +109,16 @@ export const Pricing: React.FC<PricingProps> = ({ onGetStarted }) => {
           {plans.map((plan, index) => (
             <Card
               key={index}
+              hover
               className={`p-8 relative ${
                 plan.popular
-                  ? 'border-2 border-indigo-500 dark:border-indigo-400 shadow-xl scale-105'
+                  ? 'border-2 border-silver-base shadow-silver-xl scale-105'
                   : ''
               }`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <div className="inline-flex items-center px-4 py-1 rounded-full bg-indigo-500 text-white text-sm font-medium">
+                  <div className="inline-flex items-center px-4 py-1 rounded-full glass border border-silver-base/30 text-shimmer text-sm font-medium">
                     <Icon icon={Star} size="xs" className="mr-1" />
                     Most Popular
                   </div>
@@ -125,22 +126,22 @@ export const Pricing: React.FC<PricingProps> = ({ onGetStarted }) => {
               )}
 
               <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-2xl font-display font-bold text-text-primary mb-2">
                   {plan.name}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                <p className="text-text-secondary mb-4">
                   {plan.description}
                 </p>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold text-gray-900 dark:text-white">
+                  <span className="text-4xl font-bold text-shimmer">
                     ${isAnnual ? plan.annualPrice : plan.monthlyPrice}
                   </span>
-                  <span className="text-gray-600 dark:text-gray-300">
+                  <span className="text-text-tertiary">
                     /{isAnnual ? 'month' : 'month'}
                   </span>
                 </div>
                 {isAnnual && plan.monthlyPrice > 0 && (
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-text-tertiary">
                     Billed annually (${(isAnnual ? plan.annualPrice : plan.monthlyPrice) * 12})
                   </p>
                 )}
@@ -149,8 +150,8 @@ export const Pricing: React.FC<PricingProps> = ({ onGetStarted }) => {
               <ul className="space-y-4 mb-8">
                 {plan.features.map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-center">
-                    <Icon icon={Check} size="sm" className="text-green-500 mr-3 flex-shrink-0" />
-                    <span className="text-gray-700 dark:text-gray-300">{feature}</span>
+                    <Icon icon={Check} size="sm" className="text-green-400 mr-3 flex-shrink-0" />
+                    <span className="text-text-secondary">{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -169,7 +170,7 @@ export const Pricing: React.FC<PricingProps> = ({ onGetStarted }) => {
 
         {/* Money Back Guarantee */}
         <div className="text-center mt-12">
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-text-tertiary">
             30-day money-back guarantee • No setup fees • Cancel anytime
           </p>
         </div>

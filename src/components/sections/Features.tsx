@@ -38,14 +38,14 @@ export const Features: React.FC = () => {
   ];
 
   return (
-    <section id="features" className="py-20 bg-white dark:bg-gray-900">
+    <section id="features" className="py-20 bg-dark-base">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-display font-bold text-text-primary mb-4">
             Revolutionary Learning Technology
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-xl text-text-secondary max-w-3xl mx-auto">
             Experience the future of education with our cutting-edge platform that combines 
             artificial intelligence, neuroscience, and immersive technology.
           </p>
@@ -56,14 +56,14 @@ export const Features: React.FC = () => {
           {features.map((feature, index) => (
             <Card key={index} hover className="p-6">
               <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center mr-4">
-                  <Icon icon={feature.icon} size="lg" className="text-white" />
+                <div className="w-12 h-12 bg-gradient-to-br from-silver-base/20 to-silver-dark/20 border border-silver-base/30 rounded-lg flex items-center justify-center mr-4 silver-glow">
+                  <Icon icon={feature.icon} size="lg" className="text-silver-light" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-xl font-display font-semibold text-text-primary">
                   {feature.title}
                 </h3>
               </div>
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+              <p className="text-text-secondary leading-relaxed">
                 {feature.description}
               </p>
             </Card>

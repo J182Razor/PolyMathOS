@@ -14,13 +14,38 @@ export const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-300 transform-gpu focus-silver disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden';
   
   const variantClasses = {
-    primary: 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 focus:ring-indigo-500 shadow-lg hover:shadow-xl',
-    secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700',
-    ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500 dark:text-gray-300 dark:hover:bg-gray-800',
-    outline: 'border border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-500 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800'
+    primary: `
+      bg-dark-elevated text-silver-light
+      border border-silver-base/30
+      shadow-silver hover:shadow-silver-lg
+      hover:border-silver-light/50
+      hover:scale-[1.02] active:scale-[0.98]
+      before:absolute before:inset-0 before:bg-shimmer before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300
+    `,
+    secondary: `
+      bg-dark-surface/50 text-silver-base
+      border border-silver-dark/30
+      backdrop-blur-sm
+      hover:bg-dark-surface/70 hover:border-silver-base/40
+      hover:text-silver-light
+      hover:scale-[1.02] active:scale-[0.98]
+    `,
+    ghost: `
+      text-silver-medium
+      hover:text-silver-light
+      hover:bg-dark-surface/30
+      hover:scale-[1.02] active:scale-[0.98]
+    `,
+    outline: `
+      border border-silver-dark/40 text-silver-base
+      bg-transparent
+      hover:border-silver-base/60 hover:text-silver-light
+      hover:bg-dark-surface/20
+      hover:scale-[1.02] active:scale-[0.98]
+    `
   };
   
   const sizeClasses = {
@@ -34,7 +59,7 @@ export const Button: React.FC<ButtonProps> = ({
       className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
       {...props}
     >
-      {children}
+      <span className="relative z-10">{children}</span>
     </button>
   );
 };

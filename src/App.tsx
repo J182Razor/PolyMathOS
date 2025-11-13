@@ -28,17 +28,18 @@ function App() {
   const [user, setUser] = useState<User | null>(null);
   const [assessmentData, setAssessmentData] = useState<any>(null);
 
-  // Initialize dark mode from localStorage or system preference
+  // Initialize dark mode - default to dark for premium experience
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-      setIsDarkMode(true);
-      document.documentElement.classList.add('dark');
-    } else {
+    // Default to dark mode for premium dark minimalist design
+    if (savedTheme === 'light') {
       setIsDarkMode(false);
       document.documentElement.classList.remove('dark');
+    } else {
+      setIsDarkMode(true);
+      document.documentElement.classList.add('dark');
     }
   }, []);
 
@@ -153,7 +154,7 @@ function App() {
       
       default:
         return (
-          <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+          <div className="min-h-screen bg-dark-base transition-colors duration-300">
             <Header 
               onSignIn={() => setCurrentPage('signin')} 
               onGetStarted={() => setCurrentPage('signup')}

@@ -312,27 +312,27 @@ export const EnhancedLearningSession: React.FC<EnhancedLearningSessionProps> = (
   const renderPlanningPhase = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <Icon icon={Target} size="lg" className="text-indigo-600 dark:text-indigo-400 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+        <Icon icon={Target} size="lg" className="text-silver-base mx-auto mb-4" />
+        <h2 className="text-2xl font-display font-bold text-text-primary mb-2">
           Learning Session Planning
         </h2>
-        <p className="text-gray-600 dark:text-gray-300">
+        <p className="text-text-secondary">
           Let's optimize your learning session for maximum effectiveness
         </p>
       </div>
 
       <Card className="p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <h3 className="text-lg font-display font-semibold text-text-primary mb-4">
           Set Your Learning Intentions
         </h3>
         <div className="space-y-4">
           {metaPrompts.filter(p => p.timing === 'planning').map(prompt => (
             <div key={prompt.id}>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-silver-base mb-2">
                 {prompt.question}
               </label>
               <textarea
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-silver-dark/30 rounded-lg focus-silver bg-dark-surface text-text-primary placeholder-text-tertiary"
                 rows={2}
                 placeholder="Your response..."
                 onChange={(e) => {
@@ -362,27 +362,27 @@ export const EnhancedLearningSession: React.FC<EnhancedLearningSessionProps> = (
   const renderLearningPhase = () => (
     <div className="space-y-6">
       {/* Header with real-time metrics */}
-      <div className="flex items-center justify-between bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 rounded-lg">
+      <div className="flex items-center justify-between glass border border-silver-base/30 p-4 rounded-lg">
         <div className="flex items-center space-x-4">
-          <Icon icon={Brain} size="md" />
+          <Icon icon={Brain} size="md" className="text-silver-light" />
           <div>
-            <h2 className="text-xl font-bold">Neural Learning Session</h2>
-            <p className="text-indigo-100">Question {currentQuestion + 1} of {questions.length}</p>
+            <h2 className="text-xl font-display font-bold text-text-primary">Neural Learning Session</h2>
+            <p className="text-text-secondary">Question {currentQuestion + 1} of {questions.length}</p>
           </div>
         </div>
         
         <div className="flex items-center space-x-6">
           <div className="text-center">
-            <div className="text-sm text-indigo-200">Dopamine Level</div>
-            <div className="text-lg font-bold">{learningState.dopamineLevel}%</div>
+            <div className="text-sm text-text-tertiary">Dopamine Level</div>
+            <div className="text-lg font-bold text-shimmer">{learningState.dopamineLevel}%</div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-indigo-200">Time</div>
-            <div className="text-lg font-bold">{formatTime(learningState.timeSpent)}</div>
+            <div className="text-sm text-text-tertiary">Time</div>
+            <div className="text-lg font-bold text-shimmer">{formatTime(learningState.timeSpent)}</div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-indigo-200">Streak</div>
-            <div className="text-lg font-bold">{learningState.streakCount}</div>
+            <div className="text-sm text-text-tertiary">Streak</div>
+            <div className="text-lg font-bold text-shimmer">{learningState.streakCount}</div>
           </div>
         </div>
       </div>
@@ -390,19 +390,19 @@ export const EnhancedLearningSession: React.FC<EnhancedLearningSessionProps> = (
       {/* Progress Bar with Neural Animation */}
       <div className="relative">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <span className="text-sm font-medium text-text-secondary">
             Neural Network Formation
           </span>
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <span className="text-sm font-medium text-silver-base">
             {Math.round(learningState.progress)}%
           </span>
         </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 relative overflow-hidden">
+        <div className="w-full bg-dark-elevated rounded-full h-3 relative overflow-hidden border border-silver-dark/20">
           <div 
-            className="bg-gradient-to-r from-indigo-500 to-purple-500 h-3 rounded-full transition-all duration-500 relative"
+            className="bg-shimmer h-3 rounded-full transition-all duration-500 relative"
             style={{ width: `${learningState.progress}%` }}
           >
-            <div className="absolute inset-0 bg-white opacity-30 animate-pulse rounded-full"></div>
+            <div className="absolute inset-0 bg-shimmer animate-shimmer rounded-full"></div>
           </div>
         </div>
       </div>
@@ -410,7 +410,7 @@ export const EnhancedLearningSession: React.FC<EnhancedLearningSessionProps> = (
       {/* Current Question */}
       <Card className="p-6">
         <div className="mb-6">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <h3 className="text-xl font-display font-semibold text-text-primary mb-4">
             {questions[currentQuestion].question}
           </h3>
           
@@ -423,11 +423,11 @@ export const EnhancedLearningSession: React.FC<EnhancedLearningSessionProps> = (
                 className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${
                   selectedAnswer === index
                     ? index === questions[currentQuestion].correct
-                      ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
-                      : 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
+                      ? 'border-green-500/50 bg-green-500/10 text-green-400'
+                      : 'border-red-500/50 bg-red-500/10 text-red-400'
                     : showExplanation && index === questions[currentQuestion].correct
-                    ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
-                    : 'border-gray-300 dark:border-gray-600 hover:border-indigo-500 dark:hover:border-indigo-400'
+                    ? 'border-green-500/50 bg-green-500/10 text-green-400'
+                    : 'border-silver-dark/30 hover:border-silver-base/50 text-text-secondary hover:text-text-primary bg-dark-surface/50'
                 }`}
               >
                 <div className="flex items-center">
@@ -442,16 +442,16 @@ export const EnhancedLearningSession: React.FC<EnhancedLearningSessionProps> = (
         </div>
 
         {showExplanation && (
-          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div className="mt-6 p-4 glass rounded-lg border border-silver-dark/20">
             <div className="flex items-start">
-              <Icon icon={Lightbulb} size="sm" className="text-blue-600 dark:text-blue-400 mr-3 mt-1" />
+              <Icon icon={Lightbulb} size="sm" className="text-silver-base mr-3 mt-1" />
               <div>
-                <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">Explanation</h4>
-                <p className="text-blue-800 dark:text-blue-200 mb-3">
+                <h4 className="font-semibold text-silver-light mb-2">Explanation</h4>
+                <p className="text-text-secondary mb-3">
                   {questions[currentQuestion].explanation}
                 </p>
                 {selectedAnswer === questions[currentQuestion].correct && (
-                  <div className="text-green-600 dark:text-green-400 font-medium">
+                  <div className="text-green-400 font-medium">
                     {questions[currentQuestion].rewardTrigger}
                   </div>
                 )}
@@ -476,18 +476,18 @@ export const EnhancedLearningSession: React.FC<EnhancedLearningSessionProps> = (
 
       {/* Feynman Technique Modal */}
       {feynmanMode && (
-        <Card className="p-6 border-2 border-indigo-500">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <Card className="p-6 border-2 border-silver-base">
+          <h3 className="text-lg font-display font-semibold text-text-primary mb-4">
             🧠 Feynman Technique Challenge
           </h3>
-          <p className="text-gray-600 dark:text-gray-300 mb-4">
+          <p className="text-text-secondary mb-4">
             Explain the concept from this question in simple terms, as if teaching a 12-year-old. 
             Avoid technical jargon and use analogies where helpful.
           </p>
           <textarea
             value={userExplanation}
             onChange={(e) => setUserExplanation(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            className="w-full px-3 py-2 border border-silver-dark/30 rounded-lg focus-silver bg-dark-surface text-text-primary placeholder-text-tertiary"
             rows={4}
             placeholder="Your simple explanation..."
           />
@@ -507,61 +507,61 @@ export const EnhancedLearningSession: React.FC<EnhancedLearningSessionProps> = (
   const renderReflectionPhase = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <Icon icon={Star} size="lg" className="text-yellow-500 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+        <Icon icon={Star} size="lg" className="text-yellow-400 mx-auto mb-4" />
+        <h2 className="text-2xl font-display font-bold text-text-primary mb-2">
           Session Complete! 🎉
         </h2>
-        <p className="text-gray-600 dark:text-gray-300">
+        <p className="text-text-secondary">
           Time to reflect on your learning journey
         </p>
       </div>
 
       {/* Performance Summary */}
       <Card className="p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <h3 className="text-lg font-display font-semibold text-text-primary mb-4">
           Your Neural Performance
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+            <div className="text-2xl font-bold text-shimmer">
               {Math.round(learningState.comprehensionLevel)}%
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">Comprehension</div>
+            <div className="text-sm text-text-tertiary">Comprehension</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+            <div className="text-2xl font-bold text-shimmer">
               {learningState.streakCount}
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">Correct Streak</div>
+            <div className="text-sm text-text-tertiary">Correct Streak</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+            <div className="text-2xl font-bold text-shimmer">
               {formatTime(learningState.timeSpent)}
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">Time Spent</div>
+            <div className="text-sm text-text-tertiary">Time Spent</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+            <div className="text-2xl font-bold text-shimmer">
               {learningState.achievementsUnlocked.length}
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">Achievements</div>
+            <div className="text-sm text-text-tertiary">Achievements</div>
           </div>
         </div>
       </Card>
 
       {/* Reflection Questions */}
       <Card className="p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <h3 className="text-lg font-display font-semibold text-text-primary mb-4">
           Meta-Learning Reflection
         </h3>
         <div className="space-y-4">
           {metaPrompts.filter(p => p.timing === 'reflection').map(prompt => (
             <div key={prompt.id}>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-silver-base mb-2">
                 {prompt.question}
               </label>
               <textarea
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-silver-dark/30 rounded-lg focus-silver bg-dark-surface text-text-primary placeholder-text-tertiary"
                 rows={2}
                 placeholder="Your reflection..."
                 onChange={(e) => {
@@ -589,14 +589,14 @@ export const EnhancedLearningSession: React.FC<EnhancedLearningSessionProps> = (
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900">
+    <div className="min-h-screen bg-dark-base">
       <div className="container mx-auto px-4 py-8">
         {/* Floating Reward Notification */}
         {showReward && (
           <div className="fixed top-4 right-4 z-50 animate-bounce">
-            <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-3 rounded-lg shadow-lg">
+            <div className="glass border border-silver-base/30 text-silver-light px-6 py-3 rounded-lg shadow-silver-lg">
               <div className="flex items-center">
-                <Icon icon={Star} size="sm" className="mr-2" />
+                <Icon icon={Star} size="sm" className="mr-2 text-shimmer" />
                 {showReward.content}
               </div>
             </div>

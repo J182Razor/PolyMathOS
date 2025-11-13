@@ -34,20 +34,20 @@ export const Testimonials: React.FC = () => {
         key={i}
         icon={Star}
         size="sm"
-        className={i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}
+        className={i < rating ? 'text-yellow-400 fill-current' : 'text-silver-dark'}
       />
     ));
   };
 
   return (
-    <section id="testimonials" className="py-20 bg-white dark:bg-gray-900">
+    <section id="testimonials" className="py-20 bg-dark-base">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-display font-bold text-text-primary mb-4">
             Trusted by Learners Worldwide
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-xl text-text-secondary max-w-3xl mx-auto">
             Join thousands of students, professionals, and researchers who have transformed 
             their learning experience with NeuroAscend.
           </p>
@@ -56,10 +56,10 @@ export const Testimonials: React.FC = () => {
         {/* Testimonials Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
-            <Card key={index} className="p-6 relative">
+            <Card key={index} hover className="p-6 relative">
               {/* Quote Icon */}
               <div className="absolute top-4 right-4 opacity-20">
-                <Icon icon={Quote} size="lg" className="text-indigo-500" />
+                <Icon icon={Quote} size="lg" className="text-silver-base" />
               </div>
 
               {/* Rating */}
@@ -68,22 +68,22 @@ export const Testimonials: React.FC = () => {
               </div>
 
               {/* Content */}
-              <blockquote className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
+              <blockquote className="text-text-secondary mb-6 leading-relaxed">
                 "{testimonial.content}"
               </blockquote>
 
               {/* Author */}
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mr-4">
-                  <span className="text-white font-semibold text-sm">
+                <div className="w-12 h-12 bg-gradient-to-br from-silver-base/20 to-silver-dark/20 border border-silver-base/30 rounded-full flex items-center justify-center mr-4 silver-glow">
+                  <span className="text-silver-light font-semibold text-sm">
                     {testimonial.avatar}
                   </span>
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900 dark:text-white">
+                  <div className="font-display font-semibold text-text-primary">
                     {testimonial.name}
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <div className="text-sm text-text-tertiary">
                     {testimonial.role}
                   </div>
                 </div>
@@ -94,15 +94,15 @@ export const Testimonials: React.FC = () => {
 
         {/* Trust Indicators */}
         <div className="mt-16 text-center">
-          <p className="text-gray-600 dark:text-gray-400 mb-8">
+          <p className="text-text-tertiary mb-8">
             Trusted by leading institutions and companies worldwide
           </p>
           <div className="flex flex-wrap justify-center items-center gap-8 opacity-60">
-            <div className="text-2xl font-bold text-gray-400">Stanford</div>
-            <div className="text-2xl font-bold text-gray-400">Harvard</div>
-            <div className="text-2xl font-bold text-gray-400">MIT</div>
-            <div className="text-2xl font-bold text-gray-400">Google</div>
-            <div className="text-2xl font-bold text-gray-400">Microsoft</div>
+            <div className="text-2xl font-bold text-text-tertiary">Stanford</div>
+            <div className="text-2xl font-bold text-text-tertiary">Harvard</div>
+            <div className="text-2xl font-bold text-text-tertiary">MIT</div>
+            <div className="text-2xl font-bold text-text-tertiary">Google</div>
+            <div className="text-2xl font-bold text-text-tertiary">Microsoft</div>
           </div>
         </div>
       </div>

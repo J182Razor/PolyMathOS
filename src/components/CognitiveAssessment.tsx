@@ -335,17 +335,17 @@ export const CognitiveAssessment: React.FC<CognitiveAssessmentProps> = ({ onComp
   const progress = ((currentSection + 1) / sections.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900">
+    <div className="min-h-screen bg-dark-base">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <Icon icon={Brain} size="lg" className="text-indigo-600 dark:text-indigo-400 mr-3" />
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <Icon icon={Brain} size="lg" className="text-silver-base mr-3" />
+            <h1 className="text-3xl font-display font-bold text-text-primary">
               NeuroAscend Cognitive Assessment
             </h1>
           </div>
-          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-text-secondary max-w-2xl mx-auto">
             This science-backed assessment will help us understand your unique learning profile and create 
             a personalized AI-powered learning experience optimized for your brain's reward system.
           </p>
@@ -354,18 +354,20 @@ export const CognitiveAssessment: React.FC<CognitiveAssessmentProps> = ({ onComp
         {/* Progress Bar */}
         <div className="max-w-4xl mx-auto mb-8">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span className="text-sm font-medium text-text-secondary">
               Section {currentSection + 1} of {sections.length}
             </span>
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span className="text-sm font-medium text-silver-base">
               {Math.round(progress)}% Complete
             </span>
           </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+          <div className="w-full bg-dark-elevated rounded-full h-2 border border-silver-dark/20">
             <div 
-              className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+              className="bg-shimmer h-2 rounded-full relative overflow-hidden transition-all duration-300"
               style={{ width: `${progress}%` }}
-            />
+            >
+              <div className="absolute inset-0 bg-shimmer animate-shimmer"></div>
+            </div>
           </div>
         </div>
 
@@ -374,12 +376,12 @@ export const CognitiveAssessment: React.FC<CognitiveAssessmentProps> = ({ onComp
           <div className="p-8">
             {/* Section Header */}
             <div className="flex items-center mb-6">
-              <Icon icon={currentSectionData.icon} size="lg" className="text-indigo-600 dark:text-indigo-400 mr-4" />
+              <Icon icon={currentSectionData.icon} size="lg" className="text-silver-base mr-4" />
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-2xl font-display font-bold text-text-primary">
                   {currentSectionData.title}
                 </h2>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-text-secondary">
                   {currentSectionData.subtitle}
                 </p>
               </div>
@@ -388,8 +390,8 @@ export const CognitiveAssessment: React.FC<CognitiveAssessmentProps> = ({ onComp
             {/* Questions */}
             <div className="space-y-8">
               {currentSectionData.questions.map((question, index) => (
-                <div key={question.id} className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <div key={question.id} className="border-b border-silver-dark/20 pb-6 last:border-b-0">
+                  <h3 className="text-lg font-display font-semibold text-text-primary mb-4">
                     {index + 1}. {question.question}
                   </h3>
                   
@@ -402,9 +404,9 @@ export const CognitiveAssessment: React.FC<CognitiveAssessmentProps> = ({ onComp
                             name={question.id}
                             value={optionIndex + 1}
                             onChange={(e) => handleAnswer(question.id, parseInt(e.target.value))}
-                            className="mr-3 text-indigo-600 focus:ring-indigo-500"
+                            className="mr-3 text-silver-base focus:ring-silver-base"
                           />
-                          <span className="text-gray-700 dark:text-gray-300">{option}</span>
+                          <span className="text-text-secondary">{option}</span>
                         </label>
                       ))}
                     </div>
@@ -415,14 +417,14 @@ export const CognitiveAssessment: React.FC<CognitiveAssessmentProps> = ({ onComp
                       type="text"
                       placeholder={question.placeholder}
                       onChange={(e) => handleAnswer(question.id, e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      className="w-full px-4 py-3 border border-silver-dark/30 rounded-lg focus-silver bg-dark-surface text-text-primary placeholder-text-tertiary"
                     />
                   )}
 
                   {question.type === 'select' && (
                     <select
                       onChange={(e) => handleAnswer(question.id, e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      className="w-full px-4 py-3 border border-silver-dark/30 rounded-lg focus-silver bg-dark-surface text-text-primary"
                     >
                       <option value="">Select an option...</option>
                       {question.options?.map((option, optionIndex) => (
@@ -444,9 +446,9 @@ export const CognitiveAssessment: React.FC<CognitiveAssessmentProps> = ({ onComp
                                 : currentValues.filter((v: string) => v !== option);
                               handleAnswer(question.id, newValues);
                             }}
-                            className="mr-3 text-indigo-600 focus:ring-indigo-500"
+                            className="mr-3 text-silver-base focus:ring-silver-base"
                           />
-                          <span className="text-gray-700 dark:text-gray-300">{option}</span>
+                          <span className="text-text-secondary">{option}</span>
                         </label>
                       ))}
                     </div>
@@ -456,7 +458,7 @@ export const CognitiveAssessment: React.FC<CognitiveAssessmentProps> = ({ onComp
             </div>
 
             {/* Navigation */}
-            <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex justify-between items-center mt-8 pt-6 border-t border-silver-dark/20">
               <Button
                 variant="ghost"
                 onClick={handlePrevious}

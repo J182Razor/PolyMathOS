@@ -24,10 +24,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [activeTab, setActiveTab] = useState('overview');
 
   const stats = [
-    { label: 'Learning Sessions', value: '47', icon: BookOpen, color: 'text-blue-600' },
-    { label: 'Retention Rate', value: '94%', icon: Target, color: 'text-green-600' },
-    { label: 'Knowledge Growth', value: '+285%', icon: TrendingUp, color: 'text-purple-600' },
-    { label: 'Study Streak', value: '12 days', icon: Brain, color: 'text-indigo-600' }
+    { label: 'Learning Sessions', value: '47', icon: BookOpen },
+    { label: 'Retention Rate', value: '94%', icon: Target },
+    { label: 'Knowledge Growth', value: '+285%', icon: TrendingUp },
+    { label: 'Study Streak', value: '12 days', icon: Brain }
   ];
 
   const recentLessons = [
@@ -38,16 +38,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-dark-base">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+      <header className="glass-strong border-b border-silver-dark/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <Icon icon={Brain} size="sm" className="text-white" />
+            <div className="flex items-center space-x-3">
+              <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-silver-base/20 to-silver-dark/20 border border-silver-base/30 flex items-center justify-center">
+                <Icon icon={Brain} size="sm" className="text-silver-light" />
               </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">NeuroAscend</span>
+              <span className="text-xl font-display font-bold text-shimmer">NeuroAscend</span>
             </div>
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="sm">
@@ -66,10 +66,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Welcome back, {user?.firstName || 'Alex'}!
+          <h1 className="text-3xl font-display font-bold text-text-primary mb-2">
+            Welcome back, <span className="text-shimmer">{user?.firstName || 'Alex'}</span>!
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-text-secondary">
             Ready to continue your learning journey? You're making excellent progress!
           </p>
         </div>
@@ -77,14 +77,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stats.map((stat, index) => (
-            <Card key={index} className="p-6">
+            <Card key={index} hover className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{stat.label}</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
+                  <p className="text-sm text-text-tertiary mb-1">{stat.label}</p>
+                  <p className="text-2xl font-bold text-shimmer">{stat.value}</p>
                 </div>
-                <div className={`w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center`}>
-                  <Icon icon={stat.icon} size="lg" className={stat.color} />
+                <div className="w-12 h-12 rounded-lg bg-dark-elevated border border-silver-dark/20 flex items-center justify-center silver-glow">
+                  <Icon icon={stat.icon} size="lg" className="text-silver-base" />
                 </div>
               </div>
             </Card>
@@ -96,26 +96,28 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {/* Recent Lessons */}
           <div className="lg:col-span-2">
             <Card className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+              <h2 className="text-xl font-display font-semibold text-text-primary mb-6">
                 Recent Learning Sessions
               </h2>
               <div className="space-y-4">
                 {recentLessons.map((lesson, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div key={index} className="flex items-center justify-between p-4 glass rounded-lg border border-silver-dark/10 hover:border-silver-base/30 transition-all duration-300">
                     <div className="flex-1">
-                      <h3 className="font-medium text-gray-900 dark:text-white mb-1">
+                      <h3 className="font-medium text-text-primary mb-1">
                         {lesson.title}
                       </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{lesson.time}</p>
+                      <p className="text-sm text-text-tertiary">{lesson.time}</p>
                     </div>
                     <div className="flex items-center space-x-4">
-                      <div className="w-24 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                      <div className="w-24 bg-dark-elevated rounded-full h-2 border border-silver-dark/20">
                         <div 
-                          className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full"
+                          className="bg-shimmer h-2 rounded-full relative overflow-hidden"
                           style={{ width: `${lesson.progress}%` }}
-                        />
+                        >
+                          <div className="absolute inset-0 bg-shimmer animate-shimmer"></div>
+                        </div>
                       </div>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white w-12">
+                      <span className="text-sm font-medium text-silver-base w-12">
                         {lesson.progress}%
                       </span>
                     </div>
@@ -138,7 +140,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {/* Quick Actions */}
           <div className="space-y-6">
             <Card className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-xl font-display font-semibold text-text-primary mb-4">
                 Quick Actions
               </h2>
               <div className="space-y-3">
@@ -158,7 +160,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </Card>
 
             <Card className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-xl font-display font-semibold text-text-primary mb-4">
                 Today's Goal
               </h2>
               <div className="text-center">
@@ -169,7 +171,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2"
-                      className="text-gray-200 dark:text-gray-700"
+                      className="text-silver-dark/30"
                     />
                     <path
                       d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
@@ -177,14 +179,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       stroke="currentColor"
                       strokeWidth="2"
                       strokeDasharray="75, 100"
-                      className="text-indigo-600"
+                      className="text-silver-base"
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xl font-bold text-gray-900 dark:text-white">75%</span>
+                    <span className="text-xl font-bold text-shimmer">75%</span>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-sm text-text-tertiary mb-4">
                   3 of 4 sessions completed
                 </p>
                 <Button variant="primary" size="sm" className="w-full">
