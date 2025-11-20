@@ -147,8 +147,10 @@ function App() {
   const handleCompleteAssessment = (assessmentData: any) => {
     // Store assessment data for AI personalization
     setAssessmentData(assessmentData);
-    console.log('Assessment completed:', assessmentData);
     // In a real app, this would be sent to the backend
+    if (import.meta.env.DEV) {
+      console.log('Assessment completed:', assessmentData);
+    }
     setCurrentPage('dashboard');
   };
 
