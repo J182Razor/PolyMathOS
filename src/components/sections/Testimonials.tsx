@@ -10,14 +10,14 @@ export const Testimonials: React.FC = () => {
       role: 'Neuroscientist, Stanford University',
       avatar: 'SC',
       rating: 5,
-      content: 'NeuroAscend has revolutionized how I approach learning new research methodologies. The AI-powered personalization is incredibly sophisticated and has accelerated my comprehension by at least 200%.'
+      content: 'PolyMathOS has revolutionized how I approach learning new research methodologies. The AI-powered personalization is incredibly sophisticated and has accelerated my comprehension by at least 200%.'
     },
     {
       name: 'Marcus Rodriguez',
       role: 'Software Engineer, Google',
       avatar: 'MR',
       rating: 5,
-      content: 'As someone who needs to constantly learn new technologies, NeuroAscend has been a game-changer. The neural learning engine adapts to my schedule and learning style perfectly.'
+      content: 'As someone who needs to constantly learn new technologies, PolyMathOS has been a game-changer. The neural learning engine adapts to my schedule and learning style perfectly.'
     },
     {
       name: 'Emma Thompson',
@@ -49,7 +49,7 @@ export const Testimonials: React.FC = () => {
           </h2>
           <p className="text-xl text-text-secondary max-w-3xl mx-auto">
             Join thousands of students, professionals, and researchers who have transformed 
-            their learning experience with NeuroAscend.
+            their learning experience with PolyMathOS.
           </p>
         </div>
 

@@ -34,7 +34,7 @@ interface ReviewResult {
 
 export class SpacedRepetitionService {
   private static instance: SpacedRepetitionService;
-  private storageKey = 'neuroascend_spaced_repetition';
+  private storageKey = 'polymathos_spaced_repetition';
 
   private constructor() {}
 

@@ -66,6 +66,9 @@ export const EnhancedLearningSession: React.FC<EnhancedLearningSessionProps> = (
   const [showExplanation, setShowExplanation] = useState(false);
   const [feynmanMode, setFeynmanMode] = useState(false);
   const [userExplanation, setUserExplanation] = useState('');
+  const [confidence, setConfidence] = useState<number | null>(null); // RPE: confidence before answer
+  const [rpeEvent, setRpeEvent] = useState<any>(null); // Store RPE event for display
+  const [isHyperCorrection, setIsHyperCorrection] = useState(false);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number>(Date.now());
@@ -241,11 +244,54 @@ export const EnhancedLearningSession: React.FC<EnhancedLearningSessionProps> = (
     }
   };
 
-  const handleAnswerSelect = (answerIndex: number) => {
+  const handleAnswerSelect = async (answerIndex: number) => {
+    // If confidence wasn't set, prompt for it first (RPE requirement)
+    if (confidence === null) {
+      alert('Please set your confidence level before selecting an answer. This helps optimize your learning through Reward Prediction Error (RPE).');
+      return;
+    }
+
     setSelectedAnswer(answerIndex);
     setShowExplanation(true);
     
     const isCorrect = answerIndex === questions[currentQuestion].correct;
+    const currentQ = questions[currentQuestion];
+    
+    // Process RPE
+    try {
+      const { RewardPredictionErrorService } = await import('../services/RewardPredictionErrorService');
+      const rpeService = RewardPredictionErrorService.getInstance();
+      
+      // Record prediction (should have been done, but ensure it)
+      rpeService.recordPrediction(
+        `q_${currentQ.id}`,
+        confidence,
+        isCorrect ? 'correct' : 'incorrect'
+      );
+      
+      // Process outcome
+      const rpeEventResult = rpeService.processOutcome(
+        `q_${currentQ.id}`,
+        isCorrect ? 'correct' : 'incorrect'
+      );
+      
+      if (rpeEventResult) {
+        setRpeEvent(rpeEventResult);
+        setIsHyperCorrection(rpeEventResult.learningValue >= 0.8 && !isCorrect);
+        
+        // Generate reward based on RPE
+        const reward = rpeService.generateReward(rpeEventResult);
+        if (reward.shouldReward) {
+          triggerReward('perfect_answer');
+          setLearningState(prev => ({
+            ...prev,
+            dopamineLevel: Math.min(100, prev.dopamineLevel + (reward.rewardType === 'large' ? 15 : reward.rewardType === 'medium' ? 10 : 5))
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('RPE processing error:', error);
+    }
     
     if (isCorrect) {
       // Trigger success reward
@@ -262,6 +308,12 @@ export const EnhancedLearningSession: React.FC<EnhancedLearningSessionProps> = (
       if (learningState.streakCount + 1 >= 3) {
         triggerReward('streak_3');
       }
+    } else {
+      // Reset streak on incorrect
+      setLearningState(prev => ({
+        ...prev,
+        streakCount: 0
+      }));
     }
 
     // Update progress
@@ -272,11 +324,42 @@ export const EnhancedLearningSession: React.FC<EnhancedLearningSessionProps> = (
     }));
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
+    // Save to enhanced spaced repetition before moving on
+    if (selectedAnswer !== null && confidence !== null) {
+      try {
+        const { EnhancedSpacedRepetitionService } = await import('../services/EnhancedSpacedRepetitionService');
+        const enhancedSR = EnhancedSpacedRepetitionService.getInstance();
+        
+        const currentQ = questions[currentQuestion];
+        const isCorrect = selectedAnswer === currentQ.correct;
+        
+        // Create or update item in enhanced spaced repetition
+        const itemId = `session_${Date.now()}_${currentQ.id}`;
+        enhancedSR.createItem(
+          itemId,
+          currentQ.explanation,
+          currentQ.question,
+          currentQ.options[currentQ.correct],
+          'Neuroscience',
+          undefined, // visual encoding
+          undefined // memory palace locus
+        );
+        
+        // Process review
+        enhancedSR.processReview(itemId, isCorrect, confidence, false);
+      } catch (error) {
+        console.error('Error saving to enhanced spaced repetition:', error);
+      }
+    }
+    
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
       setShowExplanation(false);
+      setConfidence(null); // Reset confidence for next question
+      setRpeEvent(null);
+      setIsHyperCorrection(false);
     } else {
       setCurrentPhase('reflection');
     }
@@ -445,6 +528,31 @@ export const EnhancedLearningSession: React.FC<EnhancedLearningSessionProps> = (
             {questions[currentQuestion].question}
           </h3>
           
+          {/* RPE: Confidence Rating Before Answer */}
+          {!showExplanation && (
+            <div className="mb-6 p-4 bg-silver-dark/10 rounded-lg border border-silver-dark/20">
+              <label className="block text-sm font-medium text-silver-base mb-3">
+                🎯 Confidence Level (Before Answering) - Critical for RPE Learning
+              </label>
+              <div className="flex items-center space-x-4">
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={confidence || 50}
+                  onChange={(e) => setConfidence(parseInt(e.target.value))}
+                  className="flex-1"
+                />
+                <span className="text-lg font-bold text-shimmer w-16 text-right">
+                  {confidence || 50}%
+                </span>
+              </div>
+              <p className="text-xs text-text-tertiary mt-2">
+                High confidence + error = Hyper-Correction (maximum learning opportunity)
+              </p>
+            </div>
+          )}
+          
           <div className="space-y-3">
             {questions[currentQuestion].options.map((option, index) => (
               <button
@@ -473,19 +581,66 @@ export const EnhancedLearningSession: React.FC<EnhancedLearningSessionProps> = (
         </div>
 
         {showExplanation && (
-          <div className="mt-6 p-4 glass rounded-lg border border-silver-dark/20">
-            <div className="flex items-start">
-              <Icon icon={Lightbulb} size="sm" className="text-silver-base mr-3 mt-1" />
-              <div>
-                <h4 className="font-semibold text-silver-light mb-2">Explanation</h4>
-                <p className="text-text-secondary mb-3">
-                  {questions[currentQuestion].explanation}
-                </p>
-                {selectedAnswer === questions[currentQuestion].correct && (
-                  <div className="text-green-400 font-medium">
-                    {questions[currentQuestion].rewardTrigger}
+          <div className="mt-6 space-y-4">
+            {/* Hyper-Correction Highlight */}
+            {isHyperCorrection && (
+              <div className="p-4 bg-yellow-500/20 border-2 border-yellow-500/50 rounded-lg">
+                <div className="flex items-start">
+                  <Icon icon={Zap} size="sm" className="text-yellow-400 mr-3 mt-1" />
+                  <div>
+                    <h4 className="font-semibold text-yellow-400 mb-2">
+                      🧠 Critical Learning Moment - Hyper-Correction Detected!
+                    </h4>
+                    <p className="text-text-secondary text-sm mb-2">
+                      You were highly confident ({confidence}%) but got it wrong. This is a 
+                      <strong className="text-yellow-400"> massive learning opportunity</strong> - 
+                      your brain will encode this correction with maximum strength.
+                    </p>
+                    <p className="text-text-secondary text-sm">
+                      RPE Value: {rpeEvent?.rpeValue?.toFixed(2)} | Learning Value: {rpeEvent?.learningValue?.toFixed(2)}
+                    </p>
                   </div>
-                )}
+                </div>
+              </div>
+            )}
+            
+            {/* RPE Feedback */}
+            {rpeEvent && !isHyperCorrection && (
+              <div className="p-4 glass rounded-lg border border-silver-dark/20">
+                <div className="flex items-start">
+                  <Icon icon={BarChart} size="sm" className="text-silver-base mr-3 mt-1" />
+                  <div>
+                    <h4 className="font-semibold text-silver-light mb-2">Reward Prediction Error (RPE)</h4>
+                    <p className="text-text-secondary text-sm">
+                      Expected: {(rpeEvent.expectedOutcome * 100).toFixed(0)}% | 
+                      Actual: {(rpeEvent.actualOutcome * 100).toFixed(0)}% | 
+                      RPE: {rpeEvent.rpeValue > 0 ? '+' : ''}{rpeEvent.rpeValue.toFixed(2)}
+                    </p>
+                    {rpeEvent.rpeValue > 0.2 && (
+                      <p className="text-green-400 text-sm mt-1">
+                        ✨ Strong positive RPE - Your brain is reinforcing this learning!
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Standard Explanation */}
+            <div className="p-4 glass rounded-lg border border-silver-dark/20">
+              <div className="flex items-start">
+                <Icon icon={Lightbulb} size="sm" className="text-silver-base mr-3 mt-1" />
+                <div>
+                  <h4 className="font-semibold text-silver-light mb-2">Explanation</h4>
+                  <p className="text-text-secondary mb-3">
+                    {questions[currentQuestion].explanation}
+                  </p>
+                  {selectedAnswer === questions[currentQuestion].correct && (
+                    <div className="text-green-400 font-medium">
+                      {questions[currentQuestion].rewardTrigger}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

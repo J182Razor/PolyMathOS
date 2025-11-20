@@ -1,10 +1,10 @@
-# NeuroAscend Developer How-To Guide
+# PolyMathOS Developer How-To Guide
 
 ## Getting Started with Development
 
 ### Setting Up Your Development Environment
 
-To begin developing with NeuroAscend, you'll need to establish a proper development environment that includes all necessary tools and dependencies. Start by ensuring you have Node.js version 18 or higher installed on your system, as this provides the JavaScript runtime required for the React application and its build tools.
+To begin developing with PolyMathOS, you'll need to establish a proper development environment that includes all necessary tools and dependencies. Start by ensuring you have Node.js version 18 or higher installed on your system, as this provides the JavaScript runtime required for the React application and its build tools.
 
 Clone the repository from GitHub using the git clone command, then navigate to the project directory and run npm install to download all required dependencies. This process will set up React, TypeScript, Tailwind CSS, and all other packages specified in the package.json file.
 
@@ -12,7 +12,7 @@ Create a .env file in the root directory and configure the necessary environment
 
 ### Understanding the Codebase Structure
 
-The NeuroAscend codebase follows a modular architecture that separates concerns and promotes maintainability. The src directory contains all application code, organized into components, pages, services, and utilities. Each directory serves a specific purpose and follows established conventions for file naming and organization.
+The PolyMathOS codebase follows a modular architecture that separates concerns and promotes maintainability. The src directory contains all application code, organized into components, pages, services, and utilities. Each directory serves a specific purpose and follows established conventions for file naming and organization.
 
 Components are divided into two main categories: UI components for reusable interface elements and section components for larger page sections. UI components like Button, Card, and Icon provide consistent styling and behavior across the application, while section components like Header, Hero, and Features compose complete page sections.
 
@@ -56,7 +56,7 @@ Consider how new strategies will interact with the dopamine optimization system 
 
 ### Extending the Neuroscience Framework
 
-The neuroscience framework underlying NeuroAscend can be extended to incorporate additional research findings or experimental approaches. The current implementation focuses on dopamine optimization, spaced repetition, and meta-learning, but the architecture supports integration of other neuroscience-based learning enhancements.
+The neuroscience framework underlying PolyMathOS can be extended to incorporate additional research findings or experimental approaches. The current implementation focuses on dopamine optimization, spaced repetition, and meta-learning, but the architecture supports integration of other neuroscience-based learning enhancements.
 
 To extend the framework, first review the existing learning science analysis documentation to understand the current theoretical foundation. New neuroscience principles should be implemented through dedicated services that can be integrated with the existing learning session and assessment components.
 

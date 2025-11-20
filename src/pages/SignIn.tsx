@@ -67,7 +67,7 @@ export const SignIn: React.FC<SignInProps> = ({ onSignIn, onBack }) => {
             <div className="w-12 h-12 bg-gradient-to-br from-silver-base/20 to-silver-dark/20 border border-silver-base/30 rounded-xl flex items-center justify-center mr-3">
               <Icon icon={Brain} size="lg" className="text-silver-light" />
             </div>
-            <span className="text-2xl font-display font-bold text-shimmer">NeuroAscend</span>
+            <span className="text-2xl font-display font-bold text-shimmer">PolyMathOS</span>
           </div>
 
           {/* Header */}
@@ -180,7 +180,7 @@ export const SignIn: React.FC<SignInProps> = ({ onSignIn, onBack }) => {
           <div className="mt-6 p-4 glass rounded-lg border border-silver-dark/20">
             <p className="text-sm text-silver-light font-medium mb-2">Demo Credentials:</p>
             <p className="text-sm text-text-secondary">
-              Email: demo@neuroascend.com<br />
+              Email: demo@polymathos.com<br />
               Password: demo123
             </p>
           </div>

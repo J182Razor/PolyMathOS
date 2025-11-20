@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Brain, BookOpen, Target, TrendingUp, Users, Settings, LogOut } from 'lucide-react';
+import { Brain, BookOpen, Target, TrendingUp, Users, Settings, LogOut, Radio } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Icon } from '../components/ui/Icon';
@@ -9,6 +9,7 @@ interface DashboardProps {
   onStartLearning?: () => void;
   onStartAssessment?: () => void;
   onSignOut?: () => void;
+  onOpenBrainwaveGenerator?: () => void;
   user?: {
     firstName: string;
     lastName: string;
@@ -19,7 +20,8 @@ interface DashboardProps {
 export const Dashboard: React.FC<DashboardProps> = ({ 
   onStartLearning, 
   onStartAssessment,
-  onSignOut, 
+  onSignOut,
+  onOpenBrainwaveGenerator,
   user 
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -48,7 +50,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-silver-base/20 to-silver-dark/20 border border-silver-base/30 flex items-center justify-center">
                 <Icon icon={Brain} size="sm" className="text-silver-light" />
               </div>
-              <span className="text-xl font-display font-bold text-shimmer">NeuroAscend</span>
+              <span className="text-xl font-display font-bold text-shimmer">PolyMathOS</span>
             </div>
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="sm">
@@ -134,6 +136,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   <Icon icon={Brain} size="sm" className="mr-2" />
                   Take Advanced Cognitive Assessment
                 </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-3 border-2 border-silver-base"
+                  onClick={() => {
+                    window.location.hash = '#polymath_dashboard';
+                    window.dispatchEvent(new HashChangeEvent('hashchange'));
+                  }}
+                >
+                  <Icon icon={Brain} size="sm" className="mr-2" />
+                  🧠 Open Polymath OS Dashboard
+                </Button>
               </div>
             </Card>
           </div>
@@ -159,6 +172,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   <Icon icon={Users} size="sm" className="mr-2" />
                   Join Study Group
                 </Button>
+                {onOpenBrainwaveGenerator && (
+                  <Button variant="outline" className="w-full justify-start" onClick={onOpenBrainwaveGenerator}>
+                    <Icon icon={Radio} size="sm" className="mr-2" />
+                    Brainwave Generator
+                  </Button>
+                )}
               </div>
             </Card>
 

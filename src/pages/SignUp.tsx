@@ -129,7 +129,7 @@ export const SignUp: React.FC<SignUpProps> = ({ onSignUp, onBack }) => {
             <div className="w-12 h-12 bg-gradient-to-br from-silver-base/20 to-silver-dark/20 border border-silver-base/30 rounded-xl flex items-center justify-center mr-3">
               <Icon icon={Brain} size="lg" className="text-silver-light" />
             </div>
-            <span className="text-2xl font-display font-bold text-shimmer">NeuroAscend</span>
+            <span className="text-2xl font-display font-bold text-shimmer">PolyMathOS</span>
           </div>
 
           {/* Header */}

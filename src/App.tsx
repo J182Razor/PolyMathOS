@@ -8,13 +8,23 @@ import { Pricing } from './components/sections/Pricing';
 import { CTA } from './components/sections/CTA';
 import { Footer } from './components/sections/Footer';
 import { Dashboard } from './pages/Dashboard';
+import { PolymathDashboard } from './pages/PolymathDashboard';
 import { SignIn } from './pages/SignIn';
 import { SignUp } from './pages/SignUp';
 import { LearningSession } from './pages/LearningSession';
 import { EnhancedLearningSession } from './pages/EnhancedLearningSession';
 import { CognitiveAssessment } from './components/CognitiveAssessment';
+import { DomainSelection } from './components/DomainSelection';
+import { MemoryPalaceBuilder } from './components/MemoryPalaceBuilder';
+import { FlashcardReview } from './components/FlashcardReview';
+import { DeepWorkBlock } from './components/DeepWorkBlock';
+import { ReflectionJournal } from './components/ReflectionJournal';
+import { TRIZApplication } from './components/TRIZApplication';
+import { CrossDomainProject } from './components/CrossDomainProject';
+import { MindMapBuilder } from './components/MindMapBuilder';
+import { BrainwaveGenerator } from './components/BrainwaveGenerator';
 
-type AppState = 'home' | 'signin' | 'signup' | 'dashboard' | 'learning' | 'assessment';
+type AppState = 'home' | 'signin' | 'signup' | 'dashboard' | 'polymath_dashboard' | 'learning' | 'assessment' | 'domain_selection' | 'memory_palace' | 'flashcards' | 'deep_work' | 'projects' | 'reflection' | 'mind_map' | 'triz' | 'brainwave_generator';
 
 interface User {
   email: string;
@@ -114,6 +124,26 @@ function App() {
     setCurrentPage('assessment');
   };
 
+  const handleGoToPolymathDashboard = () => {
+    setCurrentPage('polymath_dashboard');
+  };
+
+  // Handle hash-based navigation for Polymath features
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.substring(1);
+      const validPages: AppState[] = ['polymath_dashboard', 'memory_palace', 'flashcards', 'deep_work', 'projects', 'reflection', 'domain_selection', 'mind_map', 'triz', 'portfolio', 'brainwave_generator'];
+      if (hash && validPages.includes(hash as AppState)) {
+        setCurrentPage(hash as AppState);
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    handleHashChange(); // Check on mount
+
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
   const handleCompleteAssessment = (assessmentData: any) => {
     // Store assessment data for AI personalization
     setAssessmentData(assessmentData);
@@ -136,7 +166,34 @@ function App() {
         return <SignUp onSignUp={handleSignUp} onBack={handleBackToHome} />;
       
       case 'dashboard':
-        return <Dashboard onStartLearning={handleStartLearning} onStartAssessment={handleStartAssessment} onSignOut={handleSignOut} user={user} />;
+        return <Dashboard onStartLearning={handleStartLearning} onStartAssessment={handleStartAssessment} onSignOut={handleSignOut} onOpenBrainwaveGenerator={() => setCurrentPage('brainwave_generator')} user={user} />;
+      
+      case 'polymath_dashboard':
+        return <PolymathDashboard onSignOut={handleSignOut} user={user} />;
+      
+      case 'domain_selection':
+        return <DomainSelection onComplete={() => setCurrentPage('polymath_dashboard')} onBack={() => setCurrentPage('polymath_dashboard')} />;
+      
+      case 'memory_palace':
+        return <MemoryPalaceBuilder onComplete={() => setCurrentPage('polymath_dashboard')} onBack={() => setCurrentPage('polymath_dashboard')} />;
+      
+      case 'flashcards':
+        return <FlashcardReview onComplete={() => setCurrentPage('polymath_dashboard')} onBack={() => setCurrentPage('polymath_dashboard')} />;
+      
+      case 'deep_work':
+        return <DeepWorkBlock onComplete={() => setCurrentPage('polymath_dashboard')} onBack={() => setCurrentPage('polymath_dashboard')} />;
+      
+      case 'reflection':
+        return <ReflectionJournal onComplete={() => setCurrentPage('polymath_dashboard')} onBack={() => setCurrentPage('polymath_dashboard')} />;
+      
+      case 'triz':
+        return <TRIZApplication onComplete={() => setCurrentPage('polymath_dashboard')} onBack={() => setCurrentPage('polymath_dashboard')} />;
+      
+      case 'projects':
+        return <CrossDomainProject onComplete={() => setCurrentPage('polymath_dashboard')} onBack={() => setCurrentPage('polymath_dashboard')} />;
+      
+      case 'mind_map':
+        return <MindMapBuilder onComplete={() => setCurrentPage('polymath_dashboard')} onBack={() => setCurrentPage('polymath_dashboard')} />;
       
       case 'learning':
         return assessmentData ? (
@@ -151,6 +208,9 @@ function App() {
       
       case 'assessment':
         return <CognitiveAssessment onComplete={handleCompleteAssessment} onBack={() => setCurrentPage('dashboard')} />;
+      
+      case 'brainwave_generator':
+        return <BrainwaveGenerator onBack={() => setCurrentPage('dashboard')} />;
       
       default:
         return (
