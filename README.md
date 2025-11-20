@@ -1,4 +1,4 @@
-# 🧠 NeuroAscend - AI-Powered Learning Platform
+# 🧠 PolyMathOS - AI-Powered Learning Platform
 
 [![React](https://img.shields.io/badge/React-18.3.1-blue.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5.3-blue.svg)](https://www.typescriptlang.org/)
@@ -8,32 +8,43 @@
 
 > Transform your learning with AI + Neuroscience + AR/VR to boost retention by 300%
 
-NeuroAscend is a revolutionary learning platform that combines cutting-edge neuroscience research, artificial intelligence, and personalized education to create the most effective learning experience possible. Our platform uses advanced dopamine optimization, meta-learning techniques, and cognitive profiling to adapt to your unique brain patterns and learning style.
+PolyMathOS is a revolutionary learning platform that combines cutting-edge neuroscience research, artificial intelligence, and personalized education to create the most effective learning experience possible. Our platform uses advanced dopamine optimization, meta-learning techniques, and cognitive profiling to adapt to your unique brain patterns and learning style.
 
 ## 🌟 Key Features
 
-### 🧠 **Neuroscience-Based Learning**
-- **Dopamine Optimization**: Uses scientifically-backed reward systems to make learning naturally addictive
-- **Spaced Repetition**: Advanced algorithms for optimal memory consolidation
-- **Cognitive Load Management**: Prevents overwhelm while maximizing information retention
-- **Neural Pathway Strengthening**: Activities designed to enhance brain plasticity
+### 🧠 **Neuroscience-Based Learning (Project 144 Research)**
+- **Reward Prediction Error (RPE) System**: Confidence tracking before answers triggers optimal dopamine responses for maximum learning
+- **Hyper-Correction Detection**: High-confidence errors create massive learning opportunities through negative RPE spikes
+- **Enhanced Spaced Repetition**: Research-based intervals (Day 0, 1, 3-4, 7, 14, 30, 3mo, 6mo, 1yr) for superior retention
+- **Learning State Management**: Alpha (8-12 Hz) for reading, Theta (4-8 Hz) for visualization with binaural beats integration
+- **Image Streaming**: Win Wenger protocol for visual intelligence training and cross-hemispheric integration
+- **Variable Ratio Rewards**: Dice roll system (01-50 no reward, 51-80 small, 81-95 medium, 96-100 jackpot) for maximum engagement
+- **Interleaving Practice**: 3×3 daily loop with domain switching to prevent mental autopilot
+- **DARPA Problem-First Protocol**: Attempt problems before reading, identify knowledge gaps, targeted acquisition, Feynman teaching
 
 ### 🤖 **AI-Powered Personalization**
-- **Adaptive Content Delivery**: Real-time adjustment based on your cognitive patterns
+- **Gemini Integration**: Long-context synthesis (like NotebookLM) for complex content generation
+- **Groq Integration**: Ultra-fast inference for real-time interactions
+- **Adaptive Content Delivery**: Real-time adjustment based on your cognitive patterns and RPE data
 - **Intelligent Tutoring**: AI that understands your learning style and adapts accordingly
+- **Feynman Analysis**: AI-powered explanation quality assessment
 - **Predictive Analytics**: Anticipates learning challenges before they occur
-- **Content Generation**: Creates personalized lessons using advanced AI models
 
 ### 📊 **Comprehensive Assessment**
 - **Cognitive Profiling**: Deep analysis of your learning preferences and capabilities
 - **Dopamine Sensitivity Testing**: Identifies your optimal reward and motivation triggers
 - **Meta-Learning Evaluation**: Assesses and improves your ability to learn how to learn
+- **Confidence Calibration**: Tracks overconfidence/underconfidence for better self-awareness
 - **Progress Tracking**: Detailed analytics on retention, comprehension, and growth
 
 ### 🎯 **Advanced Learning Features**
-- **Meta-Learning Skills**: Develop strategies for more effective learning
-- **Goal Setting & Tracking**: Sophisticated progress monitoring and achievement systems
-- **Community Learning**: Collaborative features and study groups
+- **Memory Palaces**: Method of Loci with 144-grid structure for polymathic knowledge storage
+- **Mind Mapping**: Tony Buzan's radiant thinking for semantic network engineering
+- **Deep Work Blocks**: Focused practice sessions with activity type tracking
+- **Cross-Domain Projects**: Synthesize knowledge across multiple fields
+- **TRIZ Application**: 40 inventive principles for creative problem-solving
+- **Reflection Journal**: Structured reflection with mood tracking
+- **Portfolio System**: Showcase your polymathic achievements
 - **Dark Mode Support**: Comfortable learning in any lighting condition
 
 ## 🚀 Quick Start
@@ -48,8 +59,8 @@ NeuroAscend is a revolutionary learning platform that combines cutting-edge neur
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/J182Razor/NeuroAscend.git
-   cd NeuroAscend
+   git clone https://github.com/J182Razor/PolyMathOS.git
+   cd PolyMathOS
    ```
 
 2. **Install dependencies**
@@ -69,7 +80,7 @@ NeuroAscend is a revolutionary learning platform that combines cutting-edge neur
    ```
 
 5. **Open your browser**
-   Navigate to `http://localhost:3000` to start using NeuroAscend
+   Navigate to `http://localhost:3000` to start using PolyMathOS
 
 ## 📖 Documentation
 
@@ -88,7 +99,7 @@ NeuroAscend is a revolutionary learning platform that combines cutting-edge neur
 
 ## 🏗️ Architecture
 
-NeuroAscend is built with a modern, scalable architecture:
+PolyMathOS is built with a modern, scalable architecture:
 
 ```
 src/
@@ -115,19 +126,32 @@ src/
 
 ## 🧪 Scientific Foundation
 
-NeuroAscend is built on solid scientific research:
+PolyMathOS is built on rigorous scientific research from **Project 144** and the **Polymath Operating System** curriculum:
 
-### Neuroscience Principles
-- **Dopamine-Driven Learning**: Leverages the brain's reward system for sustained motivation
-- **Neuroplasticity Optimization**: Activities designed to strengthen neural pathways
-- **Cognitive Load Theory**: Prevents overwhelm while maximizing learning efficiency
-- **Spaced Repetition**: Scientifically-timed review cycles for long-term retention
+### Neuroscience Principles (Project 144 Research)
+- **Reward Prediction Error (RPE)**: Dopamine as a teaching signal - positive RPE strengthens, negative RPE triggers attention
+- **Hyper-Correction Effect**: High-confidence errors create maximum learning through massive negative RPE
+- **Neuroplasticity Optimization**: High-intensity cognitive capture (HICC) protocol simulates critical period learning
+- **Spaced Repetition Science**: Research-based intervals leveraging the forgetting curve and consolidation windows
+- **State-Dependent Learning**: Alpha/Theta states optimize different learning activities
+- **Dual Coding Theory**: Visual + verbal encoding for superior retention
 
 ### Learning Psychology
-- **Meta-Learning**: Teaching users how to learn more effectively
-- **Growth Mindset**: Fostering belief in the ability to improve through effort
-- **Intrinsic Motivation**: Building internal drive for continuous learning
+- **Meta-Learning**: Teaching users how to learn more effectively (Plan → Monitor → Evaluate)
+- **Interleaving vs Blocking**: Mixing topics improves discrimination and long-term retention
+- **Desirable Difficulties**: Making learning harder in the short term strengthens long-term mastery
+- **Variable Ratio Schedules**: Unpredictable rewards maintain higher tonic dopamine than fixed rewards
 - **Flow State**: Creating optimal conditions for deep learning experiences
+- **Growth Mindset**: Fostering belief in the ability to improve through effort
+
+### Research Sources
+- **Project 144**: Comprehensive Cognitive Engineering Architecture for PolyMathOS
+- **DARPA Education Dominance Program**: 2.81 sigma improvement through problem-first learning
+- **Defense Language Institute (DLI)**: Immersion protocols for rapid skill acquisition
+- **Win Wenger**: Image Streaming protocol for visual intelligence
+- **Tony Buzan**: Mind Mapping for semantic network engineering
+- **Anthony Metivier**: Magnetic Memory Method for Memory Palaces
+- **SM-2 Algorithm**: Spaced repetition optimization
 
 ## 🎯 Getting Started as a User
 
@@ -219,7 +243,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-NeuroAscend is built on the shoulders of giants:
+PolyMathOS is built on the shoulders of giants:
 
 - **Neuroscience Research**: Dr. Andrew Huberman, Dr. Barbara Oakley, and the learning science community
 - **AI Technology**: OpenAI for providing advanced language models
@@ -228,6 +252,6 @@ NeuroAscend is built on the shoulders of giants:
 
 ---
 
-**Ready to transform your learning?** [Get started with NeuroAscend today!](https://github.com/J182Razor/NeuroAscend)
+**Ready to transform your learning?** [Get started with PolyMathOS today!](https://github.com/J182Razor/PolyMathOS)
 
-*NeuroAscend - Where Science Meets Learning*
+*PolyMathOS - Where Science Meets Learning*
