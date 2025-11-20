@@ -545,8 +545,23 @@ export class NeuroAILessonService {
     userProfile: AssessmentProfile, 
     difficultyLevel: string
   ): Promise<LessonSection[]> {
-    // This would integrate with an AI service to generate personalized content
-    // For now, returning a structured template
+    // Integrate with LLM service for AI-generated content
+    try {
+      const { LLMService } = await import('./LLMService');
+      const llmService = LLMService.getInstance();
+      
+      const llmResponse = await llmService.generateLessonContent({
+        topic,
+        userProfile,
+        context: `Difficulty: ${difficultyLevel}, Learning style: ${this.getLearningStyleDescription(userProfile)}`,
+      });
+
+      // Parse LLM response and structure into sections
+      return this.parseLLMResponseToSections(llmResponse.content, topic);
+    } catch (error) {
+      console.error('LLM integration error, using template:', error);
+      // Fallback to template
+    }
     
     return [
       {
@@ -718,6 +733,65 @@ export class NeuroAILessonService {
       'Related concepts that build on this foundation',
       'Cross-domain connections to expand understanding'
     ];
+  }
+
+  private getLearningStyleDescription(userProfile: AssessmentProfile): string {
+    const prefs = userProfile.learningStylePreferences;
+    if (prefs.visualProcessing >= 4) return 'visual learner';
+    if (prefs.feynmanTechnique >= 4) return 'explanatory learner';
+    if (prefs.firstPrinciplesThinking >= 4) return 'analytical learner';
+    return 'balanced learner';
+  }
+
+  private parseLLMResponseToSections(content: string, topic: string): LessonSection[] {
+    // Simple parsing - in production, use more sophisticated parsing
+    const sections: LessonSection[] = [];
+    const lines = content.split('\n').filter(line => line.trim());
+    
+    let currentSection: Partial<LessonSection> | null = null;
+    
+    for (const line of lines) {
+      if (line.startsWith('# ')) {
+        // New section
+        if (currentSection) {
+          sections.push(currentSection as LessonSection);
+        }
+        currentSection = {
+          id: `section_${sections.length + 1}`,
+          title: line.replace('# ', ''),
+          type: sections.length === 0 ? 'introduction' : 'core_content',
+          content: '',
+          interactiveElements: [],
+          dopamineTriggers: [],
+        };
+      } else if (line.startsWith('## ')) {
+        if (currentSection) {
+          currentSection.title = line.replace('## ', '');
+        }
+      } else if (currentSection) {
+        currentSection.content += line + '\n';
+      }
+    }
+    
+    if (currentSection) {
+      sections.push(currentSection as LessonSection);
+    }
+
+    // Ensure we have at least basic sections
+    if (sections.length === 0) {
+      return [
+        {
+          id: 'intro',
+          title: 'Introduction',
+          type: 'introduction',
+          content: content || `Welcome to ${topic}!`,
+          interactiveElements: [],
+          dopamineTriggers: [],
+        },
+      ];
+    }
+
+    return sections;
   }
 }
 

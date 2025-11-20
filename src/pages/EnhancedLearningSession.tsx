@@ -286,17 +286,48 @@ export const EnhancedLearningSession: React.FC<EnhancedLearningSessionProps> = (
     setFeynmanMode(true);
   };
 
-  const submitFeynmanExplanation = () => {
-    // Analyze explanation quality (in real app, this would use AI)
-    const wordCount = userExplanation.split(' ').length;
-    const hasSimpleLanguage = !userExplanation.match(/\b(neurotransmitter|synaptic|neuroplasticity)\b/);
-    
-    if (wordCount > 20 && hasSimpleLanguage) {
-      triggerReward('perfect_answer');
-      setLearningState(prev => ({
-        ...prev,
-        comprehensionLevel: Math.min(100, prev.comprehensionLevel + 30)
-      }));
+  const submitFeynmanExplanation = async () => {
+    // Use LLM service for Feynman analysis
+    try {
+      const { LLMService } = await import('../services/LLMService');
+      const llmService = LLMService.getInstance();
+      
+      const currentQ = questions[currentQuestion];
+      const analysis = await llmService.analyzeFeynmanExplanation(
+        userExplanation,
+        currentQ.question
+      );
+      
+      if (analysis.clarity >= 80) {
+        triggerReward('perfect_answer');
+        setLearningState(prev => ({
+          ...prev,
+          comprehensionLevel: Math.min(100, prev.comprehensionLevel + 30)
+        }));
+      } else if (analysis.clarity >= 60) {
+        setLearningState(prev => ({
+          ...prev,
+          comprehensionLevel: Math.min(100, prev.comprehensionLevel + 15)
+        }));
+      }
+      
+      // Show feedback
+      if (analysis.suggestions.length > 0) {
+        console.log('Feynman Analysis:', analysis);
+      }
+    } catch (error) {
+      console.error('Feynman analysis error:', error);
+      // Fallback to simple analysis
+      const wordCount = userExplanation.split(' ').length;
+      const hasSimpleLanguage = !userExplanation.match(/\b(neurotransmitter|synaptic|neuroplasticity)\b/);
+      
+      if (wordCount > 20 && hasSimpleLanguage) {
+        triggerReward('perfect_answer');
+        setLearningState(prev => ({
+          ...prev,
+          comprehensionLevel: Math.min(100, prev.comprehensionLevel + 30)
+        }));
+      }
     }
     
     setFeynmanMode(false);
@@ -580,7 +611,27 @@ export const EnhancedLearningSession: React.FC<EnhancedLearningSessionProps> = (
           <Icon icon={Home} size="sm" className="mr-2" />
           Return to Dashboard
         </Button>
-        <Button variant="primary" onClick={onComplete}>
+        <Button variant="primary" onClick={async () => {
+          // Save to spaced repetition system
+          try {
+            const { SpacedRepetitionService } = await import('../services/SpacedRepetitionService');
+            const spacedRepetition = SpacedRepetitionService.getInstance();
+            
+            // Add questions from this session to spaced repetition
+            const sessionQuestions = questions.map(q => ({
+              id: `session_${Date.now()}_${q.id}`,
+              question: q.question,
+              answer: q.options[q.correct],
+              explanation: q.explanation,
+            }));
+            
+            spacedRepetition.addItemsFromSession({ questions: sessionQuestions });
+          } catch (error) {
+            console.error('Error saving to spaced repetition:', error);
+          }
+          
+          onComplete();
+        }}>
           <Icon icon={Trophy} size="sm" className="mr-2" />
           Complete Session
         </Button>
