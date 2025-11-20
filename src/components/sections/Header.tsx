@@ -46,7 +46,7 @@ export const Header: React.FC<HeaderProps> = ({
               <Icon icon={Brain} size="sm" className="text-silver-light relative z-10 group-hover:scale-110 transition-transform duration-300" />
             </div>
             <span className="text-xl font-display font-bold text-shimmer">
-              NeuroAscend
+              PolyMathOS
             </span>
           </div>
 

@@ -238,7 +238,7 @@ export const CognitiveAssessment: React.FC<CognitiveAssessmentProps> = ({ onComp
       questions: [
         {
           id: 'primaryObjective',
-          question: "What is your primary learning objective with NeuroAscend?",
+          question: "What is your primary learning objective with PolyMathOS?",
           type: 'text',
           placeholder: "e.g., Master machine learning fundamentals, Improve memory retention, Develop critical thinking skills"
         },
@@ -342,7 +342,7 @@ export const CognitiveAssessment: React.FC<CognitiveAssessmentProps> = ({ onComp
           <div className="flex items-center justify-center mb-4">
             <Icon icon={Brain} size="lg" className="text-silver-base mr-3" />
             <h1 className="text-3xl font-display font-bold text-text-primary">
-              NeuroAscend Cognitive Assessment
+              PolyMathOS Cognitive Assessment
             </h1>
           </div>
           <p className="text-text-secondary max-w-2xl mx-auto">

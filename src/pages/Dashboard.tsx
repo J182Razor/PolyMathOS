@@ -48,7 +48,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-silver-base/20 to-silver-dark/20 border border-silver-base/30 flex items-center justify-center">
                 <Icon icon={Brain} size="sm" className="text-silver-light" />
               </div>
-              <span className="text-xl font-display font-bold text-shimmer">NeuroAscend</span>
+              <span className="text-xl font-display font-bold text-shimmer">PolyMathOS</span>
             </div>
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="sm">
@@ -133,6 +133,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 <Button variant="primary" className="w-full" onClick={onStartAssessment}>
                   <Icon icon={Brain} size="sm" className="mr-2" />
                   Take Advanced Cognitive Assessment
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-3 border-2 border-silver-base"
+                  onClick={() => {
+                    window.location.hash = '#polymath_dashboard';
+                    window.dispatchEvent(new HashChangeEvent('hashchange'));
+                  }}
+                >
+                  <Icon icon={Brain} size="sm" className="mr-2" />
+                  🧠 Open Polymath OS Dashboard
                 </Button>
               </div>
             </Card>

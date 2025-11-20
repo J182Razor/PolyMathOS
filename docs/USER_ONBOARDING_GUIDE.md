@@ -1,12 +1,12 @@
-# NeuroAscend User Onboarding Guide
+# PolyMathOS User Onboarding Guide
 
-Welcome to NeuroAscend - the revolutionary AI-powered learning platform that combines cutting-edge neuroscience, artificial intelligence, and personalized education to transform how you learn.
+Welcome to PolyMathOS - the revolutionary AI-powered learning platform that combines cutting-edge neuroscience, artificial intelligence, and personalized education to transform how you learn.
 
 ## 🚀 Getting Started
 
-### What is NeuroAscend?
+### What is PolyMathOS?
 
-NeuroAscend is a science-backed learning platform that uses advanced neuroscience principles to optimize your learning experience. Our AI analyzes your cognitive patterns, learning preferences, and dopamine response to create personalized learning paths that maximize retention and accelerate comprehension.
+PolyMathOS is a science-backed learning platform that uses advanced neuroscience principles to optimize your learning experience. Our AI analyzes your cognitive patterns, learning preferences, and dopamine response to create personalized learning paths that maximize retention and accelerate comprehension.
 
 ### Key Benefits
 
@@ -20,7 +20,7 @@ NeuroAscend is a science-backed learning platform that uses advanced neuroscienc
 
 ### Step 1: Create Your Account
 
-1. Visit the NeuroAscend platform
+1. Visit the PolyMathOS platform
 2. Click "Start Your Journey" or "Get Started"
 3. Fill in your personal information:
    - First Name
@@ -44,7 +44,7 @@ After registration, you'll be taken to your personalized dashboard where you can
 
 ### Why Take the Assessment?
 
-The Cognitive Assessment is the foundation of your NeuroAscend experience. It analyzes your:
+The Cognitive Assessment is the foundation of your PolyMathOS experience. It analyzes your:
 - **Dopamine Response Patterns**: How you respond to rewards and achievements
 - **Meta-Learning Skills**: Your ability to learn how to learn
 - **Learning Style Preferences**: Visual, auditory, kinesthetic, or reading/writing
@@ -123,7 +123,7 @@ The platform includes sophisticated goal management tools that help you maintain
 
 ### Study Groups and Community Learning
 
-NeuroAscend recognizes that social learning can significantly enhance retention and motivation. The platform offers study group features where you can collaborate with other learners, share insights, and benefit from collective knowledge building.
+PolyMathOS recognizes that social learning can significantly enhance retention and motivation. The platform offers study group features where you can collaborate with other learners, share insights, and benefit from collective knowledge building.
 
 ### Progress Analytics and Insights
 
@@ -137,7 +137,7 @@ The platform includes a fully functional dark mode that adapts to your system pr
 
 ### Maximizing Your Learning Potential
 
-To get the most out of NeuroAscend, establish a consistent learning routine that aligns with your cognitive assessment results. The platform works best when used regularly, allowing the AI to continuously refine its understanding of your learning patterns and preferences.
+To get the most out of PolyMathOS, establish a consistent learning routine that aligns with your cognitive assessment results. The platform works best when used regularly, allowing the AI to continuously refine its understanding of your learning patterns and preferences.
 
 ### Understanding Dopamine Optimization
 
@@ -179,4 +179,4 @@ As you become more comfortable with the platform, explore the advanced features 
 
 Your feedback helps improve the platform for all users. The system learns from user interactions and continuously evolves to provide better learning experiences. Don't hesitate to share your thoughts and suggestions through the feedback mechanisms built into the platform.
 
-Welcome to the future of learning with NeuroAscend. Your journey toward accelerated, optimized learning starts now.
+Welcome to the future of learning with PolyMathOS. Your journey toward accelerated, optimized learning starts now.

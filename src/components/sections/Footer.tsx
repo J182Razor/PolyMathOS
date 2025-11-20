@@ -45,7 +45,7 @@ export const Footer: React.FC = () => {
               <div className="w-8 h-8 bg-gradient-to-br from-silver-base/20 to-silver-dark/20 border border-silver-base/30 rounded-lg flex items-center justify-center">
                 <Icon icon={Brain} size="sm" className="text-silver-light" />
               </div>
-              <span className="text-xl font-display font-bold text-shimmer">NeuroAscend</span>
+              <span className="text-xl font-display font-bold text-shimmer">PolyMathOS</span>
             </div>
             <p className="text-text-secondary mb-6 max-w-md">
               Transforming education through AI-powered personalized learning. 
@@ -143,7 +143,7 @@ export const Footer: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="flex items-center space-x-3">
               <Icon icon={Mail} size="sm" className="text-silver-base" />
-              <span className="text-text-secondary">hello@neuroascend.com</span>
+              <span className="text-text-secondary">hello@polymathos.com</span>
             </div>
             <div className="flex items-center space-x-3">
               <Icon icon={Phone} size="sm" className="text-silver-base" />
@@ -173,7 +173,7 @@ export const Footer: React.FC = () => {
 
           {/* Copyright */}
           <div className="text-center text-text-tertiary text-sm">
-            <p>&copy; 2025 NeuroAscend. All rights reserved.</p>
+            <p>&copy; 2025 PolyMathOS. All rights reserved.</p>
           </div>
         </div>
       </div>

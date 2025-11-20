@@ -203,7 +203,7 @@ export class NeuroAILessonService {
     
     return {
       id: `lesson_${Date.now()}`,
-      title: `${topic}: Personalized NeuroAscend Experience`,
+      title: `${topic}: Personalized PolyMathOS Experience`,
       description: `AI-optimized lesson tailored to your unique cognitive profile and learning goals`,
       estimatedDuration: this.calculateOptimalDuration(userProfile),
       difficultyLevel,
