@@ -1,4 +1,4 @@
-# NeuroAscend Technical Documentation
+# PolyMathOS Technical Documentation
 
 ## Table of Contents
 
@@ -15,7 +15,7 @@
 
 ## System Architecture
 
-NeuroAscend is built as a modern single-page application using React with TypeScript, implementing a sophisticated learning platform that integrates advanced neuroscience principles with artificial intelligence. The architecture follows a component-based design pattern that promotes reusability, maintainability, and scalability.
+PolyMathOS is built as a modern single-page application using React with TypeScript, implementing a sophisticated learning platform that integrates advanced neuroscience principles with artificial intelligence. The architecture follows a component-based design pattern that promotes reusability, maintainability, and scalability.
 
 The frontend application is structured around a centralized state management system that handles user authentication, learning progress tracking, and real-time adaptation to user cognitive patterns. The platform utilizes a service-oriented architecture where specialized services handle different aspects of the learning experience, including dopamine optimization, meta-learning skill development, and personalized content delivery.
 
@@ -25,13 +25,13 @@ The neuroscience integration layer represents one of the most innovative aspects
 
 ### Prerequisites
 
-Before setting up the NeuroAscend development environment, ensure your system meets the following requirements. You will need Node.js version 18 or higher, which provides the JavaScript runtime environment necessary for running the React application and its associated build tools. The npm package manager, which comes bundled with Node.js, is required for dependency management and script execution.
+Before setting up the PolyMathOS development environment, ensure your system meets the following requirements. You will need Node.js version 18 or higher, which provides the JavaScript runtime environment necessary for running the React application and its associated build tools. The npm package manager, which comes bundled with Node.js, is required for dependency management and script execution.
 
 A modern web browser with JavaScript enabled is essential for testing and development. The platform is optimized for Chrome, Firefox, Safari, and Edge browsers, with full support for modern web standards including ES6+ features, CSS Grid, and Flexbox layouts.
 
 ### Local Development Setup
 
-To set up the NeuroAscend platform for local development, begin by cloning the repository from GitHub to your local machine. Navigate to your desired project directory and execute the git clone command with the repository URL. Once the repository is cloned, navigate into the project directory and install the required dependencies using npm.
+To set up the PolyMathOS platform for local development, begin by cloning the repository from GitHub to your local machine. Navigate to your desired project directory and execute the git clone command with the repository URL. Once the repository is cloned, navigate into the project directory and install the required dependencies using npm.
 
 The installation process will download and configure all necessary packages, including React, TypeScript, Tailwind CSS, and various utility libraries. The package.json file contains comprehensive dependency specifications that ensure consistent development environments across different machines and setups.
 
@@ -47,7 +47,7 @@ Database configuration, if applicable, should be set up according to your chosen
 
 ### Project Structure
 
-The NeuroAscend codebase follows a well-organized directory structure that promotes maintainability and scalability. The src directory contains all application source code, organized into logical subdirectories including components, pages, services, and utilities. The components directory is further subdivided into ui components for reusable interface elements and sections for larger page components.
+The PolyMathOS codebase follows a well-organized directory structure that promotes maintainability and scalability. The src directory contains all application source code, organized into logical subdirectories including components, pages, services, and utilities. The components directory is further subdivided into ui components for reusable interface elements and sections for larger page components.
 
 The pages directory contains the main application views, including the dashboard, learning sessions, authentication pages, and assessment interfaces. Each page component is designed as a self-contained module that manages its own state and interactions while integrating seamlessly with the broader application architecture.
 
@@ -72,7 +72,7 @@ End-to-end testing scenarios validate complete user workflows, from account crea
 
 ### Core Components
 
-The NeuroAscend platform is built around a sophisticated component architecture that balances reusability with specialized functionality. The core components include the Header, which provides navigation and user authentication controls, the Dashboard that serves as the central hub for user activities, and the various learning interface components that deliver the educational content.
+The PolyMathOS platform is built around a sophisticated component architecture that balances reusability with specialized functionality. The core components include the Header, which provides navigation and user authentication controls, the Dashboard that serves as the central hub for user activities, and the various learning interface components that deliver the educational content.
 
 The Header component implements a responsive navigation system that adapts to different screen sizes and user authentication states. When users are logged in, the header displays personalized information and provides access to account settings, progress tracking, and logout functionality. The component also includes the dark mode toggle, which seamlessly switches between light and dark themes while maintaining user preferences across sessions.
 
@@ -98,7 +98,7 @@ Form components include advanced validation, error handling, and user experience
 
 ### Neural Learning Engine
 
-The AI integration in NeuroAscend represents a sophisticated implementation of machine learning principles applied to personalized education. The neural learning engine continuously analyzes user interactions, learning patterns, and cognitive responses to build comprehensive models of individual learning preferences and capabilities.
+The AI integration in PolyMathOS represents a sophisticated implementation of machine learning principles applied to personalized education. The neural learning engine continuously analyzes user interactions, learning patterns, and cognitive responses to build comprehensive models of individual learning preferences and capabilities.
 
 The system employs advanced algorithms to process user data in real-time, identifying patterns that indicate optimal learning conditions for each individual. This includes analyzing response times, accuracy rates, engagement levels, and retention patterns to create detailed cognitive profiles that inform content adaptation decisions.
 
