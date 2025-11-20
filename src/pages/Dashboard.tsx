@@ -3,6 +3,7 @@ import { Brain, BookOpen, Target, TrendingUp, Users, Settings, LogOut } from 'lu
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Icon } from '../components/ui/Icon';
+import { SpacedRepetitionWidget } from '../components/SpacedRepetitionWidget';
 
 interface DashboardProps {
   onStartLearning?: () => void;
@@ -139,6 +140,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
           {/* Quick Actions */}
           <div className="space-y-6">
+            <SpacedRepetitionWidget />
+            
             <Card className="p-6">
               <h2 className="text-xl font-display font-semibold text-text-primary mb-4">
                 Quick Actions
