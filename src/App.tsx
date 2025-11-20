@@ -22,8 +22,9 @@ import { ReflectionJournal } from './components/ReflectionJournal';
 import { TRIZApplication } from './components/TRIZApplication';
 import { CrossDomainProject } from './components/CrossDomainProject';
 import { MindMapBuilder } from './components/MindMapBuilder';
+import { BrainwaveGenerator } from './components/BrainwaveGenerator';
 
-type AppState = 'home' | 'signin' | 'signup' | 'dashboard' | 'polymath_dashboard' | 'learning' | 'assessment' | 'domain_selection' | 'memory_palace' | 'flashcards' | 'deep_work' | 'projects' | 'reflection' | 'mind_map' | 'triz';
+type AppState = 'home' | 'signin' | 'signup' | 'dashboard' | 'polymath_dashboard' | 'learning' | 'assessment' | 'domain_selection' | 'memory_palace' | 'flashcards' | 'deep_work' | 'projects' | 'reflection' | 'mind_map' | 'triz' | 'brainwave_generator';
 
 interface User {
   email: string;
@@ -131,7 +132,7 @@ function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.substring(1);
-      const validPages: AppState[] = ['polymath_dashboard', 'memory_palace', 'flashcards', 'deep_work', 'projects', 'reflection', 'domain_selection', 'mind_map', 'triz', 'portfolio'];
+      const validPages: AppState[] = ['polymath_dashboard', 'memory_palace', 'flashcards', 'deep_work', 'projects', 'reflection', 'domain_selection', 'mind_map', 'triz', 'portfolio', 'brainwave_generator'];
       if (hash && validPages.includes(hash as AppState)) {
         setCurrentPage(hash as AppState);
       }
@@ -165,7 +166,7 @@ function App() {
         return <SignUp onSignUp={handleSignUp} onBack={handleBackToHome} />;
       
       case 'dashboard':
-        return <Dashboard onStartLearning={handleStartLearning} onStartAssessment={handleStartAssessment} onSignOut={handleSignOut} user={user} />;
+        return <Dashboard onStartLearning={handleStartLearning} onStartAssessment={handleStartAssessment} onSignOut={handleSignOut} onOpenBrainwaveGenerator={() => setCurrentPage('brainwave_generator')} user={user} />;
       
       case 'polymath_dashboard':
         return <PolymathDashboard onSignOut={handleSignOut} user={user} />;
@@ -207,6 +208,9 @@ function App() {
       
       case 'assessment':
         return <CognitiveAssessment onComplete={handleCompleteAssessment} onBack={() => setCurrentPage('dashboard')} />;
+      
+      case 'brainwave_generator':
+        return <BrainwaveGenerator onBack={() => setCurrentPage('dashboard')} />;
       
       default:
         return (
