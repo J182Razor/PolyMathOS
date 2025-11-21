@@ -1,0 +1,136 @@
+{
+  "name": "PolyMathOS - Session Orchestrator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sessions/create",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-create",
+      "name": "Create Session Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "session-create"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse session creation request\nconst body = $input.item.json.body;\nconst user = body.user;\nconst topic = body.topic;\nconst domain = body.domain;\nconst options = body.options || {};\n\n// Determine which features to include\nconst features = {\n  brainwave: options.includeBrainwave !== false,\n  imageStreaming: options.includeImageStreaming !== false,\n  memoryPalace: options.includeMemoryPalace !== false,\n  flashcards: options.includeFlashcards !== false,\n  mindMap: options.includeMindMap !== false,\n  deepWork: options.includeDeepWork !== false,\n  triz: options.includeTRIZ !== false,\n  crossDomain: options.includeCrossDomain !== false,\n  reflection: options.includeReflection !== false\n};\n\nreturn {\n  userId: user.id,\n  topic,\n  domain,\n  features,\n  duration: options.duration || 90,\n  learningStyle: user.learningStyle\n};"
+      },
+      "id": "parse-request",
+      "name": "Parse Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.N8N_WEBHOOK_URL }}/webhook/agent-chat",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "=Create a comprehensive lesson plan for learning \"{{ $json.topic }}\" in {{ $json.domain }}. Include key concepts, learning objectives, and a structured approach. The learner has a {{ $json.learningStyle }} learning style."
+            },
+            {
+              "name": "provider",
+              "value": "nvidia"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "generate-lesson",
+      "name": "Generate Lesson Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build session structure\nconst input = $input.item.json;\nconst lessonContent = $('Generate Lesson Content').item.json.content || '';\nconst parsed = $('Parse Request').item.json;\n\nconst steps = [];\nlet order = 0;\n\n// Brainwave step\nif (parsed.features.brainwave) {\n  steps.push({\n    type: 'brainwave',\n    title: 'Brainwave Entrainment',\n    description: 'Prepare your mind for learning',\n    duration: 5,\n    order: order++\n  });\n}\n\n// Image Streaming\nif (parsed.features.imageStreaming) {\n  steps.push({\n    type: 'image_streaming',\n    title: 'Consciousness Expansion',\n    description: 'Activate creative pathways',\n    duration: 10,\n    order: order++\n  });\n}\n\n// Lesson\nsteps.push({\n  type: 'lesson',\n  title: `Learn: ${parsed.topic}`,\n  description: lessonContent.substring(0, 200),\n  duration: 30,\n  content: { fullContent: lessonContent },\n  order: order++\n});\n\n// Memory Palace\nif (parsed.features.memoryPalace) {\n  steps.push({\n    type: 'memory_palace',\n    title: 'Memory Palace Construction',\n    description: 'Store knowledge in spatial memory',\n    duration: 15,\n    order: order++\n  });\n}\n\n// Flashcards\nif (parsed.features.flashcards) {\n  steps.push({\n    type: 'flashcard',\n    title: 'Spaced Repetition Review',\n    description: 'Review key concepts',\n    duration: 20,\n    order: order++\n  });\n}\n\n// Mind Map\nif (parsed.features.mindMap) {\n  steps.push({\n    type: 'mind_map',\n    title: 'Mind Map Creation',\n    description: 'Visualize connections',\n    duration: 15,\n    order: order++\n  });\n}\n\n// Deep Work\nif (parsed.features.deepWork) {\n  steps.push({\n    type: 'deep_work',\n    title: 'Deep Practice Session',\n    description: 'Apply through deliberate practice',\n    duration: 30,\n    order: order++\n  });\n}\n\n// TRIZ\nif (parsed.features.triz) {\n  steps.push({\n    type: 'triz',\n    title: 'TRIZ Problem Solving',\n    description: 'Apply inventive principles',\n    duration: 20,\n    order: order++\n  });\n}\n\n// Cross-Domain\nif (parsed.features.crossDomain) {\n  steps.push({\n    type: 'cross_domain',\n    title: 'Cross-Domain Synthesis',\n    description: 'Connect across domains',\n    duration: 25,\n    order: order++\n  });\n}\n\n// Reflection\nif (parsed.features.reflection) {\n  steps.push({\n    type: 'reflection',\n    title: 'Reflection & Integration',\n    description: 'Reflect on learning journey',\n    duration: 10,\n    order: order++\n  });\n}\n\nconst totalDuration = steps.reduce((sum, step) => sum + step.duration, 0);\n\nreturn {\n  id: `session-${Date.now()}`,\n  title: `Complete Learning Session: ${parsed.topic}`,\n  description: `A comprehensive learning experience covering ${parsed.topic}`,\n  domain: parsed.domain,\n  difficulty: 5,\n  estimatedDuration: totalDuration,\n  steps,\n  learningStyle: parsed.learningStyle,\n  objectives: [\n    `Understand core concepts of ${parsed.topic}`,\n    `Apply ${parsed.topic} in practical scenarios`,\n    `Connect ${parsed.topic} to other domains`\n  ],\n  status: 'draft'\n};"
+      },
+      "id": "build-session",
+      "name": "Build Session",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": {
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "user_id": "={{ $('Parse Request').item.json.userId }}",
+              "session_id": "={{ $json.id }}",
+              "title": "={{ $json.title }}",
+              "domain": "={{ $json.domain }}",
+              "steps": "={{ JSON.stringify($json.steps) }}",
+              "status": "={{ $json.status }}",
+              "created_at": "={{ $now }}"
+            }
+          }
+        },
+        "table": {
+          "value": "learning_sessions"
+        },
+        "options": {}
+      },
+      "id": "save-session",
+      "name": "Save Session",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [1050, 300],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"session\": $('Build Session').item.json } }}",
+        "options": {}
+      },
+      "id": "respond-create",
+      "name": "Respond Create",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "Create Session Webhook": {
+      "main": [[{ "node": "Parse Request", "type": "main", "index": 0 }]]
+    },
+    "Parse Request": {
+      "main": [[{ "node": "Generate Lesson Content", "type": "main", "index": 0 }]]
+    },
+    "Generate Lesson Content": {
+      "main": [[{ "node": "Build Session", "type": "main", "index": 0 }]]
+    },
+    "Build Session": {
+      "main": [[{ "node": "Save Session", "type": "main", "index": 0 }]]
+    },
+    "Save Session": {
+      "main": [[{ "node": "Respond Create", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+
