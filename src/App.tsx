@@ -249,7 +249,7 @@ function App() {
       
       default:
         return (
-          <div className="min-h-screen bg-dark-base transition-colors duration-300">
+          <div className="min-h-screen bg-light-base dark:bg-dark-base transition-colors duration-300">
             <Header 
               onSignIn={() => setCurrentPage('signin')} 
               onGetStarted={() => setCurrentPage('signup')}
