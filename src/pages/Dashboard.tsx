@@ -43,12 +43,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
   return (
     <div className="min-h-screen bg-light-base dark:bg-dark-base transition-colors duration-300">
       {/* Header */}
-      <header className="glass-strong border-b border-silver-300 dark:border-silver-dark/20">
+      <header className="glass-strong border-b border-silver-300 dark:border-silver-500/20">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="flex items-center justify-between h-20 py-4">
             <div className="flex items-center space-x-3">
-              <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-silver-base/20 to-silver-dark/20 border border-silver-base/30 flex items-center justify-center">
-                <Icon icon={Brain} size="sm" className="text-silver-light" />
+              <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-silver-300/20 to-silver-500/20 border border-silver-300/30 flex items-center justify-center">
+                <Icon icon={Brain} size="sm" className="text-silver-200" />
               </div>
               <span className="text-xl font-display font-bold text-shimmer">PolyMathOS</span>
             </div>
@@ -104,7 +104,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </h2>
               <div className="space-y-4">
                 {recentLessons.map((lesson, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 glass rounded-lg border border-silver-dark/10 hover:border-silver-base/30 transition-all duration-300">
+                  <div key={index} className="flex items-center justify-between p-4 glass rounded-lg border border-silver-500/10 hover:border-silver-300/30 transition-all duration-300">
                     <div className="flex-1">
                       <h3 className="font-medium text-text-primary mb-1">
                         {lesson.title}
@@ -112,7 +112,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       <p className="text-sm text-text-tertiary">{lesson.time}</p>
                     </div>
                     <div className="flex items-center space-x-4">
-                      <div className="w-24 bg-dark-elevated rounded-full h-2 border border-silver-dark/20">
+                      <div className="w-24 bg-dark-elevated rounded-full h-2 border border-silver-500/20">
                         <div 
                           className="bg-shimmer h-2 rounded-full relative overflow-hidden"
                           style={{ width: `${lesson.progress}%` }}
@@ -120,7 +120,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           <div className="absolute inset-0 bg-shimmer animate-shimmer"></div>
                         </div>
                       </div>
-                      <span className="text-sm font-medium text-silver-base w-12">
+                      <span className="text-sm font-medium text-silver-300 w-12">
                         {lesson.progress}%
                       </span>
                     </div>
@@ -138,7 +138,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="w-full mt-3 border-2 border-silver-base"
+                  className="w-full mt-3 border-2 border-silver-300"
                   onClick={() => {
                     window.location.hash = '#polymath_dashboard';
                     window.dispatchEvent(new HashChangeEvent('hashchange'));
@@ -204,7 +204,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2"
-                      className="text-silver-dark/30"
+                      className="text-silver-500/30"
                     />
                     <path
                       d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
@@ -212,7 +212,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       stroke="currentColor"
                       strokeWidth="2"
                       strokeDasharray="75, 100"
-                      className="text-silver-base"
+                      className="text-silver-300"
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">

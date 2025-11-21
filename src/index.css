@@ -20,7 +20,7 @@
 /* Base Styles */
 @layer base {
   * {
-    @apply border-silver-dark/20;
+    @apply border-silver-500/20;
   }
 
   html {
@@ -70,7 +70,7 @@
   }
 
   a {
-    @apply text-silver-base hover:text-silver-light transition-colors duration-200;
+    @apply text-silver-300 hover:text-silver-200 transition-colors duration-200;
   }
 }
 
@@ -79,13 +79,13 @@
   /* Glassmorphism Effect */
   .glass {
     @apply bg-light-surface/80 dark:bg-dark-surface/80 backdrop-blur-xl;
-    @apply border border-silver-400/30 dark:border-silver-dark/20;
+    @apply border border-silver-400/30 dark:border-silver-500/20;
     @apply shadow-glass;
   }
 
   .glass-strong {
     @apply bg-light-surface/90 dark:bg-dark-surface/90 backdrop-blur-2xl;
-    @apply border border-silver-400/40 dark:border-silver-base/30;
+    @apply border border-silver-400/40 dark:border-silver-300/30;
     @apply shadow-glass;
   }
 
@@ -104,7 +104,7 @@
 
   /* Shimmer Border Effect */
   .border-shimmer {
-    @apply border border-silver-base/30;
+    @apply border border-silver-300/30;
     animation: borderShimmer 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
@@ -150,7 +150,7 @@
 
   /* Focus States */
   .focus-silver {
-    @apply focus:outline-none focus:ring-2 focus:ring-silver-base/50 focus:ring-offset-2 focus:ring-offset-dark-base;
+    @apply focus:outline-none focus:ring-2 focus:ring-silver-300/50 focus:ring-offset-2 focus:ring-offset-light-base dark:focus:ring-offset-dark-base;
   }
 
   /* Scrollbar Styling */
@@ -163,11 +163,11 @@
   }
 
   .scrollbar-silver::-webkit-scrollbar-thumb {
-    @apply bg-silver-dark/50 rounded-full;
+    @apply bg-silver-500/50 rounded-full;
   }
 
   .scrollbar-silver::-webkit-scrollbar-thumb:hover {
-    @apply bg-silver-medium/70;
+    @apply bg-silver-400/70;
   }
 }
 
@@ -214,7 +214,7 @@
 
   /* Selection */
   ::selection {
-    @apply bg-silver-base/30 text-text-primary;
+    @apply bg-silver-300/30 text-text-primary;
   }
 
   /* Smooth Transitions */
