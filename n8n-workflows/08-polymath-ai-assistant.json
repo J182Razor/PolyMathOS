@@ -1,0 +1,222 @@
+{
+  "name": "PolyMathOS - Polymath AI Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "polymath/register",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-register",
+      "name": "Register User Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "polymath-register"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": {
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "name": "={{ $json.body.name }}",
+              "email": "={{ $json.body.email }}",
+              "learning_style": "={{ $json.body.learningStyle }}",
+              "daily_commitment": "={{ $json.body.dailyCommitment }}",
+              "level": 1,
+              "xp": 0,
+              "streak": 0,
+              "created_at": "={{ $now }}"
+            }
+          }
+        },
+        "table": {
+          "value": "polymath_users"
+        },
+        "options": {}
+      },
+      "id": "create-user",
+      "name": "Create User",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"userId\": $json.id, \"message\": \"User registered successfully\" } }}",
+        "options": {}
+      },
+      "id": "respond-register",
+      "name": "Respond Register",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "polymath/coach",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-coach",
+      "name": "Coaching Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 500],
+      "webhookId": "polymath-coach"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build coaching prompt\nconst body = $input.item.json.body;\nconst userInput = body.userInput;\nconst context = body.context || {};\n\nconst prompt = `You are PolymathOS AI - an elite cognitive acceleration coach. Your mission is to provide:\n1. Encouraging, specific, and actionable feedback\n2. Science-backed learning strategies\n3. Personalized recommendations based on the user's learning style\n4. Motivation to push boundaries and connect concepts across domains\n\nUser Context:\n${context.learningStyle ? `Learning Style: ${context.learningStyle}` : ''}\n${context.currentDomain ? `Current Domain: ${context.currentDomain}` : ''}\n${context.efficiencyMetrics ? `Efficiency: ${JSON.stringify(context.efficiencyMetrics)}` : ''}\n\nUser Input: \"${userInput}\"\n\nProvide coaching feedback that is:\n- Specific and actionable\n- Encouraging and motivating\n- Based on neuroscience and learning science\n- Tailored to their learning style\n- Focused on accelerating their polymath journey`;\n\nreturn {\n  prompt,\n  provider: body.provider || 'nvidia',\n  context\n};"
+      },
+      "id": "build-prompt",
+      "name": "Build Coaching Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 500]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.N8N_WEBHOOK_URL }}/webhook/agent-chat",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "={{ $json.prompt }}"
+            },
+            {
+              "name": "provider",
+              "value": "={{ $json.provider }}"
+            },
+            {
+              "name": "context",
+              "value": "={{ $json.context }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "call-llm",
+      "name": "Call LLM Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 500]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"feedback\": $json.content } }}",
+        "options": {}
+      },
+      "id": "respond-coach",
+      "name": "Respond Coach",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 500]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "polymath/analyze",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-analyze",
+      "name": "Analyze Efficiency Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 700],
+      "webhookId": "polymath-analyze"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  pu.*,\n  COUNT(DISTINCT ls.id) as total_sessions,\n  AVG(ls.final_score) as avg_score,\n  COUNT(DISTINCT rpe.id) as total_rpe_events,\n  AVG(rpe.rpe_value) as avg_rpe,\n  COUNT(DISTINCT sr.id) as total_flashcards\nFROM polymath_users pu\nLEFT JOIN learning_sessions ls ON ls.user_id = pu.id\nLEFT JOIN rpe_events rpe ON rpe.user_id = pu.id\nLEFT JOIN spaced_repetition_items sr ON sr.user_id = pu.id\nWHERE pu.id = $1\nGROUP BY pu.id",
+        "additionalFields": {
+          "queryParameters": "={{ [$json.body.userId] }}"
+        }
+      },
+      "id": "get-user-stats",
+      "name": "Get User Stats",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 700],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate efficiency metrics\nconst user = $input.item.json;\n\nconst totalReviews = user.total_flashcards || 0;\nconst correctReviews = Math.floor(totalReviews * 0.85); // Assume 85% retention\nconst retentionRate = totalReviews > 0 ? (correctReviews / totalReviews) * 100 : 95;\n\nconst domainDiversity = 0.8; // Default\nconst consistency = Math.min((user.streak || 0) / 30, 1);\nconst engagement = Math.min((user.total_study_time || 0) / 1000, 1);\nconst synthesis = Math.min((user.cross_domain_projects || 0) / 5, 1);\n\nconst efficiencyFactors = {\n  retention: retentionRate / 100,\n  domainDiversity,\n  consistency,\n  engagement,\n  synthesis\n};\n\nconst efficiencyScore = (Object.values(efficiencyFactors).reduce((a, b) => a + b, 0) / Object.keys(efficiencyFactors).length) * 100;\n\nreturn {\n  efficiencyScore: Math.round(efficiencyScore * 10) / 10,\n  retentionRate: Math.round(retentionRate * 10) / 10,\n  domainDiversity: Math.round(domainDiversity * 100) / 100,\n  learningVelocity: (user.level || 1) * 10 + (user.streak || 0),\n  innovationIndex: (user.cross_domain_projects || 0) * 15,\n  neuralPlasticity: Math.min(100, (user.deep_work_blocks || 0) * 3),\n  efficiencyFactors\n};"
+      },
+      "id": "calculate-efficiency",
+      "name": "Calculate Efficiency",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 700]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"efficiency\": $json } }}",
+        "options": {}
+      },
+      "id": "respond-analyze",
+      "name": "Respond Analyze",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 700]
+    }
+  ],
+  "connections": {
+    "Register User Webhook": {
+      "main": [[{ "node": "Create User", "type": "main", "index": 0 }]]
+    },
+    "Create User": {
+      "main": [[{ "node": "Respond Register", "type": "main", "index": 0 }]]
+    },
+    "Coaching Webhook": {
+      "main": [[{ "node": "Build Coaching Prompt", "type": "main", "index": 0 }]]
+    },
+    "Build Coaching Prompt": {
+      "main": [[{ "node": "Call LLM Agent", "type": "main", "index": 0 }]]
+    },
+    "Call LLM Agent": {
+      "main": [[{ "node": "Respond Coach", "type": "main", "index": 0 }]]
+    },
+    "Analyze Efficiency Webhook": {
+      "main": [[{ "node": "Get User Stats", "type": "main", "index": 0 }]]
+    },
+    "Get User Stats": {
+      "main": [[{ "node": "Calculate Efficiency", "type": "main", "index": 0 }]]
+    },
+    "Calculate Efficiency": {
+      "main": [[{ "node": "Respond Analyze", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

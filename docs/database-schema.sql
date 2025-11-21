@@ -107,6 +107,30 @@ CREATE TABLE IF NOT EXISTS environment_variables (
   UNIQUE(user_id, key)
 );
 
+-- Polymath users table
+CREATE TABLE IF NOT EXISTS polymath_users (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255),
+  learning_style VARCHAR(50),
+  daily_commitment INTEGER DEFAULT 60,
+  level INTEGER DEFAULT 1,
+  xp INTEGER DEFAULT 0,
+  streak INTEGER DEFAULT 0,
+  longest_streak INTEGER DEFAULT 0,
+  image_stream_sessions INTEGER DEFAULT 0,
+  deep_work_blocks INTEGER DEFAULT 0,
+  mind_maps_created INTEGER DEFAULT 0,
+  cross_domain_projects INTEGER DEFAULT 0,
+  total_study_time INTEGER DEFAULT 0,
+  motivation_level INTEGER DEFAULT 7,
+  goal_alignment_score INTEGER DEFAULT 85,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id)
+);
+
 -- Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_learning_sessions_user_id ON learning_sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_learning_sessions_status ON learning_sessions(status);

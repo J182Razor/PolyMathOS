@@ -178,6 +178,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     Brainwave Generator
                   </Button>
                 )}
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    window.location.hash = '#polymath_ai';
+                    window.dispatchEvent(new HashChangeEvent('hashchange'));
+                  }}
+                >
+                  <Icon icon={Brain} size="sm" className="mr-2" />
+                  Polymath AI Assistant
+                </Button>
               </div>
             </Card>
 

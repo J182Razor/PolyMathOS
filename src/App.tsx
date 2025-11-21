@@ -23,8 +23,9 @@ import { TRIZApplication } from './components/TRIZApplication';
 import { CrossDomainProject } from './components/CrossDomainProject';
 import { MindMapBuilder } from './components/MindMapBuilder';
 import { BrainwaveGenerator } from './components/BrainwaveGenerator';
+import { PolymathAIAssistant } from './components/PolymathAIAssistant';
 
-type AppState = 'home' | 'signin' | 'signup' | 'dashboard' | 'polymath_dashboard' | 'learning' | 'assessment' | 'domain_selection' | 'memory_palace' | 'flashcards' | 'deep_work' | 'projects' | 'reflection' | 'mind_map' | 'triz' | 'brainwave_generator';
+type AppState = 'home' | 'signin' | 'signup' | 'dashboard' | 'polymath_dashboard' | 'learning' | 'assessment' | 'domain_selection' | 'memory_palace' | 'flashcards' | 'deep_work' | 'projects' | 'reflection' | 'mind_map' | 'triz' | 'brainwave_generator' | 'polymath_ai';
 
 interface User {
   email: string;
@@ -132,7 +133,7 @@ function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.substring(1);
-      const validPages: AppState[] = ['polymath_dashboard', 'memory_palace', 'flashcards', 'deep_work', 'projects', 'reflection', 'domain_selection', 'mind_map', 'triz', 'portfolio', 'brainwave_generator'];
+      const validPages: AppState[] = ['polymath_dashboard', 'memory_palace', 'flashcards', 'deep_work', 'projects', 'reflection', 'domain_selection', 'mind_map', 'triz', 'portfolio', 'brainwave_generator', 'polymath_ai'];
       if (hash && validPages.includes(hash as AppState)) {
         setCurrentPage(hash as AppState);
       }
@@ -213,6 +214,23 @@ function App() {
       
       case 'brainwave_generator':
         return <BrainwaveGenerator onBack={() => setCurrentPage('dashboard')} />;
+      
+      case 'polymath_ai':
+        return (
+          <div className="min-h-screen bg-gray-900">
+            <div className="container mx-auto p-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-4 text-gray-400 hover:text-gray-100"
+              >
+                ← Back to Dashboard
+              </button>
+              <div className="h-[calc(100vh-8rem)]">
+                <PolymathAIAssistant />
+              </div>
+            </div>
+          </div>
+        );
       
       default:
         return (
