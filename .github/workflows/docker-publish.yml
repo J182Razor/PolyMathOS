@@ -24,4 +24,7 @@ jobs:
         context: .
         push: true
         tags: johnlawal/polymathos:latest
-
+        build-args: |
+          NODE_OPTIONS=--max-old-space-size=2048
+        cache-from: type=registry,ref=johnlawal/polymathos:latest
+        cache-to: type=inline
