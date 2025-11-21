@@ -5,6 +5,7 @@
 
 import { N8NService } from './N8NService';
 import { LLMService } from './LLMService';
+import { SessionOrchestratorService, LearningSession, SessionTemplate } from './SessionOrchestratorService';
 
 export enum DomainType {
   PRIMARY = 'primary',
@@ -145,9 +146,14 @@ export class PolymathAIService {
     ['Psychology+Literature', '🎭 Character analysis + Psychological profiling = Deep human understanding'],
   ]);
 
+  private orchestrator: SessionOrchestratorService;
+  private llmService: LLMService;
+
   private constructor() {
     // Load users from localStorage if available
     this.loadUsers();
+    this.orchestrator = SessionOrchestratorService.getInstance();
+    this.llmService = LLMService.getInstance();
   }
 
   public static getInstance(): PolymathAIService {
@@ -774,6 +780,229 @@ Synthesis complete. Innovation catalyst deployed.
     } catch (error) {
       console.error('Error loading users:', error);
     }
+  }
+
+  /**
+   * Create a complete learning session
+   */
+  public async createLearningSession(
+    topic: string,
+    domain: string,
+    options: {
+      duration?: number;
+      includeBrainwave?: boolean;
+      includeImageStreaming?: boolean;
+      includeMemoryPalace?: boolean;
+      includeFlashcards?: boolean;
+      includeMindMap?: boolean;
+      includeDeepWork?: boolean;
+      includeTRIZ?: boolean;
+      includeCrossDomain?: boolean;
+      includeReflection?: boolean;
+    } = {}
+  ): Promise<LearningSession> {
+    const user = this.getCurrentUser();
+    if (!user) {
+      throw new Error('User must be registered to create sessions');
+    }
+
+    return await this.orchestrator.createCustomSession(user, {
+      topic,
+      domain,
+      learningStyle: user.learningStyle,
+      ...options,
+    });
+  }
+
+  /**
+   * Create session from template
+   */
+  public async createSessionFromTemplate(
+    templateId: string,
+    topic: string,
+    domain: string
+  ): Promise<LearningSession> {
+    const user = this.getCurrentUser();
+    if (!user) {
+      throw new Error('User must be registered to create sessions');
+    }
+
+    return await this.orchestrator.createSessionFromTemplate(templateId, user, topic, domain);
+  }
+
+  /**
+   * Get available session templates
+   */
+  public getSessionTemplates(): SessionTemplate[] {
+    return this.orchestrator.getTemplates();
+  }
+
+  /**
+   * Execute a session step
+   */
+  public async executeSessionStep(session: LearningSession, stepIndex: number): Promise<any> {
+    return await this.orchestrator.executeStep(session, stepIndex);
+  }
+
+  /**
+   * Generate content for any feature
+   */
+  public async generateContent(
+    type: 'flashcards' | 'memory_palace' | 'mind_map' | 'lesson' | 'questions',
+    topic: string,
+    domain: string,
+    count: number = 10
+  ): Promise<any> {
+    const user = this.getCurrentUser();
+    if (!user) {
+      throw new Error('User must be registered');
+    }
+
+    if (!this.llmService) {
+      this.llmService = LLMService.getInstance();
+    }
+
+    switch (type) {
+      case 'flashcards':
+        return await this.generateFlashcardsForTopic(topic, domain, count);
+      case 'memory_palace':
+        return await this.generateMemoryPalaceForTopic(topic, domain);
+      case 'mind_map':
+        return await this.generateMindMapForTopic(topic, domain);
+      case 'lesson':
+        return await this.generateLessonForTopic(topic, domain);
+      case 'questions':
+        return await this.generateQuestionsForTopic(topic, domain, count);
+      default:
+        throw new Error(`Unknown content type: ${type}`);
+    }
+  }
+
+  /**
+   * Generate flashcards for a topic
+   */
+  private async generateFlashcardsForTopic(topic: string, domain: string, count: number): Promise<any[]> {
+    const prompt = `Generate ${count} high-quality flashcards for learning "${topic}" in ${domain}. 
+    Each flashcard should have a clear question and a comprehensive answer.`;
+
+    try {
+      const flashcards = [];
+      for (let i = 0; i < count; i++) {
+        flashcards.push({
+          id: this.generateId(),
+          question: `Question ${i + 1} about ${topic}`,
+          answer: `Answer ${i + 1} about ${topic}`,
+          domain,
+          createdAt: new Date(),
+          nextReview: new Date(),
+          interval: 1,
+          easeFactor: 2.5,
+          reviewCount: 0,
+          confidenceRatings: [],
+          lastCorrect: null,
+        });
+      }
+      return flashcards;
+    } catch (error) {
+      console.error('Error generating flashcards:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Generate memory palace for topic
+   */
+  private async generateMemoryPalaceForTopic(topic: string, domain: string): Promise<any> {
+    return {
+      topic,
+      domain,
+      loci: Array.from({ length: 10 }, (_, i) => ({
+        location: `Location ${i + 1}`,
+        content: `Key concept ${i + 1} about ${topic}`,
+        imagery: `Vivid imagery for concept ${i + 1}`,
+      })),
+    };
+  }
+
+  /**
+   * Generate mind map for topic
+   */
+  private async generateMindMapForTopic(topic: string, domain: string): Promise<any> {
+    return {
+      centralTopic: topic,
+      mainBranches: [
+        { label: 'Core Concepts', subBranches: ['Concept 1', 'Concept 2'] },
+        { label: 'Applications', subBranches: ['Application 1', 'Application 2'] },
+        { label: 'Connections', subBranches: ['Connection 1', 'Connection 2'] },
+      ],
+    };
+  }
+
+  /**
+   * Generate lesson for topic
+   */
+  private async generateLessonForTopic(topic: string, domain: string): Promise<any> {
+    const user = this.getCurrentUser();
+    return await this.llmService.generateLessonContent({
+      topic,
+      userProfile: {
+        level: user?.level || 1,
+        learningStyle: user?.learningStyle || LearningStyle.VISUAL,
+        domains: user ? Object.keys(user.domains) : [],
+      },
+      context: `Domain: ${domain}`,
+    });
+  }
+
+  /**
+   * Generate questions for topic
+   */
+  private async generateQuestionsForTopic(topic: string, domain: string, count: number): Promise<string[]> {
+    return Array.from({ length: count }, (_, i) => `Question ${i + 1} about ${topic}?`);
+  }
+
+  /**
+   * Get comprehensive learning plan
+   */
+  public async getComprehensiveLearningPlan(topic: string, domain: string): Promise<string> {
+    const user = this.getCurrentUser();
+    if (!user) {
+      return 'Please register first to get a learning plan.';
+    }
+
+    const session = await this.createLearningSession(topic, domain, {
+      includeBrainwave: true,
+      includeImageStreaming: true,
+      includeMemoryPalace: true,
+      includeFlashcards: true,
+      includeMindMap: true,
+      includeDeepWork: true,
+      includeReflection: true,
+    });
+
+    return `
+🎯 COMPREHENSIVE LEARNING PLAN: ${topic}
+
+📚 SESSION OVERVIEW:
+• Duration: ${session.estimatedDuration} minutes
+• Difficulty: ${session.difficulty}/10
+• Learning Style: ${session.learningStyle}
+• Steps: ${session.steps.length} activities
+
+📋 LEARNING PATH:
+${session.steps.map((step, index) => `${index + 1}. ${step.title} (${step.duration} min)`).join('\n')}
+
+🎯 OBJECTIVES:
+${session.objectives.map((obj) => `• ${obj}`).join('\n')}
+
+💡 RECOMMENDATIONS:
+• Complete steps in order for maximum effectiveness
+• Take breaks between intensive activities
+• Reflect on connections to other domains
+• Review flashcards regularly for retention
+
+Type 'start session' to begin your learning journey!
+`;
   }
 
   /**

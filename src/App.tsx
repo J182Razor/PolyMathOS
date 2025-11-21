@@ -24,6 +24,7 @@ import { CrossDomainProject } from './components/CrossDomainProject';
 import { MindMapBuilder } from './components/MindMapBuilder';
 import { BrainwaveGenerator } from './components/BrainwaveGenerator';
 import { PolymathAIAssistant } from './components/PolymathAIAssistant';
+import { PolymathAIAssistantEnhanced } from './components/PolymathAIAssistantEnhanced';
 
 type AppState = 'home' | 'signin' | 'signup' | 'dashboard' | 'polymath_dashboard' | 'learning' | 'assessment' | 'domain_selection' | 'memory_palace' | 'flashcards' | 'deep_work' | 'projects' | 'reflection' | 'mind_map' | 'triz' | 'brainwave_generator' | 'polymath_ai';
 
@@ -226,7 +227,12 @@ function App() {
                 ← Back to Dashboard
               </button>
               <div className="h-[calc(100vh-8rem)]">
-                <PolymathAIAssistant />
+                <PolymathAIAssistantEnhanced
+                  onNavigate={(target, config) => {
+                    window.location.hash = `#${target}`;
+                    window.dispatchEvent(new HashChangeEvent('hashchange'));
+                  }}
+                />
               </div>
             </div>
           </div>
