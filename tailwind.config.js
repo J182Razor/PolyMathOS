@@ -49,11 +49,11 @@ export default {
           800: '#2a2a3a',
           900: '#1a1a2a',
         },
-        // Dark Theme (for dark mode)
+        // Dark Theme (for dark mode) - Enhanced for better contrast
         dark: {
-          base: '#0A0A0F',
-          surface: '#111118',
-          elevated: '#1A1A24',
+          base: '#05050A', // Deeper black/navy for maximum contrast
+          surface: '#0F111A', // Lighter for cards - critical for depth
+          elevated: '#1A1D2D', // For hover states
           overlay: '#0F0F15',
         },
         // Light Theme (for light mode)
@@ -63,12 +63,12 @@ export default {
           elevated: '#F1F3F5',
           overlay: '#E8E8F0',
         },
-        // Text Hierarchy (works for both modes)
+        // Text Hierarchy - High contrast for readability
         text: {
-          primary: '#1A1A2A', // Dark text for light mode
-          secondary: '#4A4A5A',
-          tertiary: '#6B6B7F',
-          disabled: '#9090A0',
+          primary: '#FFFFFF', // Pure white for headings in dark mode
+          secondary: '#E2E8F0', // Slate 200 - Bright silver for body text
+          tertiary: '#94A3B8', // Slate 400 - Legible for labels
+          disabled: '#64748B', // Slate 500
         },
         // Legacy support
         primary: {

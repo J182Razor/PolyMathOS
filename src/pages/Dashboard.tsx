@@ -83,7 +83,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <Card key={index} hover className="p-8 rounded-xl border-2 border-silver-200 dark:border-silver-700 hover:border-royal-400 dark:hover:border-royal-500 transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-text-tertiary">{stat.label}</p>
+                  <p className="text-sm font-medium text-text-secondary">{stat.label}</p>
                   <p className="text-3xl font-bold bg-brand-gradient bg-clip-text text-transparent">{stat.value}</p>
                 </div>
                 <div className="w-16 h-16 rounded-xl bg-royal-50 dark:bg-royal-950/30 border-2 border-royal-200 dark:border-royal-800 flex items-center justify-center shadow-lg shadow-royal-500/10 dark:shadow-royal-500/20">
@@ -98,18 +98,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Recent Lessons */}
           <div className="lg:col-span-2">
-            <Card className="p-6">
-              <h2 className="text-xl font-display font-semibold text-text-primary mb-6">
+            <Card className="p-8 rounded-xl border-2 border-silver-500/20">
+              <h2 className="text-2xl font-display font-semibold text-text-primary mb-8">
                 Recent Learning Sessions
               </h2>
               <div className="space-y-4">
                 {recentLessons.map((lesson, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 glass rounded-lg border border-silver-500/10 hover:border-silver-300/30 transition-all duration-300">
+                  <div key={index} className="flex items-center justify-between p-5 glass rounded-lg border-2 border-silver-500/10 hover:border-royal-500/30 transition-all duration-300">
                     <div className="flex-1">
                       <h3 className="font-medium text-text-primary mb-1">
                         {lesson.title}
                       </h3>
-                      <p className="text-sm text-text-tertiary">{lesson.time}</p>
+                      <p className="text-sm text-text-secondary opacity-80">{lesson.time}</p>
                     </div>
                     <div className="flex items-center space-x-4">
                       <div className="w-24 bg-dark-elevated rounded-full h-2 border border-silver-500/20">
@@ -120,7 +120,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           <div className="absolute inset-0 bg-shimmer animate-shimmer"></div>
                         </div>
                       </div>
-                      <span className="text-sm font-medium text-silver-300 w-12">
+                      <span className="text-sm font-medium text-text-secondary w-12">
                         {lesson.progress}%
                       </span>
                     </div>
@@ -155,8 +155,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <div className="space-y-6">
             <SpacedRepetitionWidget />
             
-            <Card className="p-6">
-              <h2 className="text-xl font-display font-semibold text-text-primary mb-4">
+            <Card className="p-8 rounded-xl border-2 border-silver-500/20">
+              <h2 className="text-2xl font-display font-semibold text-text-primary mb-6">
                 Quick Actions
               </h2>
               <div className="space-y-3">

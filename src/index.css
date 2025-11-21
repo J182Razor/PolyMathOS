@@ -6,14 +6,17 @@
 
 /* CSS Custom Properties */
 :root {
-  --color-dark-base: #0A0A0F;
-  --color-dark-surface: #111118;
-  --color-dark-elevated: #1A1A24;
+  --color-dark-base: #05050A;
+  --color-dark-surface: #0F111A;
+  --color-dark-elevated: #1A1D2D;
   --color-dark-overlay: #0F0F15;
   --color-silver-light: #E8E8F0;
   --color-silver-base: #C0C0D0;
   --color-silver-medium: #9090A0;
   --color-silver-dark: #606070;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #E2E8F0;
+  --color-text-tertiary: #94A3B8;
   --shimmer-duration: 3s;
 }
 
@@ -67,6 +70,8 @@
 
   p {
     @apply text-text-secondary leading-relaxed;
+    font-size: 1rem;
+    line-height: 1.75;
   }
 
   a {
