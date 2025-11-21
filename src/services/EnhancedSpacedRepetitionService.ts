@@ -134,7 +134,7 @@ export class EnhancedSpacedRepetitionService {
     confidence: number, // 0-100%
     contextChanged: boolean = false
   ): EnhancedReviewItem | null {
-    const item = this.getItem(itemId);
+    let item = this.getItem(itemId);
     if (!item) return null;
 
     const now = new Date();

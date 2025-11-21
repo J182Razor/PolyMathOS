@@ -1,0 +1,236 @@
+{
+  "name": "PolyMathOS - User Authentication",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "auth/signup",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-signup",
+      "name": "Sign Up Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "signup"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.email }}",
+              "operation": "isNotEmpty"
+            },
+            {
+              "value1": "={{ $json.body.password }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "validate-input",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": {
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "email": "={{ $json.body.email }}",
+              "password_hash": "={{ $json.body.password }}",
+              "first_name": "={{ $json.body.firstName }}",
+              "last_name": "={{ $json.body.lastName }}",
+              "created_at": "={{ $now }}",
+              "updated_at": "={{ $now }}"
+            }
+          }
+        },
+        "table": {
+          "value": "users"
+        },
+        "options": {}
+      },
+      "id": "insert-user",
+      "name": "Insert User to Supabase",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [650, 200],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, email, first_name, last_name FROM users WHERE email = $1",
+        "additionalFields": {
+          "queryParameters": "={{ [$json.body.email] }}"
+        }
+      },
+      "id": "get-user",
+      "name": "Get User",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [850, 200],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"user\": $json, \"token\": \"{{ $env.JWT_SECRET }}\" } }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": false, \"error\": \"Invalid input\" } }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "respond-error",
+      "name": "Respond Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 400]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "auth/signin",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-signin",
+      "name": "Sign In Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 500],
+      "webhookId": "signin"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, email, first_name, last_name, password_hash FROM users WHERE email = $1",
+        "additionalFields": {
+          "queryParameters": "={{ [$json.body.email] }}"
+        }
+      },
+      "id": "verify-user",
+      "name": "Verify User",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 500],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.password_hash }}",
+              "value2": "={{ $json.body.password }}",
+              "operation": "equals"
+            }
+          ]
+        }
+      },
+      "id": "check-password",
+      "name": "Check Password",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [650, 500]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"user\": { \"id\": $json.id, \"email\": $json.email, \"firstName\": $json.first_name, \"lastName\": $json.last_name }, \"token\": \"{{ $env.JWT_SECRET }}\" } }}",
+        "options": {}
+      },
+      "id": "respond-signin-success",
+      "name": "Respond Sign In Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": false, \"error\": \"Invalid credentials\" } }}",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "id": "respond-signin-error",
+      "name": "Respond Sign In Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 600]
+    }
+  ],
+  "connections": {
+    "Sign Up Webhook": {
+      "main": [[{ "node": "Validate Input", "type": "main", "index": 0 }]]
+    },
+    "Validate Input": {
+      "main": [
+        [{ "node": "Insert User to Supabase", "type": "main", "index": 0 }],
+        [{ "node": "Respond Error", "type": "main", "index": 0 }]
+      ]
+    },
+    "Insert User to Supabase": {
+      "main": [[{ "node": "Get User", "type": "main", "index": 0 }]]
+    },
+    "Get User": {
+      "main": [[{ "node": "Respond Success", "type": "main", "index": 0 }]]
+    },
+    "Sign In Webhook": {
+      "main": [[{ "node": "Verify User", "type": "main", "index": 0 }]]
+    },
+    "Verify User": {
+      "main": [[{ "node": "Check Password", "type": "main", "index": 0 }]]
+    },
+    "Check Password": {
+      "main": [
+        [{ "node": "Respond Sign In Success", "type": "main", "index": 0 }],
+        [{ "node": "Respond Sign In Error", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

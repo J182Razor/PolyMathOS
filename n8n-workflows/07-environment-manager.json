@@ -1,0 +1,150 @@
+{
+  "name": "PolyMathOS - Environment Variable Manager",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "env/get",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-get-env",
+      "name": "Get Env Variables Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "get-env"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT key, value, description, is_secret FROM environment_variables WHERE user_id = $1 OR user_id IS NULL ORDER BY user_id NULLS LAST",
+        "additionalFields": {
+          "queryParameters": "={{ [$json.query.userId] }}"
+        }
+      },
+      "id": "get-variables",
+      "name": "Get Variables",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Mask secret values\nconst variables = $input.all();\nconst result = variables.map(item => ({\n  key: item.json.key,\n  value: item.json.is_secret ? '***MASKED***' : item.json.value,\n  description: item.json.description,\n  isSecret: item.json.is_secret\n}));\n\nreturn result;"
+      },
+      "id": "mask-secrets",
+      "name": "Mask Secrets",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"variables\": $json } }}",
+        "options": {}
+      },
+      "id": "respond-get",
+      "name": "Respond Get",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "env/set",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-set-env",
+      "name": "Set Env Variable Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 500],
+      "webhookId": "set-env"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "user_id": "={{ $json.body.userId }}",
+              "key": "={{ $json.body.key }}",
+              "value": "={{ $json.body.value }}",
+              "description": "={{ $json.body.description }}",
+              "is_secret": "={{ $json.body.isSecret || false }}",
+              "updated_at": "={{ $now }}"
+            }
+          }
+        },
+        "table": {
+          "value": "environment_variables"
+        },
+        "updateKey": {
+          "value": "user_id,key"
+        },
+        "options": {}
+      },
+      "id": "upsert-variable",
+      "name": "Upsert Variable",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 500],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"message\": \"Environment variable set successfully\" } }}",
+        "options": {}
+      },
+      "id": "respond-set",
+      "name": "Respond Set",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 500]
+    }
+  ],
+  "connections": {
+    "Get Env Variables Webhook": {
+      "main": [[{ "node": "Get Variables", "type": "main", "index": 0 }]]
+    },
+    "Get Variables": {
+      "main": [[{ "node": "Mask Secrets", "type": "main", "index": 0 }]]
+    },
+    "Mask Secrets": {
+      "main": [[{ "node": "Respond Get", "type": "main", "index": 0 }]]
+    },
+    "Set Env Variable Webhook": {
+      "main": [[{ "node": "Upsert Variable", "type": "main", "index": 0 }]]
+    },
+    "Upsert Variable": {
+      "main": [[{ "node": "Respond Set", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

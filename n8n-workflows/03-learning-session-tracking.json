@@ -1,0 +1,223 @@
+{
+  "name": "PolyMathOS - Learning Session Tracking",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sessions/start",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-start",
+      "name": "Start Session Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "session-start"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": {
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "user_id": "={{ $json.body.userId }}",
+              "session_type": "={{ $json.body.sessionType }}",
+              "topic": "={{ $json.body.topic }}",
+              "started_at": "={{ $now }}",
+              "status": "active"
+            }
+          }
+        },
+        "table": {
+          "value": "learning_sessions"
+        },
+        "options": {}
+      },
+      "id": "create-session",
+      "name": "Create Session",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"sessionId\": $json.id, \"startedAt\": $json.started_at } }}",
+        "options": {}
+      },
+      "id": "respond-start",
+      "name": "Respond Start",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sessions/update",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-update",
+      "name": "Update Session Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 500],
+      "webhookId": "session-update"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "questions_answered": "={{ $json.body.questionsAnswered }}",
+              "correct_answers": "={{ $json.body.correctAnswers }}",
+              "rpe_events": "={{ $json.body.rpeEvents }}",
+              "confidence_scores": "={{ $json.body.confidenceScores }}",
+              "updated_at": "={{ $now }}"
+            }
+          }
+        },
+        "table": {
+          "value": "learning_sessions"
+        },
+        "updateKey": {
+          "value": "id"
+        },
+        "options": {}
+      },
+      "id": "update-session",
+      "name": "Update Session",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 500],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sessions/complete",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-complete",
+      "name": "Complete Session Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 700],
+      "webhookId": "session-complete"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "status": "completed",
+              "completed_at": "={{ $now }}",
+              "duration_minutes": "={{ $json.body.durationMinutes }}",
+              "final_score": "={{ $json.body.finalScore }}",
+              "updated_at": "={{ $now }}"
+            }
+          }
+        },
+        "table": {
+          "value": "learning_sessions"
+        },
+        "updateKey": {
+          "value": "id"
+        },
+        "options": {}
+      },
+      "id": "complete-session",
+      "name": "Complete Session",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 700],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM learning_sessions WHERE id = $1",
+        "additionalFields": {
+          "queryParameters": "={{ [$json.body.sessionId] }}"
+        }
+      },
+      "id": "get-session",
+      "name": "Get Session",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [650, 700],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"session\": $json } }}",
+        "options": {}
+      },
+      "id": "respond-complete",
+      "name": "Respond Complete",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 700]
+    }
+  ],
+  "connections": {
+    "Start Session Webhook": {
+      "main": [[{ "node": "Create Session", "type": "main", "index": 0 }]]
+    },
+    "Create Session": {
+      "main": [[{ "node": "Respond Start", "type": "main", "index": 0 }]]
+    },
+    "Update Session Webhook": {
+      "main": [[{ "node": "Update Session", "type": "main", "index": 0 }]]
+    },
+    "Complete Session Webhook": {
+      "main": [[{ "node": "Complete Session", "type": "main", "index": 0 }]]
+    },
+    "Complete Session": {
+      "main": [[{ "node": "Get Session", "type": "main", "index": 0 }]]
+    },
+    "Get Session": {
+      "main": [[{ "node": "Respond Complete", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

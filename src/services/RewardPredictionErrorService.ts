@@ -401,7 +401,7 @@ export class RewardPredictionErrorService {
   }
 
   private saveEvent(event: RPEEvent): void {
-    const events = this.getAllEvents();
+    let events = this.getAllEvents();
     events.push(event);
     
     // Keep only last 1000 events to prevent storage bloat

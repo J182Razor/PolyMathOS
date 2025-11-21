@@ -1,0 +1,183 @@
+{
+  "name": "PolyMathOS - Spaced Repetition Scheduler",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Hourly Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM spaced_repetition_items WHERE next_review_date <= NOW() AND status = 'active' ORDER BY next_review_date ASC LIMIT 100",
+        "options": {}
+      },
+      "id": "get-due-items",
+      "name": "Get Due Items",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Group items by user\nconst items = $input.all();\nconst userGroups = {};\n\nfor (const item of items) {\n  const userId = item.json.user_id;\n  if (!userGroups[userId]) {\n    userGroups[userId] = [];\n  }\n  userGroups[userId].push(item.json);\n}\n\nreturn Object.entries(userGroups).map(([userId, items]) => ({\n  userId,\n  items,\n  count: items.length\n}));"
+      },
+      "id": "group-by-user",
+      "name": "Group By User",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.N8N_WEBHOOK_URL }}/notifications/review-due",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "={{ $json.userId }}"
+            },
+            {
+              "name": "itemCount",
+              "value": "={{ $json.count }}"
+            },
+            {
+              "name": "items",
+              "value": "={{ $json.items }}"
+            },
+            {
+              "name": "message",
+              "value": "=You have {{ $json.count }} items due for review!"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notify-users",
+      "name": "Notify Users",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "spaced-repetition/process",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-process",
+      "name": "Process Review Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 500],
+      "webhookId": "sr-process"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate next review date based on SM-2 algorithm\nconst body = $input.item.json.body;\nconst item = body.item;\nconst wasCorrect = body.wasCorrect;\nconst confidence = body.confidence;\n\n// Stage progression map\nconst stageProgression = {\n  'learning': 'reviewing',\n  'reviewing': 'mastering',\n  'mastering': 'mastered'\n};\n\n// Calculate next review date\nlet nextReviewDate;\nlet newStage = item.current_stage;\n\nif (wasCorrect) {\n  newStage = stageProgression[item.current_stage] || item.current_stage;\n  \n  // Days until next review based on stage\n  const daysMap = {\n    'learning': 1,\n    'reviewing': 3,\n    'mastering': 7,\n    'mastered': 30\n  };\n  \n  const days = daysMap[newStage] || 1;\n  const nextDate = new Date();\n  nextDate.setDate(nextDate.getDate() + days);\n  nextReviewDate = nextDate.toISOString();\n} else {\n  // Reset to learning stage if incorrect\n  newStage = 'learning';\n  nextReviewDate = new Date().toISOString(); // Review immediately\n}\n\nreturn {\n  itemId: item.id,\n  newStage,\n  nextReviewDate,\n  wasCorrect,\n  confidence,\n  reviewCount: (item.review_count || 0) + 1\n};"
+      },
+      "id": "calculate-next-review",
+      "name": "Calculate Next Review",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 500]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "current_stage": "={{ $json.newStage }}",
+              "next_review_date": "={{ $json.nextReviewDate }}",
+              "review_count": "={{ $json.reviewCount }}",
+              "last_review_date": "={{ $now }}",
+              "updated_at": "={{ $now }}"
+            }
+          }
+        },
+        "table": {
+          "value": "spaced_repetition_items"
+        },
+        "updateKey": {
+          "value": "id"
+        },
+        "options": {}
+      },
+      "id": "update-item",
+      "name": "Update Item",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [650, 500],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"nextReviewDate\": $('Calculate Next Review').item.json.nextReviewDate, \"newStage\": $('Calculate Next Review').item.json.newStage } }}",
+        "options": {}
+      },
+      "id": "respond-process",
+      "name": "Respond Process",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 500]
+    }
+  ],
+  "connections": {
+    "Hourly Schedule": {
+      "main": [[{ "node": "Get Due Items", "type": "main", "index": 0 }]]
+    },
+    "Get Due Items": {
+      "main": [[{ "node": "Group By User", "type": "main", "index": 0 }]]
+    },
+    "Group By User": {
+      "main": [[{ "node": "Notify Users", "type": "main", "index": 0 }]]
+    },
+    "Process Review Webhook": {
+      "main": [[{ "node": "Calculate Next Review", "type": "main", "index": 0 }]]
+    },
+    "Calculate Next Review": {
+      "main": [[{ "node": "Update Item", "type": "main", "index": 0 }]]
+    },
+    "Update Item": {
+      "main": [[{ "node": "Respond Process", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

@@ -23,12 +23,15 @@ PolyMathOS is a revolutionary learning platform that combines cutting-edge neuro
 - **DARPA Problem-First Protocol**: Attempt problems before reading, identify knowledge gaps, targeted acquisition, Feynman teaching
 
 ### 🤖 **AI-Powered Personalization**
+- **n8n Automation**: Centralized agent management and workflow automation
+- **NVIDIA Integration**: GPU-optimized models from build.nvidia.com
 - **Gemini Integration**: Long-context synthesis (like NotebookLM) for complex content generation
 - **Groq Integration**: Ultra-fast inference for real-time interactions
 - **Adaptive Content Delivery**: Real-time adjustment based on your cognitive patterns and RPE data
 - **Intelligent Tutoring**: AI that understands your learning style and adapts accordingly
 - **Feynman Analysis**: AI-powered explanation quality assessment
 - **Predictive Analytics**: Anticipates learning challenges before they occur
+- **Environment Variable Management**: Secure API key storage via n8n
 
 ### 📊 **Comprehensive Assessment**
 - **Cognitive Profiling**: Deep analysis of your learning preferences and capabilities
@@ -71,7 +74,8 @@ PolyMathOS is a revolutionary learning platform that combines cutting-edge neuro
 3. **Set up environment variables**
    ```bash
    cp .env.example .env
-   # Add your OpenAI API key and other configuration
+   # Add your API keys and configuration
+   # See README_N8N_INTEGRATION.md for n8n setup
    ```
 
 4. **Start the development server**
@@ -91,6 +95,8 @@ PolyMathOS is a revolutionary learning platform that combines cutting-edge neuro
 ### Technical Documentation
 - **[Technical Documentation](docs/TECHNICAL_DOCUMENTATION.md)** - System architecture and implementation details
 - **[Developer How-To Guide](docs/DEVELOPER_HOW_TO_GUIDE.md)** - Development setup and customization guide
+- **[n8n Integration Guide](README_N8N_INTEGRATION.md)** - Complete n8n automation setup and workflows
+- **[n8n Setup Guide](docs/N8N_SETUP_GUIDE.md)** - Detailed n8n installation and configuration
 
 ### Research Documents
 - **[Dopamine and Addictive Learning](docs/DopamineandAddictiveLearning_Science-BackedNeurohacks.pdf)** - Neuroscience research on motivation
@@ -127,7 +133,9 @@ src/
 │   ├── InterleavingService.ts               # 3×3 daily loop & domain switching
 │   ├── DARPALearningService.ts             # Problem-first protocol
 │   ├── SpacedRepetitionService.ts          # SM-2 algorithm
-│   ├── LLMService.ts                        # Gemini & Groq integration
+│   ├── LLMService.ts                        # Gemini, Groq & NVIDIA integration
+│   ├── N8NService.ts                        # n8n automation integration
+│   ├── NVIDIAAIService.ts                   # NVIDIA API integration
 │   ├── NeuroAILessonService.ts             # AI-powered lesson generation
 │   ├── PolymathUserService.ts              # User data management
 │   └── PolymathFeaturesService.ts          # Advanced features
@@ -142,6 +150,8 @@ src/
 - **Styling**: Tailwind CSS with custom dark minimalist design system (silver accents, shimmer effects)
 - **Build Tool**: Vite for fast development and optimized builds
 - **AI Integration**: 
+  - **n8n**: Workflow automation and centralized agent management
+  - **NVIDIA API**: GPU-optimized models from build.nvidia.com
   - **Gemini API**: Long-context synthesis for complex content (like NotebookLM)
   - **Groq API**: Ultra-fast inference for real-time interactions
   - **OpenAI API**: Fallback for content generation

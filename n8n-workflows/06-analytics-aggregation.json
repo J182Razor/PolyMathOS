@@ -1,0 +1,132 @@
+{
+  "name": "PolyMathOS - Analytics Aggregation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "6-Hour Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  user_id,\n  COUNT(*) as total_sessions,\n  AVG(final_score) as avg_score,\n  SUM(duration_minutes) as total_minutes,\n  COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_sessions\nFROM learning_sessions\nWHERE created_at >= NOW() - INTERVAL '7 days'\nGROUP BY user_id",
+        "options": {}
+      },
+      "id": "aggregate-sessions",
+      "name": "Aggregate Sessions",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  user_id,\n  COUNT(*) as total_rpe_events,\n  AVG(rpe_value) as avg_rpe,\n  COUNT(CASE WHEN is_hyper_correction THEN 1 END) as hyper_corrections,\n  AVG(learning_value) as avg_learning_value\nFROM rpe_events\nWHERE created_at >= NOW() - INTERVAL '7 days'\nGROUP BY user_id",
+        "options": {}
+      },
+      "id": "aggregate-rpe",
+      "name": "Aggregate RPE",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 500],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge analytics data\nconst sessions = $('Aggregate Sessions').all();\nconst rpe = $('Aggregate RPE').all();\n\nconst analytics = {};\n\n// Process sessions\nfor (const session of sessions) {\n  const userId = session.json.user_id;\n  analytics[userId] = {\n    userId,\n    ...session.json\n  };\n}\n\n// Merge RPE data\nfor (const rpeData of rpe) {\n  const userId = rpeData.json.user_id;\n  if (analytics[userId]) {\n    analytics[userId] = {\n      ...analytics[userId],\n      ...rpeData.json\n    };\n  } else {\n    analytics[userId] = {\n      userId,\n      ...rpeData.json\n    };\n  }\n}\n\nreturn Object.values(analytics);"
+      },
+      "id": "merge-analytics",
+      "name": "Merge Analytics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 400]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": {
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "user_id": "={{ $json.userId }}",
+              "period_start": "={{ $now }}",
+              "period_end": "={{ $now }}",
+              "total_sessions": "={{ $json.total_sessions || 0 }}",
+              "avg_score": "={{ $json.avg_score || 0 }}",
+              "total_minutes": "={{ $json.total_minutes || 0 }}",
+              "total_rpe_events": "={{ $json.total_rpe_events || 0 }}",
+              "avg_rpe": "={{ $json.avg_rpe || 0 }}",
+              "hyper_corrections": "={{ $json.hyper_corrections || 0 }}",
+              "created_at": "={{ $now }}"
+            }
+          }
+        },
+        "table": {
+          "value": "user_analytics"
+        },
+        "options": {}
+      },
+      "id": "save-analytics",
+      "name": "Save Analytics",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [850, 400],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Database"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "6-Hour Schedule": {
+      "main": [
+        [{ "node": "Aggregate Sessions", "type": "main", "index": 0 }],
+        [{ "node": "Aggregate RPE", "type": "main", "index": 0 }]
+      ]
+    },
+    "Aggregate Sessions": {
+      "main": [[{ "node": "Merge Analytics", "type": "main", "index": 0 }]]
+    },
+    "Aggregate RPE": {
+      "main": [[{ "node": "Merge Analytics", "type": "main", "index": 0 }]]
+    },
+    "Merge Analytics": {
+      "main": [[{ "node": "Save Analytics", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

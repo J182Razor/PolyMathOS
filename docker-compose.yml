@@ -23,4 +23,5 @@ services:
 networks:
   polymathos-network:
     driver: bridge
+    name: polymathos-network
 

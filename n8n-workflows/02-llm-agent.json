@@ -1,0 +1,308 @@
+{
+  "name": "PolyMathOS - LLM Agent Service",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "agent/chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-chat",
+      "name": "Chat Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "agent-chat"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Route to appropriate LLM based on request\nconst request = $input.item.json.body;\nconst provider = request.provider || 'nvidia';\nconst message = request.message;\nconst context = request.context || {};\n\nreturn {\n  provider,\n  message,\n  context,\n  userId: request.userId,\n  sessionId: request.sessionId\n};"
+      },
+      "id": "parse-request",
+      "name": "Parse Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.provider }}",
+              "value2": "nvidia",
+              "operation": "equals"
+            }
+          ]
+        }
+      },
+      "id": "route-provider",
+      "name": "Route Provider",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [650, 300],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "nvidia",
+              "leftValue": "={{ $json.provider }}",
+              "rightValue": "nvidia",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "gemini",
+              "leftValue": "={{ $json.provider }}",
+              "rightValue": "gemini",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "groq",
+              "leftValue": "={{ $json.provider }}",
+              "rightValue": "groq",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://integrate.api.nvidia.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.NVIDIA_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "={{ $env.NVIDIA_MODEL || 'meta/llama-3.1-70b-instruct' }}"
+            },
+            {
+              "name": "messages",
+              "value": "={{ [\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a helpful Learning AI Assistant for PolyMathOS, a neuroscience-based learning platform. Provide helpful, encouraging, and science-backed advice.\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": $json.message\n  }\n] }}"
+            },
+            {
+              "name": "temperature",
+              "value": "0.7"
+            },
+            {
+              "name": "max_tokens",
+              "value": "2000"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "nvidia-api",
+      "name": "NVIDIA API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{ $env.GEMINI_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "contents",
+              "value": "={{ [{\n  \"parts\": [{\n    \"text\": $json.message\n  }]\n}] }}"
+            },
+            {
+              "name": "generationConfig",
+              "value": "={{ {\n  \"temperature\": 0.7,\n  \"maxOutputTokens\": 2000\n} }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "gemini-api",
+      "name": "Gemini API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.GROQ_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "llama-3.1-70b-versatile"
+            },
+            {
+              "name": "messages",
+              "value": "={{ [\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a helpful Learning AI Assistant.\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": $json.message\n  }\n] }}"
+            },
+            {
+              "name": "temperature",
+              "value": "0.7"
+            },
+            {
+              "name": "max_tokens",
+              "value": "2000"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "groq-api",
+      "name": "Groq API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalize response from different providers\nconst input = $input.item.json;\nconst provider = $('Route Provider').item.json.provider;\n\nlet content = '';\nlet tokens = 0;\n\nif (provider === 'nvidia') {\n  content = input.choices?.[0]?.message?.content || '';\n  tokens = input.usage?.total_tokens || 0;\n} else if (provider === 'gemini') {\n  content = input.candidates?.[0]?.content?.parts?.[0]?.text || '';\n  tokens = input.usageMetadata?.totalTokenCount || 0;\n} else if (provider === 'groq') {\n  content = input.choices?.[0]?.message?.content || '';\n  tokens = input.usage?.total_tokens || 0;\n}\n\nreturn {\n  content,\n  provider,\n  tokens,\n  timestamp: new Date().toISOString()\n};"
+      },
+      "id": "normalize-response",
+      "name": "Normalize Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": {
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "user_id": "={{ $('Parse Request').item.json.userId }}",
+              "session_id": "={{ $('Parse Request').item.json.sessionId }}",
+              "provider": "={{ $json.provider }}",
+              "message": "={{ $('Parse Request').item.json.message }}",
+              "response": "={{ $json.content }}",
+              "tokens_used": "={{ $json.tokens }}",
+              "created_at": "={{ $now }}"
+            }
+          }
+        },
+        "table": {
+          "value": "llm_interactions"
+        },
+        "options": {}
+      },
+      "id": "log-interaction",
+      "name": "Log Interaction",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [1250, 300],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"content\": $('Normalize Response').item.json.content, \"provider\": $('Normalize Response').item.json.provider, \"tokens\": $('Normalize Response').item.json.tokens } }}",
+        "options": {}
+      },
+      "id": "respond-chat",
+      "name": "Respond Chat",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    }
+  ],
+  "connections": {
+    "Chat Webhook": {
+      "main": [[{ "node": "Parse Request", "type": "main", "index": 0 }]]
+    },
+    "Parse Request": {
+      "main": [[{ "node": "Route Provider", "type": "main", "index": 0 }]]
+    },
+    "Route Provider": {
+      "main": [
+        [{ "node": "NVIDIA API", "type": "main", "index": 0 }],
+        [{ "node": "Gemini API", "type": "main", "index": 0 }],
+        [{ "node": "Groq API", "type": "main", "index": 0 }]
+      ]
+    },
+    "NVIDIA API": {
+      "main": [[{ "node": "Normalize Response", "type": "main", "index": 0 }]]
+    },
+    "Gemini API": {
+      "main": [[{ "node": "Normalize Response", "type": "main", "index": 0 }]]
+    },
+    "Groq API": {
+      "main": [[{ "node": "Normalize Response", "type": "main", "index": 0 }]]
+    },
+    "Normalize Response": {
+      "main": [[{ "node": "Log Interaction", "type": "main", "index": 0 }]]
+    },
+    "Log Interaction": {
+      "main": [[{ "node": "Respond Chat", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

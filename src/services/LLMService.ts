@@ -2,8 +2,10 @@
  * LLM Integration Service
  * Integrates Gemini (for synthesis and long-context), Groq (for speed), and NVIDIA (for performance)
  * Leverages unique qualities of Gemini (like NotebookLM), Groq's fast inference, and NVIDIA's GPU-optimized models
+ * Optionally uses n8n for centralized agent management
  */
 import { NVIDIAAIService } from './NVIDIAAIService';
+import { N8NService } from './N8NService';
 
 interface LLMConfig {
   geminiApiKey?: string;
@@ -12,6 +14,8 @@ interface LLMConfig {
   useGroqForSpeed?: boolean;
   useGeminiForSynthesis?: boolean;
   useNVIDIAForPerformance?: boolean;
+  useN8N?: boolean;
+  n8nWebhookUrl?: string;
 }
 
 interface LessonGenerationRequest {
@@ -42,6 +46,8 @@ export class LLMService {
       useGroqForSpeed: true,
       useGeminiForSynthesis: true,
       useNVIDIAForPerformance: true,
+      useN8N: import.meta.env.VITE_USE_N8N === 'true',
+      n8nWebhookUrl: import.meta.env.VITE_N8N_WEBHOOK_URL,
     };
     this.nvidiaService = NVIDIAAIService.getInstance();
   }
@@ -61,6 +67,28 @@ export class LLMService {
     const startTime = Date.now();
 
     try {
+      // Use n8n agent if configured
+      if (this.config.useN8N && this.config.n8nWebhookUrl) {
+        try {
+          const prompt = `Generate a comprehensive lesson on: ${request.topic}. ${request.context || ''}`;
+          const result = await N8NService.chatWithAgent({
+            message: prompt,
+            provider: 'nvidia',
+            context: request,
+          });
+          if (result.success && result.content) {
+            return {
+              content: result.content,
+              model: (result.provider as 'nvidia' | 'gemini' | 'groq') || 'nvidia',
+              tokensUsed: result.tokens,
+              latency: Date.now() - startTime,
+            };
+          }
+        } catch (error) {
+          console.warn('n8n agent failed, falling back to direct APIs:', error);
+        }
+      }
+
       // Use NVIDIA for performance-optimized content generation
       if (this.config.useNVIDIAForPerformance && this.nvidiaService.isConfigured()) {
         try {
@@ -96,6 +124,26 @@ export class LLMService {
     const startTime = Date.now();
 
     try {
+      // Use n8n agent if configured
+      if (this.config.useN8N && this.config.n8nWebhookUrl) {
+        try {
+          const result = await N8NService.chatWithAgent({
+            message: prompt,
+            provider: 'nvidia',
+          });
+          if (result.success && result.content) {
+            return {
+              content: result.content,
+              model: (result.provider as 'nvidia' | 'gemini' | 'groq') || 'nvidia',
+              tokensUsed: result.tokens,
+              latency: Date.now() - startTime,
+            };
+          }
+        } catch (error) {
+          console.warn('n8n agent failed, falling back to direct APIs:', error);
+        }
+      }
+
       // Try NVIDIA first for GPU-optimized performance
       if (this.nvidiaService.isConfigured() && this.config.useNVIDIAForPerformance) {
         try {
