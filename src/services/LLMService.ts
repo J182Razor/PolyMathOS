@@ -1,14 +1,17 @@
 /**
  * LLM Integration Service
- * Integrates Gemini (for synthesis and long-context) and Groq (for speed)
- * Leverages unique qualities of Gemini (like NotebookLM) and Groq's fast inference
+ * Integrates Gemini (for synthesis and long-context), Groq (for speed), and NVIDIA (for performance)
+ * Leverages unique qualities of Gemini (like NotebookLM), Groq's fast inference, and NVIDIA's GPU-optimized models
  */
+import { NVIDIAAIService } from './NVIDIAAIService';
 
 interface LLMConfig {
   geminiApiKey?: string;
   groqApiKey?: string;
+  nvidiaApiKey?: string;
   useGroqForSpeed?: boolean;
   useGeminiForSynthesis?: boolean;
+  useNVIDIAForPerformance?: boolean;
 }
 
 interface LessonGenerationRequest {
@@ -20,7 +23,7 @@ interface LessonGenerationRequest {
 
 interface LLMResponse {
   content: string;
-  model: 'gemini' | 'groq';
+  model: 'gemini' | 'groq' | 'nvidia';
   tokensUsed?: number;
   latency?: number;
 }
@@ -29,13 +32,18 @@ export class LLMService {
   private static instance: LLMService;
   private config: LLMConfig;
 
+  private nvidiaService: NVIDIAAIService;
+
   private constructor() {
     this.config = {
       geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY,
       groqApiKey: import.meta.env.VITE_GROQ_API_KEY,
+      nvidiaApiKey: import.meta.env.VITE_NVIDIA_API_KEY,
       useGroqForSpeed: true,
       useGeminiForSynthesis: true,
+      useNVIDIAForPerformance: true,
     };
+    this.nvidiaService = NVIDIAAIService.getInstance();
   }
 
   public static getInstance(): LLMService {
@@ -53,6 +61,15 @@ export class LLMService {
     const startTime = Date.now();
 
     try {
+      // Use NVIDIA for performance-optimized content generation
+      if (this.config.useNVIDIAForPerformance && this.nvidiaService.isConfigured()) {
+        try {
+          return await this.generateWithNVIDIA(request);
+        } catch (error) {
+          console.warn('NVIDIA API failed, falling back to other providers:', error);
+        }
+      }
+
       // Use Gemini for synthesis (like NotebookLM) - better for complex content generation
       if (this.config.useGeminiForSynthesis && this.config.geminiApiKey) {
         return await this.generateWithGemini(request);
@@ -72,13 +89,32 @@ export class LLMService {
   }
 
   /**
-   * Quick response using Groq for speed
-   * Groq provides ultra-fast inference for real-time interactions
+   * Quick response using fastest available provider
+   * Priority: NVIDIA (if configured) > Groq > Gemini
    */
   public async generateQuickResponse(prompt: string): Promise<LLMResponse> {
     const startTime = Date.now();
 
     try {
+      // Try NVIDIA first for GPU-optimized performance
+      if (this.nvidiaService.isConfigured() && this.config.useNVIDIAForPerformance) {
+        try {
+          const content = await this.nvidiaService.generateText(
+            prompt,
+            'You are an expert learning assistant that provides concise, helpful responses optimized for learning.',
+            { temperature: 0.7, max_tokens: 500 }
+          );
+          return {
+            content,
+            model: 'nvidia',
+            latency: Date.now() - startTime,
+          };
+        } catch (error) {
+          console.warn('NVIDIA quick response failed, falling back:', error);
+        }
+      }
+
+      // Fallback to Groq for speed
       if (this.config.groqApiKey && this.config.useGroqForSpeed) {
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
@@ -180,7 +216,14 @@ export class LLMService {
       throw new Error('Gemini API request failed');
     } catch (error) {
       console.error('Gemini API error:', error);
-      // Fallback to Groq or mock
+      // Fallback to NVIDIA, Groq, or mock
+      if (this.nvidiaService.isConfigured()) {
+        try {
+          return await this.generateWithNVIDIA(request);
+        } catch (error) {
+          console.warn('NVIDIA fallback failed:', error);
+        }
+      }
       if (this.config.groqApiKey) {
         return this.generateWithGroq(request);
       }
@@ -237,6 +280,63 @@ export class LLMService {
       console.error('Groq API error:', error);
       return this.generateMockResponse(request);
     }
+  }
+
+  /**
+   * Generate with NVIDIA - GPU-optimized performance
+   */
+  private async generateWithNVIDIA(request: LessonGenerationRequest): Promise<LLMResponse> {
+    const startTime = Date.now();
+
+    try {
+      const prompt = this.buildNVIDIAPrompt(request);
+      
+      const content = await this.nvidiaService.generateText(
+        prompt,
+        'You are an expert educational content creator specializing in neuroscience-based learning optimization. Create comprehensive, personalized learning content.',
+        {
+          temperature: 0.7,
+          max_tokens: 2000,
+        }
+      );
+
+      const latency = Date.now() - startTime;
+      
+      return {
+        content,
+        model: 'nvidia',
+        latency,
+      };
+    } catch (error) {
+      console.error('NVIDIA API error:', error);
+      // Fallback to other providers
+      if (this.config.geminiApiKey) {
+        return this.generateWithGemini(request);
+      }
+      if (this.config.groqApiKey) {
+        return this.generateWithGroq(request);
+      }
+      return this.generateMockResponse(request);
+    }
+  }
+
+  private buildNVIDIAPrompt(request: LessonGenerationRequest): string {
+    return `Create a personalized learning lesson on "${request.topic}" optimized for neuroscience-based learning.
+
+User Profile:
+- Dopamine sensitivity: ${request.userProfile?.dopamineProfile?.rewardSensitivity || 'moderate'}
+- Learning style: ${this.getLearningStyle(request.userProfile)}
+- Meta-learning skills: ${this.getMetaLearningLevel(request.userProfile)}
+- Goals: ${request.userProfile?.personalGoals?.primaryObjective || 'General learning'}
+
+Requirements:
+1. Use first principles thinking to break down the topic
+2. Include dopamine-optimized micro-rewards and milestones
+3. Apply meta-learning techniques (planning, monitoring, reflection)
+4. Use the Feynman technique for explanations
+5. Create engaging, personalized content optimized for GPU-accelerated learning
+
+Generate comprehensive lesson content that adapts to this user's cognitive profile and leverages high-performance AI capabilities.`;
   }
 
   private buildGeminiPrompt(request: LessonGenerationRequest): string {
@@ -321,8 +421,12 @@ In a production environment with API keys configured, this would generate a comp
 To enable full functionality:
 1. Add VITE_GEMINI_API_KEY to your .env file for Gemini integration
 2. Add VITE_GROQ_API_KEY to your .env file for Groq integration
+3. Add VITE_NVIDIA_API_KEY to your .env file for NVIDIA NIM integration (from build.nvidia.com)
 
-The system will automatically use Gemini for complex synthesis (like NotebookLM) and Groq for ultra-fast responses.`;
+The system will automatically use:
+- NVIDIA for GPU-optimized performance (if configured)
+- Gemini for complex synthesis (like NotebookLM)
+- Groq for ultra-fast responses`;
   }
 
   /**
@@ -334,6 +438,33 @@ The system will automatically use Gemini for complex synthesis (like NotebookLM)
     suggestions: string[];
   }> {
     try {
+      // Try NVIDIA first for performance
+      if (this.nvidiaService.isConfigured() && this.config.useNVIDIAForPerformance) {
+        try {
+          const prompt = `Analyze this explanation of "${concept}":\n\n${explanation}\n\nProvide: 1) Clarity score (0-100), 2) Knowledge gaps, 3) Improvement suggestions. Return as JSON with keys: clarity (number), gaps (array of strings), suggestions (array of strings).`;
+          const content = await this.nvidiaService.generateText(
+            prompt,
+            'You are an expert educator analyzing student explanations using the Feynman technique. Identify clarity, gaps, and provide constructive feedback. Always return valid JSON.',
+            { temperature: 0.5, max_tokens: 500 }
+          );
+          
+          try {
+            const analysis = JSON.parse(content);
+            return {
+              clarity: analysis.clarity || 70,
+              gaps: analysis.gaps || [],
+              suggestions: analysis.suggestions || [],
+            };
+          } catch (parseError) {
+            // If JSON parsing fails, fall through to other providers
+            console.warn('NVIDIA response not valid JSON, falling back:', parseError);
+          }
+        } catch (error) {
+          console.warn('NVIDIA Feynman analysis failed, falling back:', error);
+        }
+      }
+
+      // Fallback to Groq
       if (this.config.groqApiKey) {
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
