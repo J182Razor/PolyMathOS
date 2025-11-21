@@ -29,12 +29,15 @@
 
   body {
     @apply m-0 min-h-screen;
-    @apply bg-dark-base text-text-primary;
+    @apply bg-light-base dark:bg-dark-base;
+    @apply text-text-primary;
     @apply font-sans antialiased;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    padding: 0;
+    margin: 0;
   }
 
   #root {
@@ -75,14 +78,14 @@
 @layer components {
   /* Glassmorphism Effect */
   .glass {
-    @apply bg-dark-surface/80 backdrop-blur-xl;
-    @apply border border-silver-dark/20;
+    @apply bg-light-surface/80 dark:bg-dark-surface/80 backdrop-blur-xl;
+    @apply border border-silver-400/30 dark:border-silver-dark/20;
     @apply shadow-glass;
   }
 
   .glass-strong {
-    @apply bg-dark-surface/90 backdrop-blur-2xl;
-    @apply border border-silver-base/30;
+    @apply bg-light-surface/90 dark:bg-dark-surface/90 backdrop-blur-2xl;
+    @apply border border-silver-400/40 dark:border-silver-base/30;
     @apply shadow-glass;
   }
 

@@ -41,11 +41,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-dark-base">
+    <div className="min-h-screen bg-light-base dark:bg-dark-base transition-colors duration-300">
       {/* Header */}
-      <header className="glass-strong border-b border-silver-dark/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+      <header className="glass-strong border-b border-silver-300 dark:border-silver-dark/20">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="flex items-center justify-between h-20 py-4">
             <div className="flex items-center space-x-3">
               <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-silver-base/20 to-silver-dark/20 border border-silver-base/30 flex items-center justify-center">
                 <Icon icon={Brain} size="sm" className="text-silver-light" />
@@ -66,28 +66,28 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-display font-bold text-text-primary mb-2">
-            Welcome back, <span className="text-shimmer">{user?.firstName || 'Alex'}</span>!
+        <div className="mb-12">
+          <h1 className="text-4xl sm:text-5xl font-display font-bold text-royal-600 dark:text-royal-400 mb-4">
+            Welcome back, <span className="text-purple-600 dark:text-purple-400">{user?.firstName || 'Alex'}</span>!
           </h1>
-          <p className="text-text-secondary">
+          <p className="text-lg text-text-secondary">
             Ready to continue your learning journey? You're making excellent progress!
           </p>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {stats.map((stat, index) => (
-            <Card key={index} hover className="p-6">
+            <Card key={index} hover className="p-8 rounded-xl border-2 border-silver-200 dark:border-silver-700 hover:border-royal-400 dark:hover:border-royal-500 transition-all duration-300">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-text-tertiary mb-1">{stat.label}</p>
-                  <p className="text-2xl font-bold text-shimmer">{stat.value}</p>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-text-tertiary">{stat.label}</p>
+                  <p className="text-3xl font-bold bg-brand-gradient bg-clip-text text-transparent">{stat.value}</p>
                 </div>
-                <div className="w-12 h-12 rounded-lg bg-dark-elevated border border-silver-dark/20 flex items-center justify-center silver-glow">
-                  <Icon icon={stat.icon} size="lg" className="text-silver-base" />
+                <div className="w-16 h-16 rounded-xl bg-royal-50 dark:bg-royal-950/30 border-2 border-royal-200 dark:border-royal-800 flex items-center justify-center shadow-lg shadow-royal-500/10 dark:shadow-royal-500/20">
+                  <Icon icon={stat.icon} size="lg" className="text-royal-600 dark:text-royal-400" />
                 </div>
               </div>
             </Card>

@@ -25,6 +25,7 @@ import { MindMapBuilder } from './components/MindMapBuilder';
 import { BrainwaveGenerator } from './components/BrainwaveGenerator';
 import { PolymathAIAssistant } from './components/PolymathAIAssistant';
 import { PolymathAIAssistantEnhanced } from './components/PolymathAIAssistantEnhanced';
+import { InstallationWizard } from './components/InstallationWizard';
 
 type AppState = 'home' | 'signin' | 'signup' | 'dashboard' | 'polymath_dashboard' | 'learning' | 'assessment' | 'domain_selection' | 'memory_palace' | 'flashcards' | 'deep_work' | 'projects' | 'reflection' | 'mind_map' | 'triz' | 'brainwave_generator' | 'polymath_ai';
 
@@ -39,6 +40,7 @@ function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [assessmentData, setAssessmentData] = useState<any>(null);
+  const [showInstallationWizard, setShowInstallationWizard] = useState(false);
 
   // Initialize dark mode - default to dark for premium experience
   useEffect(() => {
@@ -52,6 +54,13 @@ function App() {
     } else {
       setIsDarkMode(true);
       document.documentElement.classList.add('dark');
+    }
+
+    // Check if installation is needed
+    const installationCompleted = localStorage.getItem('polymathos_installation_completed');
+    const n8nUrl = localStorage.getItem('n8n_webhook_url');
+    if (!installationCompleted && !n8nUrl) {
+      setShowInstallationWizard(true);
     }
   }, []);
 
@@ -263,7 +272,23 @@ function App() {
     }
   };
 
-  return renderCurrentPage();
+  return (
+    <>
+      {renderCurrentPage()}
+      {showInstallationWizard && (
+        <InstallationWizard
+          onComplete={() => {
+            localStorage.setItem('polymathos_installation_completed', 'true');
+            setShowInstallationWizard(false);
+          }}
+          onSkip={() => {
+            localStorage.setItem('polymathos_installation_completed', 'true');
+            setShowInstallationWizard(false);
+          }}
+        />
+      )}
+    </>
+  );
 }
 
 export default App;

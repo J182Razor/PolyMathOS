@@ -3,7 +3,14 @@
  * Handles all communication with n8n webhooks for backend automation
  */
 
-const N8N_BASE_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || 'http://localhost:5678';
+// Get n8n URL from localStorage (set during installation) or env
+const getN8NBaseUrl = (): string => {
+  const savedUrl = localStorage.getItem('n8n_webhook_url');
+  if (savedUrl) {
+    return savedUrl.endsWith('/') ? savedUrl.slice(0, -1) : savedUrl;
+  }
+  return import.meta.env.VITE_N8N_WEBHOOK_URL || 'http://localhost:5678';
+};
 
 interface SignUpRequest {
   email: string;
@@ -48,7 +55,9 @@ interface EnvVariableRequest {
 }
 
 export class N8NService {
-  private static baseUrl = N8N_BASE_URL;
+  private static get baseUrl(): string {
+    return getN8NBaseUrl();
+  }
 
   /**
    * User Authentication - Sign Up

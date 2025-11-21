@@ -18,33 +18,39 @@ export const Button: React.FC<ButtonProps> = ({
   
   const variantClasses = {
     primary: `
-      bg-dark-elevated text-silver-light
-      border border-silver-base/30
-      shadow-silver hover:shadow-silver-lg
-      hover:border-silver-light/50
+      bg-royal-600 dark:bg-royal-600 text-white
+      border border-royal-700 dark:border-royal-500
+      shadow-lg shadow-royal-500/20 dark:shadow-royal-500/30
+      hover:bg-royal-700 dark:hover:bg-royal-500
+      hover:shadow-xl hover:shadow-royal-500/30 dark:hover:shadow-royal-500/40
       hover:scale-[1.02] active:scale-[0.98]
-      before:absolute before:inset-0 before:bg-shimmer before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300
+      transition-all duration-300
     `,
     secondary: `
-      bg-dark-surface/50 text-silver-base
-      border border-silver-dark/30
-      backdrop-blur-sm
-      hover:bg-dark-surface/70 hover:border-silver-base/40
-      hover:text-silver-light
+      bg-purple-600 dark:bg-purple-600 text-white
+      border border-purple-700 dark:border-purple-500
+      shadow-lg shadow-purple-500/20 dark:shadow-purple-500/30
+      hover:bg-purple-700 dark:hover:bg-purple-500
+      hover:shadow-xl hover:shadow-purple-500/30 dark:hover:shadow-purple-500/40
       hover:scale-[1.02] active:scale-[0.98]
+      transition-all duration-300
     `,
     ghost: `
-      text-silver-medium
-      hover:text-silver-light
-      hover:bg-dark-surface/30
+      text-royal-600 dark:text-royal-400
+      hover:text-royal-700 dark:hover:text-royal-300
+      hover:bg-royal-50 dark:hover:bg-royal-950/20
       hover:scale-[1.02] active:scale-[0.98]
+      transition-all duration-300
     `,
     outline: `
-      border border-silver-dark/40 text-silver-base
+      border-2 border-royal-500 dark:border-royal-400 
+      text-royal-600 dark:text-royal-400
       bg-transparent
-      hover:border-silver-base/60 hover:text-silver-light
-      hover:bg-dark-surface/20
+      hover:border-royal-600 dark:hover:border-royal-300
+      hover:text-royal-700 dark:hover:text-royal-300
+      hover:bg-royal-50 dark:hover:bg-royal-950/10
       hover:scale-[1.02] active:scale-[0.98]
+      transition-all duration-300
     `
   };
   

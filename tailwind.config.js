@@ -8,52 +8,98 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Dark Minimalist Theme
+        // Royal Blue (Primary)
+        royal: {
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6', // Royal Blue Base
+          600: '#2563eb', // Royal Blue Primary
+          700: '#1d4ed8', // Royal Blue Dark
+          800: '#1e40af',
+          900: '#1e3a8a',
+          950: '#172554',
+        },
+        // Purple (Secondary)
+        purple: {
+          50: '#faf5ff',
+          100: '#f3e8ff',
+          200: '#e9d5ff',
+          300: '#d8b4fe',
+          400: '#c084fc', // Purple Base
+          500: '#a855f7', // Purple Primary
+          600: '#9333ea', // Purple Dark
+          700: '#7e22ce',
+          800: '#6b21a8',
+          900: '#581c87',
+          950: '#3b0764',
+        },
+        // Silver (Accent)
+        silver: {
+          50: '#f8f9fa',
+          100: '#f1f3f5',
+          200: '#e8e8f0', // Silver Light
+          300: '#c0c0d0', // Silver Base
+          400: '#9090a0', // Silver Medium
+          500: '#606070', // Silver Dark
+          600: '#4a4a5a',
+          700: '#3a3a4a',
+          800: '#2a2a3a',
+          900: '#1a1a2a',
+        },
+        // Dark Theme (for dark mode)
         dark: {
           base: '#0A0A0F',
           surface: '#111118',
           elevated: '#1A1A24',
           overlay: '#0F0F15',
         },
-        // Silver Accent System
-        silver: {
-          light: '#E8E8F0',
-          base: '#C0C0D0',
-          medium: '#9090A0',
-          dark: '#606070',
+        // Light Theme (for light mode)
+        light: {
+          base: '#FFFFFF',
+          surface: '#F8F9FA',
+          elevated: '#F1F3F5',
+          overlay: '#E8E8F0',
         },
-        // Text Hierarchy
+        // Text Hierarchy (works for both modes)
         text: {
-          primary: '#FFFFFF',
-          secondary: '#B8B8C8',
+          primary: '#1A1A2A', // Dark text for light mode
+          secondary: '#4A4A5A',
           tertiary: '#6B6B7F',
-          disabled: '#3A3A4A',
+          disabled: '#9090A0',
         },
-        // Legacy support (keeping for gradual migration)
+        // Legacy support
         primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#2563eb', // Royal Blue
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a8a',
         },
         secondary: {
-          50: '#fdf4ff',
-          100: '#fae8ff',
-          200: '#f5d0fe',
-          300: '#f0abfc',
-          400: '#e879f9',
-          500: '#d946ef',
-          600: '#c026d3',
-          700: '#a21caf',
-          800: '#86198f',
-          900: '#701a75',
+          50: '#faf5ff',
+          100: '#f3e8ff',
+          200: '#e9d5ff',
+          300: '#d8b4fe',
+          400: '#c084fc',
+          500: '#a855f7', // Purple
+          600: '#9333ea',
+          700: '#7e22ce',
+          800: '#6b21a8',
+          900: '#581c87',
         }
+      },
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
+        '128': '32rem',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -63,7 +109,11 @@ export default {
         'shimmer': 'linear-gradient(135deg, rgba(232, 232, 240, 0.1) 0%, rgba(192, 192, 208, 0.2) 50%, rgba(144, 144, 160, 0.1) 100%)',
         'shimmer-strong': 'linear-gradient(135deg, rgba(232, 232, 240, 0.3) 0%, rgba(192, 192, 208, 0.5) 50%, rgba(144, 144, 160, 0.3) 100%)',
         'silver-gradient': 'linear-gradient(135deg, #E8E8F0 0%, #C0C0D0 50%, #9090A0 100%)',
+        'royal-gradient': 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)',
+        'purple-gradient': 'linear-gradient(135deg, #a855f7 0%, #9333ea 50%, #7e22ce 100%)',
+        'brand-gradient': 'linear-gradient(135deg, #2563eb 0%, #a855f7 50%, #c0c0d0 100%)',
         'glass': 'linear-gradient(135deg, rgba(17, 17, 24, 0.8) 0%, rgba(26, 26, 36, 0.6) 100%)',
+        'glass-light': 'linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(248, 249, 250, 0.6) 100%)',
       },
       backdropBlur: {
         xs: '2px',
