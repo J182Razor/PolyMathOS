@@ -9,7 +9,7 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onStartJourney }) => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-dark-base pt-24 pb-24">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-light-base dark:bg-dark-base pt-24 pb-24">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute inset-0" style={{

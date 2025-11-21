@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* CSS Custom Properties */
+/* CSS Custom Properties - Light Mode (Default) */
 :root {
   --color-dark-base: #05050A;
   --color-dark-surface: #0F111A;
@@ -14,10 +14,18 @@
   --color-silver-base: #C0C0D0;
   --color-silver-medium: #9090A0;
   --color-silver-dark: #606070;
+  /* Light mode text colors */
+  --color-text-primary: #1A1A2A;
+  --color-text-secondary: #4A4A5A;
+  --color-text-tertiary: #6B6B7F;
+  --shimmer-duration: 3s;
+}
+
+/* Dark Mode Overrides */
+.dark {
   --color-text-primary: #FFFFFF;
   --color-text-secondary: #E2E8F0;
   --color-text-tertiary: #94A3B8;
-  --shimmer-duration: 3s;
 }
 
 /* Base Styles */
@@ -33,7 +41,7 @@
   body {
     @apply m-0 min-h-screen;
     @apply bg-light-base dark:bg-dark-base;
-    @apply text-text-primary;
+    @apply text-text-primary dark:text-white;
     @apply font-sans antialiased;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -49,7 +57,8 @@
 
   /* Typography */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-semibold text-text-primary;
+    @apply font-display font-semibold;
+    @apply text-text-primary dark:text-white;
     letter-spacing: -0.02em;
   }
 
@@ -69,13 +78,13 @@
   }
 
   p {
-    @apply text-text-secondary leading-relaxed;
+    @apply text-text-secondary dark:text-slate-200 leading-relaxed;
     font-size: 1rem;
     line-height: 1.75;
   }
 
   a {
-    @apply text-silver-300 hover:text-silver-200 transition-colors duration-200;
+    @apply text-royal-600 dark:text-royal-400 hover:text-royal-700 dark:hover:text-royal-300 transition-colors duration-200;
   }
 }
 

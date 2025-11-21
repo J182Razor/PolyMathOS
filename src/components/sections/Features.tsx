@@ -38,7 +38,7 @@ export const Features: React.FC = () => {
   ];
 
   return (
-    <section id="features" className="py-24 bg-dark-base">
+    <section id="features" className="py-24 bg-light-surface dark:bg-dark-base">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         {/* Section Header */}
         <div className="text-center mb-20">

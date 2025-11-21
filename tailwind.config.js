@@ -63,12 +63,12 @@ export default {
           elevated: '#F1F3F5',
           overlay: '#E8E8F0',
         },
-        // Text Hierarchy - High contrast for readability
+        // Text Hierarchy - Theme-aware for light and dark modes
         text: {
-          primary: '#FFFFFF', // Pure white for headings in dark mode
-          secondary: '#E2E8F0', // Slate 200 - Bright silver for body text
-          tertiary: '#94A3B8', // Slate 400 - Legible for labels
-          disabled: '#64748B', // Slate 500
+          primary: '#1A1A2A', // Dark text for light mode, overridden in dark mode
+          secondary: '#4A4A5A', // Medium dark for light mode
+          tertiary: '#6B6B7F', // Muted for light mode
+          disabled: '#9090A0', // Disabled state
         },
         // Legacy support
         primary: {
