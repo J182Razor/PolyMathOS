@@ -214,13 +214,31 @@ export const InstallationWizard: React.FC<{
           </p>
         </div>
 
-        <Button
-          onClick={handleN8nConnect}
-          disabled={isLoading || !n8nUrl.trim()}
-          className="w-full"
-        >
-          {isLoading ? 'Connecting...' : n8nConnected ? '✓ Connected' : 'Connect to n8n'}
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            onClick={handleN8nConnect}
+            disabled={isLoading || !n8nUrl.trim()}
+            className="flex-1"
+          >
+            {isLoading ? 'Connecting...' : n8nConnected ? '✓ Connected' : 'Connect to n8n'}
+          </Button>
+          {!n8nConnected && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                 // Allow manual bypass
+                 setN8nConnected(true);
+                 if (n8nUrl) {
+                     setEnvVariables(prev => ({ ...prev, N8N_WEBHOOK_URL: n8nUrl }));
+                     localStorage.setItem('n8n_webhook_url', n8nUrl);
+                 }
+              }}
+              className="whitespace-nowrap"
+            >
+              Skip Check (Manual)
+            </Button>
+          )}
+        </div>
 
         {n8nConnected && (
           <div className="p-4 rounded-lg bg-royal-50 dark:bg-royal-950/20 border border-royal-200 dark:border-royal-800">

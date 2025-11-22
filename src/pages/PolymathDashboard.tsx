@@ -10,6 +10,7 @@ import { Icon } from '../components/ui/Icon';
 import { PolymathUserService } from '../services/PolymathUserService';
 import { PolymathFeaturesService } from '../services/PolymathFeaturesService';
 import { PolymathUser, DomainType } from '../types/polymath';
+import { SettingsModal } from '../components/SettingsModal';
 
 interface PolymathDashboardProps {
   onSignOut?: () => void;
@@ -28,6 +29,7 @@ export const PolymathDashboard: React.FC<PolymathDashboardProps> = ({
   const [analytics, setAnalytics] = useState<any>(null);
   const [sessionPlan, setSessionPlan] = useState<any>(null);
   const [showReward, setShowReward] = useState<string[]>([]);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const userService = PolymathUserService.getInstance();
   const featuresService = PolymathFeaturesService.getInstance();
@@ -82,6 +84,7 @@ export const PolymathDashboard: React.FC<PolymathDashboardProps> = ({
 
   return (
     <div className="min-h-screen bg-dark-base">
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
       {/* Header */}
       <header className="glass-strong border-b border-silver-dark/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -97,7 +100,7 @@ export const PolymathDashboard: React.FC<PolymathDashboardProps> = ({
                 <Icon icon={Dice6} size="sm" className="mr-2" />
                 Roll Reward
               </Button>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" onClick={() => setIsSettingsOpen(true)}>
                 <Icon icon={Settings} size="sm" className="mr-2" />
                 Settings
               </Button>

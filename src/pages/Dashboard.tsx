@@ -4,6 +4,7 @@ import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Icon } from '../components/ui/Icon';
 import { SpacedRepetitionWidget } from '../components/SpacedRepetitionWidget';
+import { SettingsModal } from '../components/SettingsModal';
 
 interface DashboardProps {
   onStartLearning?: () => void;
@@ -25,6 +26,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   user 
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const stats = [
     { label: 'Learning Sessions', value: '47', icon: BookOpen },
@@ -42,6 +44,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="min-h-screen bg-light-base dark:bg-dark-base transition-colors duration-300">
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
       {/* Header */}
       <header className="glass-strong border-b border-silver-300 dark:border-silver-500/20">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
@@ -53,7 +56,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <span className="text-xl font-display font-bold text-shimmer">PolyMathOS</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" onClick={() => setIsSettingsOpen(true)}>
                 <Icon icon={Settings} size="sm" className="mr-2" />
                 Settings
               </Button>

@@ -10,14 +10,19 @@
   --color-dark-surface: #0F111A;
   --color-dark-elevated: #1A1D2D;
   --color-dark-overlay: #0F0F15;
+  
   --color-silver-light: #E8E8F0;
   --color-silver-base: #C0C0D0;
   --color-silver-medium: #9090A0;
   --color-silver-dark: #606070;
+
+  --color-gold-light: #FCEFC7;
+  --color-gold-base: #F29D0B;
+
   /* Light mode text colors */
-  --color-text-primary: #1A1A2A;
-  --color-text-secondary: #4A4A5A;
-  --color-text-tertiary: #6B6B7F;
+  --color-text-primary: #0F172A; /* Darker slate for better contrast on sky blue */
+  --color-text-secondary: #334155;
+  --color-text-tertiary: #64748B;
   --shimmer-duration: 3s;
 }
 
@@ -111,6 +116,19 @@
       var(--color-silver-light) 0%,
       var(--color-silver-base) 50%,
       var(--color-silver-light) 100%
+    );
+    background-size: 200% auto;
+    animation: textShimmer var(--shimmer-duration) ease-in-out infinite;
+  }
+
+  /* Gold Shimmer Text Effect */
+  .text-shimmer-gold {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(
+      135deg,
+      var(--color-gold-light) 0%,
+      var(--color-gold-base) 50%,
+      var(--color-gold-light) 100%
     );
     background-size: 200% auto;
     animation: textShimmer var(--shimmer-duration) ease-in-out infinite;

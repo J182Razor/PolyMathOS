@@ -49,6 +49,20 @@ export default {
           800: '#2a2a3a',
           900: '#1a1a2a',
         },
+        // Gold (Accent) - For elegant touches
+        gold: {
+          50: '#FFFAEB',
+          100: '#FCEFC7',
+          200: '#FAE094',
+          300: '#F8CB61',
+          400: '#F5B02E',
+          500: '#F29D0B', // Gold Base
+          600: '#D97F06',
+          700: '#B36003',
+          800: '#924806',
+          900: '#783A06',
+          950: '#451E02',
+        },
         // Dark Theme (for dark mode) - Enhanced for better contrast
         dark: {
           base: '#05050A', // Deeper black/navy for maximum contrast
@@ -56,12 +70,12 @@ export default {
           elevated: '#1A1D2D', // For hover states
           overlay: '#0F0F15',
         },
-        // Light Theme (for light mode)
+        // Light Theme (for light mode) - Vibrant Sky Blue & Silver
         light: {
-          base: '#FFFFFF',
-          surface: '#F8F9FA',
-          elevated: '#F1F3F5',
-          overlay: '#E8E8F0',
+          base: '#F0F9FF', // Sky Blue 50
+          surface: '#FFFFFF', // White surface for contrast
+          elevated: '#E0F2FE', // Sky Blue 100
+          overlay: '#BAE6FD', // Sky Blue 200
         },
         // Text Hierarchy - Theme-aware for light and dark modes
         text: {
