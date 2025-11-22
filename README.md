@@ -1,62 +1,71 @@
-# 🧠 PolyMathOS - AI-Powered Learning Platform
+# 🧠 PolyMathOS v2.1 - AI-Enhanced Genius Learning Platform
 
-[![React](https://img.shields.io/badge/React-18.3.1-blue.svg)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.5.3-blue.svg)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.1-38B2AC.svg)](https://tailwindcss.com/)
-[![Vite](https://img.shields.io/badge/Vite-6.0.1-646CFF.svg)](https://vitejs.dev/)
+[![React](https://img.shields.io/badge/React-19.1.0-blue.svg)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue.svg)](https://www.typescriptlang.org/)
+[![Python](https://img.shields.io/badge/Python-3.9+-green.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-> Transform your learning with AI + Neuroscience + AR/VR to boost retention by 300%
+> **Transform your learning with AI + Quantum Computing + Self-Evolving Agents to achieve genius-level intelligence**
 
-PolyMathOS is a revolutionary learning platform that combines cutting-edge neuroscience research, artificial intelligence, and personalized education to create the most effective learning experience possible. Our platform uses advanced dopamine optimization, meta-learning techniques, and cognitive profiling to adapt to your unique brain patterns and learning style.
+PolyMathOS is a revolutionary learning platform that combines cutting-edge neuroscience research, quantum computing, multi-agent AI collaboration, and self-evolving intelligence to create the most advanced learning experience possible. Our platform uses advanced dopamine optimization, meta-learning techniques, quantum-enhanced optimization, and intelligent agent systems to adapt and evolve with your learning journey.
 
 ## 🌟 Key Features
 
 ### 🧠 **Neuroscience-Based Learning (Project 144 Research)**
-- **Reward Prediction Error (RPE) System**: Confidence tracking before answers triggers optimal dopamine responses for maximum learning
-- **Hyper-Correction Detection**: High-confidence errors create massive learning opportunities through negative RPE spikes
-- **Enhanced Spaced Repetition**: Research-based intervals (Day 0, 1, 3-4, 7, 14, 30, 3mo, 6mo, 1yr) for superior retention
-- **Learning State Management**: Alpha (8-12 Hz) for reading, Theta (4-8 Hz) for visualization with binaural beats integration
-- **Image Streaming**: Win Wenger protocol for visual intelligence training and cross-hemispheric integration
-- **Variable Ratio Rewards**: Dice roll system (01-50 no reward, 51-80 small, 81-95 medium, 96-100 jackpot) for maximum engagement
-- **Interleaving Practice**: 3×3 daily loop with domain switching to prevent mental autopilot
-- **DARPA Problem-First Protocol**: Attempt problems before reading, identify knowledge gaps, targeted acquisition, Feynman teaching
+- **Reward Prediction Error (RPE) System**: Confidence tracking before answers triggers optimal dopamine responses
+- **Hyper-Correction Detection**: High-confidence errors create massive learning opportunities
+- **Enhanced Spaced Repetition**: Research-based intervals (Day 0, 1, 3-4, 7, 14, 30, 3mo, 6mo, 1yr)
+- **Learning State Management**: Alpha (8-12 Hz) for reading, Theta (4-8 Hz) for visualization
+- **Image Streaming**: Win Wenger protocol for visual intelligence training
+- **Variable Ratio Rewards**: Dice roll system for maximum engagement
+- **Interleaving Practice**: 3×3 daily loop with domain switching
+- **DARPA Problem-First Protocol**: Problem-first learning with knowledge gap identification
 
-### 🤖 **AI-Powered Personalization**
-- **n8n Automation**: Centralized agent management and workflow automation
-- **NVIDIA Integration**: GPU-optimized models from build.nvidia.com
-- **Gemini Integration**: Long-context synthesis (like NotebookLM) for complex content generation
-- **Groq Integration**: Ultra-fast inference for real-time interactions
-- **Adaptive Content Delivery**: Real-time adjustment based on your cognitive patterns and RPE data
-- **Intelligent Tutoring**: AI that understands your learning style and adapts accordingly
-- **Feynman Analysis**: AI-powered explanation quality assessment
-- **Predictive Analytics**: Anticipates learning challenges before they occur
-- **Environment Variable Management**: Secure API key storage via n8n
+### ⚛️ **Quantum Computing Integration**
+- **Quantum Optimization Engine**: QAOA and quantum annealing for learning path optimization
+- **Quantum Pattern Recognition**: Quantum kernel methods and convolutional networks
+- **Quantum Neural Networks**: Full quantum neural network implementation with backpropagation
+- **Quantum Feature Selection**: Optimal feature selection using quantum algorithms
+- **Multiple Backends**: D-Wave, IBM Qiskit, PennyLane, and simulators
 
-### 📊 **Comprehensive Assessment**
-- **Cognitive Profiling**: Deep analysis of your learning preferences and capabilities
-- **Dopamine Sensitivity Testing**: Identifies your optimal reward and motivation triggers
-- **Meta-Learning Evaluation**: Assesses and improves your ability to learn how to learn
-- **Confidence Calibration**: Tracks overconfidence/underconfidence for better self-awareness
-- **Progress Tracking**: Detailed analytics on retention, comprehension, and growth
+### 🤖 **Intelligent AI Systems**
+- **Intelligent LLM Router**: Dynamic model selection based on task requirements (quality, speed, cost)
+- **Self-Evolving Agents**: All 8 specialized agents improve automatically using Lemon AI framework
+- **Multi-Agent Collaboration**: 8 specialized agents working together for collective intelligence
+- **Performance Tracking**: Comprehensive metrics and automatic optimization
+- **Automatic Failover**: Smart model switching on errors
 
 ### 🎯 **Advanced Learning Features**
-- **Memory Palaces**: Method of Loci with 144-grid structure for polymathic knowledge storage
-- **Mind Mapping**: Tony Buzan's radiant thinking for semantic network engineering
-- **Deep Work Blocks**: Focused practice sessions with activity type tracking
+- **Memory Palaces**: Method of Loci with 144-grid structure
+- **Mind Mapping**: Tony Buzan's radiant thinking for semantic networks
+- **Deep Work Blocks**: Focused practice sessions with activity tracking
 - **Cross-Domain Projects**: Synthesize knowledge across multiple fields
 - **TRIZ Application**: 40 inventive principles for creative problem-solving
 - **Reflection Journal**: Structured reflection with mood tracking
-- **Portfolio System**: Showcase your polymathic achievements
-- **Dark Mode Support**: Comfortable learning in any lighting condition
+- **Flashcard System**: SM-2 spaced repetition algorithm
+- **Brainwave Generator**: Binaural beats for optimal learning states
+
+### 📊 **Storage & Persistence**
+- **Local Filesystem**: Automatic versioning and organization
+- **Supabase Cloud Storage**: Public URL generation for artifacts
+- **PostgreSQL Database**: Task/execution history, agent evolution tracking
+- **Artifact Management**: Versioned storage with automatic organization
+
+### 🔧 **Automation & Integration**
+- **n8n Integration**: Workflow automation and centralized agent management
+- **Multiple LLM Providers**: OpenAI, Anthropic, Google, Groq, NVIDIA, DeepSeek, Ollama, Lemon AI
+- **API-First Architecture**: 18+ RESTful API endpoints
+- **Docker Support**: Complete containerization for easy deployment
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ 
-- npm or yarn package manager
-- Modern web browser (Chrome, Firefox, Safari, Edge)
+- **Node.js** 18+ and npm/yarn
+- **Python** 3.9+ (for backend)
+- **Docker** and Docker Compose (optional, for full stack)
+- **Modern web browser** (Chrome, Firefox, Safari, Edge)
 
 ### Installation
 
@@ -66,255 +75,266 @@ PolyMathOS is a revolutionary learning platform that combines cutting-edge neuro
    cd PolyMathOS
    ```
 
-2. **Install dependencies**
+2. **Install frontend dependencies**
    ```bash
    npm install
    ```
 
-3. **Set up environment variables**
+3. **Install backend dependencies**
    ```bash
-   cp .env.example .env
-   # Add your API keys and configuration
-   # See README_N8N_INTEGRATION.md for n8n setup
+   cd backend
+   pip install -r requirements.txt
    ```
 
-4. **Start the development server**
+4. **Set up environment variables**
    ```bash
+   # Frontend (.env)
+   VITE_API_URL=http://localhost:8000
+   VITE_N8N_WEBHOOK_URL=http://localhost:5678
+   
+   # Backend (backend/.env)
+   DATABASE_URL=postgresql://user:pass@localhost:5432/polymathos
+   SUPABASE_URL=https://your-project.supabase.co
+   SUPABASE_ANON_KEY=your-anon-key
+   OPENAI_API_KEY=your-key
+   ANTHROPIC_API_KEY=your-key
+   # ... other API keys
+   ```
+
+5. **Start the services**
+   ```bash
+   # Option 1: Docker Compose (Recommended)
+   docker-compose up --build
+   
+   # Option 2: Manual
+   # Terminal 1: Frontend
    npm run dev
+   
+   # Terminal 2: Backend
+   cd backend
+   uvicorn app.main:app --reload
+   
+   # Terminal 3: n8n (optional)
+   docker-compose -f docker-compose.n8n.yml up
    ```
 
-5. **Open your browser**
-   Navigate to `http://localhost:3000` to start using PolyMathOS
+6. **Access the application**
+   - Frontend: `http://localhost:5173`
+   - Backend API: `http://localhost:8000`
+   - API Docs: `http://localhost:8000/docs`
+   - n8n: `http://localhost:5678`
 
 ## 📖 Documentation
 
-### User Guides
-- **[User Onboarding Guide](docs/USER_ONBOARDING_GUIDE.md)** - Complete guide for new users
-- **[Learning Science Analysis](docs/learning_science_analysis.md)** - Research foundation behind the platform
+### Setup & Installation
+- **[Comprehensive Setup Guide](docs/SETUP_GUIDE.md)** - Complete installation and configuration
+- **[Docker Setup Guide](docs/DOCKER_SETUP.md)** - Container-based deployment
+- **[n8n Integration Guide](README_N8N_INTEGRATION.md)** - Automation setup
+
+### Usage Guides
+- **[Comprehensive Usage Guide](docs/USAGE_GUIDE.md)** - Complete feature documentation with examples
+- **[User Onboarding Guide](docs/USER_ONBOARDING_GUIDE.md)** - Getting started as a user
+- **[Developer How-To Guide](docs/DEVELOPER_HOW_TO_GUIDE.md)** - Development and customization
 
 ### Technical Documentation
-- **[Technical Documentation](docs/TECHNICAL_DOCUMENTATION.md)** - System architecture and implementation details
-- **[Developer How-To Guide](docs/DEVELOPER_HOW_TO_GUIDE.md)** - Development setup and customization guide
-- **[n8n Integration Guide](README_N8N_INTEGRATION.md)** - Complete n8n automation setup and workflows
-- **[n8n Setup Guide](docs/N8N_SETUP_GUIDE.md)** - Detailed n8n installation and configuration
-
-### Research Documents
-- **[Dopamine and Addictive Learning](docs/DopamineandAddictiveLearning_Science-BackedNeurohacks.pdf)** - Neuroscience research on motivation
-- **[Meta-Learning Enhancement](docs/DopamineLoadingandMeta-Learning_EnhancingLearningandTraining.pdf)** - Advanced learning strategies
-- **[Genius Learning Synthesis](docs/GeniusLearningStrategySynthesis_.docx)** - Comprehensive learning methodology
+- **[Technical Documentation](docs/TECHNICAL_DOCUMENTATION.md)** - System architecture
+- **[API Documentation](http://localhost:8000/docs)** - Interactive API reference
+- **[Debug Reports](DEBUG_REPORT_V2.1.md)** - System status and completion
 
 ## 🏗️ Architecture
 
-PolyMathOS is built with a modern, scalable architecture:
-
+### Frontend (React + TypeScript)
 ```
 src/
-├── components/                    # Reusable UI components
-│   ├── ui/                       # Basic UI elements (Button, Card, Icon)
-│   ├── sections/                 # Page sections (Header, Hero, Features)
-│   ├── ImageStreaming.tsx        # Win Wenger Image Streaming protocol
-│   ├── MemoryPalaceBuilder.tsx   # Method of Loci implementation
-│   ├── MindMapBuilder.tsx        # Tony Buzan Mind Mapping
-│   ├── FlashcardReview.tsx       # Spaced repetition interface
-│   ├── DeepWorkBlock.tsx         # Focused practice sessions
-│   ├── ReflectionJournal.tsx     # Structured reflection
-│   ├── TRIZApplication.tsx       # Creative problem-solving
-│   └── CrossDomainProject.tsx    # Multi-domain synthesis
-├── pages/                        # Main application pages
-│   ├── Dashboard.tsx             # User dashboard
-│   ├── PolymathDashboard.tsx     # Advanced polymath features
-│   ├── SignIn.tsx                # Authentication
-│   ├── LearningSession.tsx       # Basic learning interface
-│   └── EnhancedLearningSession.tsx # RPE-integrated learning
-├── services/                      # Business logic and AI integration
-│   ├── RewardPredictionErrorService.ts      # RPE calculation & hyper-correction
-│   ├── EnhancedSpacedRepetitionService.ts  # Research-based spacing
-│   ├── LearningStateService.ts              # Alpha/Theta state management
-│   ├── InterleavingService.ts               # 3×3 daily loop & domain switching
-│   ├── DARPALearningService.ts             # Problem-first protocol
-│   ├── SpacedRepetitionService.ts          # SM-2 algorithm
-│   ├── LLMService.ts                        # Gemini, Groq & NVIDIA integration
-│   ├── N8NService.ts                        # n8n automation integration
-│   ├── NVIDIAAIService.ts                   # NVIDIA API integration
-│   ├── NeuroAILessonService.ts             # AI-powered lesson generation
-│   ├── PolymathUserService.ts              # User data management
-│   └── PolymathFeaturesService.ts          # Advanced features
-├── types/
-│   └── polymath.ts               # Comprehensive type definitions
-└── docs/                         # Comprehensive documentation
+├── components/          # UI components
+│   ├── ui/             # Basic elements (Button, Card, Icon)
+│   ├── sections/       # Page sections
+│   └── [Features]      # Learning feature components
+├── pages/              # Main application pages
+├── services/           # Business logic and AI integration
+└── types/              # TypeScript definitions
+```
+
+### Backend (Python + FastAPI)
+```
+backend/app/
+├── core/               # Core system classes
+│   ├── polymath_os.py  # Main PolyMathOS system
+│   └── enhanced_system.py  # Enhanced with quantum & agents
+├── modules/            # Feature modules
+│   ├── quantum_optimization.py
+│   ├── quantum_patterns.py
+│   ├── multi_agent.py
+│   ├── llm_router.py
+│   ├── lemon_ai_integration.py
+│   ├── storage_persistence.py
+│   └── [Other modules]
+└── main.py             # FastAPI application
 ```
 
 ### Technology Stack
 
-- **Frontend**: React 18 with TypeScript
-- **Styling**: Tailwind CSS with custom dark minimalist design system (silver accents, shimmer effects)
-- **Build Tool**: Vite for fast development and optimized builds
-- **AI Integration**: 
-  - **n8n**: Workflow automation and centralized agent management
-  - **NVIDIA API**: GPU-optimized models from build.nvidia.com
-  - **Gemini API**: Long-context synthesis for complex content (like NotebookLM)
-  - **Groq API**: Ultra-fast inference for real-time interactions
-  - **OpenAI API**: Fallback for content generation
-- **State Management**: React hooks and context
-- **Storage**: LocalStorage for user data and learning progress
-- **Responsive Design**: Mobile-first approach with dark mode support
-- **Accessibility**: WCAG 2.1 AA compliant
+**Frontend:**
+- React 19 with TypeScript
+- Tailwind CSS (Sky Blue/Silver/Gold theme)
+- Vite for build tooling
+- React Router for navigation
+
+**Backend:**
+- FastAPI (Python)
+- PyTorch for ML models
+- Quantum libraries (Qiskit, PennyLane, D-Wave)
+- PostgreSQL for database
+- Supabase for cloud storage
+
+**AI & Automation:**
+- n8n for workflow automation
+- Multiple LLM providers (OpenAI, Anthropic, Google, etc.)
+- Lemon AI for self-evolving agents
+- Sentence Transformers for embeddings
+
+## 🎯 Core Capabilities
+
+### 1. Intelligent Learning Path Generation
+- AI-powered curriculum creation
+- Quantum-optimized learning sequences
+- Personalized based on cognitive profile
+- Multi-domain integration
+
+### 2. Self-Evolving Agent System
+- 8 specialized AI agents
+- Automatic performance tracking
+- Evolution based on feedback
+- Continuous improvement
+
+### 3. Quantum-Enhanced Optimization
+- Learning path optimization
+- Pattern recognition
+- Feature selection
+- Neural network training
+
+### 4. Multi-Agent Collaboration
+- Collective problem-solving
+- Specialized agent coordination
+- Emergent intelligence detection
+- Ethical evaluation
+
+### 5. Comprehensive Storage
+- Local filesystem with versioning
+- Cloud storage (Supabase)
+- Database persistence (PostgreSQL)
+- Artifact management
+
+## 📊 API Endpoints
+
+### Core Endpoints
+- `GET /` - System status
+- `POST /enroll` - User enrollment
+- `GET /activity/{user_id}` - Get next activity
+- `POST /genius/activate` - Activate genius mode
+- `GET /progress/{user_id}` - Progress report
+
+### Quantum Computing
+- `POST /quantum/optimize-path` - Quantum path optimization
+- `POST /quantum/pattern-recognition` - Quantum pattern recognition
+
+### Multi-Agent Collaboration
+- `POST /collaboration/solve` - Collaborative problem solving
+
+### LLM Router
+- `POST /llm/select` - Intelligent LLM selection
+- `GET /llm/performance` - Performance metrics
+
+### Agent Evolution
+- `POST /agents/evolve` - Evolve an agent
+- `GET /agents/{agent_id}/evolution` - Evolution history
+
+### Storage
+- `POST /storage/artifact` - Store artifact
+- `GET /storage/artifact/{artifact_id}` - Retrieve artifact
+- `GET /storage/task/{task_id}/artifacts` - List artifacts
+
+**Full API Documentation**: Visit `http://localhost:8000/docs` when the backend is running
 
 ## 🧪 Scientific Foundation
 
-PolyMathOS is built on rigorous scientific research from **Project 144** and the **Polymath Operating System** curriculum:
+PolyMathOS is built on rigorous scientific research:
 
-### Neuroscience Principles (Project 144 Research)
-- **Reward Prediction Error (RPE)**: Dopamine as a teaching signal - positive RPE strengthens, negative RPE triggers attention
-- **Hyper-Correction Effect**: High-confidence errors create maximum learning through massive negative RPE
-- **Neuroplasticity Optimization**: High-intensity cognitive capture (HICC) protocol simulates critical period learning
-- **Spaced Repetition Science**: Research-based intervals leveraging the forgetting curve and consolidation windows
-- **State-Dependent Learning**: Alpha/Theta states optimize different learning activities
-- **Dual Coding Theory**: Visual + verbal encoding for superior retention
-
-### Learning Psychology
-- **Meta-Learning**: Teaching users how to learn more effectively (Plan → Monitor → Evaluate)
-- **Interleaving vs Blocking**: Mixing topics improves discrimination and long-term retention
-- **Desirable Difficulties**: Making learning harder in the short term strengthens long-term mastery
-- **Variable Ratio Schedules**: Unpredictable rewards maintain higher tonic dopamine than fixed rewards
-- **Flow State**: Creating optimal conditions for deep learning experiences
-- **Growth Mindset**: Fostering belief in the ability to improve through effort
-
-### Research Sources
-- **Project 144**: Comprehensive Cognitive Engineering Architecture for PolyMathOS
-- **DARPA Education Dominance Program**: 2.81 sigma improvement through problem-first learning
-- **Defense Language Institute (DLI)**: Immersion protocols for rapid skill acquisition
-- **Win Wenger**: Image Streaming protocol for visual intelligence
-- **Tony Buzan**: Mind Mapping for semantic network engineering
-- **Anthony Metivier**: Magnetic Memory Method for Memory Palaces
-- **SM-2 Algorithm**: Spaced repetition optimization
-
-## 🎯 Getting Started as a User
-
-1. **Create Your Account**: Sign up with your email and create a secure password
-2. **Take the Cognitive Assessment**: Complete our comprehensive evaluation (5-10 minutes)
-3. **Receive Your Learning Profile**: Get personalized insights about your cognitive patterns
-4. **Start Your First Session**: Begin with AI-generated content tailored to your profile
-5. **Track Your Progress**: Monitor your improvement through detailed analytics
-
-## 👩‍💻 Development
-
-### Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run type-check` - Run TypeScript compiler
-
-### Contributing
-
-We welcome contributions! Please see our [Developer How-To Guide](docs/DEVELOPER_HOW_TO_GUIDE.md) for detailed information on:
-
-- Setting up the development environment
-- Code standards and best practices
-- Testing procedures
-- Submitting pull requests
-
-## 📊 Performance & Analytics
-
-NeuroAscend includes comprehensive analytics to track learning effectiveness:
-
-- **Retention Rates**: Monitor how well information is retained over time
-- **Learning Velocity**: Track how quickly you master new concepts
-- **Engagement Metrics**: Understand your optimal learning patterns
-- **Cognitive Growth**: Measure improvements in meta-learning skills
+- **Project 144 Research**: Comprehensive cognitive engineering
+- **DARPA Education Dominance**: Problem-first learning protocols
+- **Neuroscience**: RPE, dopamine optimization, neuroplasticity
+- **Quantum Computing**: Optimization and pattern recognition
+- **Multi-Agent Systems**: Collective intelligence and emergence
+- **Meta-Learning**: Learning how to learn
 
 ## 🔒 Privacy & Security
 
-Your learning data is protected with enterprise-grade security:
+- **Local-First**: Core functionality works offline
+- **Encrypted Storage**: All sensitive data encrypted
+- **API Key Management**: Secure storage via Settings
+- **GDPR Compliant**: Privacy by design
 
-- **End-to-End Encryption**: All personal data is encrypted in transit and at rest
-- **Privacy by Design**: Minimal data collection with explicit consent
-- **GDPR Compliant**: Full compliance with international privacy regulations
-- **Secure AI Processing**: AI analysis happens in secure, isolated environments
+## 🌍 System Requirements
 
-## 🌍 Accessibility
+### Minimum
+- **CPU**: Modern multi-core processor
+- **RAM**: 4GB (8GB recommended)
+- **Storage**: 2GB free space
+- **OS**: macOS, Linux, or Windows with WSL
 
-NeuroAscend is designed to be accessible to all learners:
-
-- **WCAG 2.1 AA Compliant**: Meets international accessibility standards
-- **Screen Reader Support**: Full compatibility with assistive technologies
-- **Keyboard Navigation**: Complete functionality without mouse interaction
-- **High Contrast Mode**: Optimized for users with visual impairments
-- **Responsive Design**: Works seamlessly across all devices and screen sizes
+### Recommended
+- **CPU**: 8+ cores
+- **RAM**: 16GB+
+- **GPU**: NVIDIA RTX 3080+ (for quantum simulations)
+- **Storage**: SSD with 10GB+ free space
 
 ## 📈 Roadmap
 
-### Current Version (v1.0) - Project 144 Integration Complete
-- ✅ **Reward Prediction Error (RPE) System**: Confidence tracking and hyper-correction detection
-- ✅ **Enhanced Spaced Repetition**: Research-based intervals (Day 0, 1, 3-4, 7, 14, 30+)
-- ✅ **Learning State Management**: Alpha/Theta states with binaural beats
-- ✅ **Image Streaming**: Win Wenger protocol for visual intelligence
-- ✅ **Variable Ratio Rewards**: Dice roll system for maximum engagement
-- ✅ **Interleaving Practice**: 3×3 daily loop with domain switching
-- ✅ **DARPA Problem-First Protocol**: Knowledge tracing and targeted acquisition
-- ✅ **Memory Palaces**: Method of Loci with 144-grid structure
-- ✅ **Mind Mapping**: Semantic network engineering
-- ✅ **Gemini & Groq Integration**: Advanced AI for synthesis and speed
-- ✅ **Dark Minimalist UI**: Silver accents with shimmer effects
-- ✅ Core learning platform with AI integration
-- ✅ Cognitive assessment and profiling
-- ✅ Responsive design with dark mode
+### ✅ v2.1 (Current)
+- Intelligent LLM Router
+- Self-Evolving Agents (Lemon AI)
+- Quantum Computing Integration
+- Multi-Agent Collaboration
+- Storage & Persistence
 
-### Upcoming Features (v1.1)
-- 🔄 Advanced RPE analytics dashboard
-- 🔄 Interleaving session UI components
-- 🔄 DARPA problem generator per domain
-- 🔄 Social learning features
-- 🔄 Mobile app development
-- 🔄 AR/VR learning experiences
+### 🔄 v2.2 (Planned)
+- Advanced quantum hardware integration
+- Real-time neurofeedback
+- Enhanced agent capabilities
+- Mobile app
 
-### Future Vision (v2.0+)
-- 🔮 Brain-computer interface integration
-- 🔮 Advanced biometric monitoring
-- 🔮 Collaborative AI tutoring
-- 🔮 Enterprise learning management
+### 🔮 v3.0 (Future)
+- Brain-computer interface
+- AR/VR learning experiences
+- Global collaboration network
+- Autonomous research capabilities
 
-## 📚 Learning Strategy Documentation
+## 🤝 Contributing
 
-Comprehensive guides on the research-based learning strategies:
-
-- **[Learning Strategy Refinement](LEARNING_STRATEGY_REFINEMENT.md)** - Complete overview of Project 144 integration
-- **[Learning Strategy Complete](LEARNING_STRATEGY_COMPLETE.md)** - Full implementation details
-- **[Build Complete](README_BUILD_COMPLETE.md)** - LLM and spaced repetition integration
+We welcome contributions! Please see:
+- [Developer How-To Guide](docs/DEVELOPER_HOW_TO_GUIDE.md)
+- [Contributing Guidelines](CONTRIBUTING.md)
 
 ## 📞 Support
 
-Need help? We're here for you:
-
-- **Documentation**: Comprehensive guides in the `/docs` folder
-- **Issues**: Report bugs or request features via GitHub Issues
-- **Community**: Join our learning community for peer support
-- **Contact**: Reach out to our team for technical support
+- **Documentation**: Comprehensive guides in `/docs`
+- **Issues**: [GitHub Issues](https://github.com/J182Razor/PolyMathOS/issues)
+- **API Docs**: `http://localhost:8000/docs`
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
-PolyMathOS is built on the shoulders of giants:
-
-- **Project 144 Research**: Comprehensive Cognitive Engineering Architecture for PolyMathOS
-- **Polymath OS Curriculum**: Elite Self-Study Curriculum for Genius-Level Learning
-- **DARPA Education Dominance Program**: Problem-first learning and knowledge tracing
-- **Defense Language Institute (DLI)**: Immersion protocols and intensive training methods
-- **Win Wenger**: Image Streaming protocol for visual intelligence
-- **Tony Buzan**: Mind Mapping and radiant thinking
-- **Anthony Metivier**: Magnetic Memory Method and Memory Palaces
-- **Neuroscience Research**: Dr. Andrew Huberman, Dr. Barbara Oakley, and the learning science community
-- **AI Technology**: Google Gemini, Groq, and OpenAI for advanced language models
-- **Open Source Community**: The React, TypeScript, and Tailwind CSS communities
-- **Educational Psychology**: Researchers in cognitive load theory, meta-learning, and spaced repetition
+Built on the shoulders of giants:
+- **Project 144 Research**
+- **Lemon AI Framework** ([GitHub](https://github.com/hexdocom/lemonai))
+- **Quantum Computing Libraries** (Qiskit, PennyLane, D-Wave)
+- **Open Source Community**
 
 ---
 
-**Ready to transform your learning?** [Get started with PolyMathOS today!](https://github.com/J182Razor/PolyMathOS)
+**Ready to achieve genius-level learning?** [Get started with PolyMathOS today!](https://github.com/J182Razor/PolyMathOS)
 
-*PolyMathOS - Where Science Meets Learning*
+*PolyMathOS - Where Science Meets Learning, Quantum Meets Intelligence*
