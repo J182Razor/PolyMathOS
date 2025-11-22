@@ -92,27 +92,17 @@ class CollaborationResult:
             "emergence_indicators": self.emergence_indicators
         }
 
-class PolyMathOSLLMRouter:
-    """Intelligent model selection for PolyMathOS collaboration tasks"""
-    
-    MODELS = {
-        "gpt-4o": {"speed": 8, "cost": 7, "quality": 10, "context": 128000},
-        "claude-sonnet-4": {"speed": 9, "cost": 6, "quality": 10, "context": 200000},
-        "gpt-4o-mini": {"speed": 10, "cost": 2, "quality": 7, "context": 128000}
-    }
-    
-    def select(self, task: str, priority: str = "quality", override: str = None):
-        if override:
-            return override
-        
-        if task in ["knowledge_organization", "strategy_planning", "meta_learning"]:
-            return "claude-sonnet-4" if priority != "cost" else "gpt-4o-mini"
-        elif task in ["pattern_recognition", "optimization"]:
-            return "gpt-4o" if priority == "quality" else "gpt-4o-mini"
-        elif task in ["creative_synthesis", "research_analysis"]:
-            return "claude-sonnet-4" if priority != "cost" else "gpt-4o-mini"
-        
-        return "claude-sonnet-4"
+# Import intelligent LLM router and Lemon AI (lazy import to avoid circular dependencies)
+try:
+    from .llm_router import llm_router, TaskRequirements
+    from .lemon_ai_integration import lemon_ai_integration
+    from .storage_persistence import artifact_manager, database_persistence
+except ImportError:
+    # Fallback if modules not available
+    llm_router = None
+    lemon_ai_integration = None
+    artifact_manager = None
+    database_persistence = None
 
 class PolyMathOSCollaborationSwarm:
     """Multi-agent collaboration system for PolyMathOS"""
@@ -121,7 +111,8 @@ class PolyMathOSCollaborationSwarm:
         if not SWARMS_AVAILABLE:
             logger.warning("swarms library not available, using fallback mode")
         
-        self.router = PolyMathOSLLMRouter()
+        self.router = llm_router if llm_router else None  # Use intelligent LLM router
+        self.lemon_ai = lemon_ai_integration if lemon_ai_integration else None
         self.override = model_override
         self.priority = priority
         
@@ -151,87 +142,123 @@ class PolyMathOSCollaborationSwarm:
         self.message_queue = []
         self.conversations = {}
     
-    def _get_model(self, task: str) -> str:
-        return self.router.select(task, self.priority, self.override)
+    def _get_model(self, task: str, requires_reasoning: bool = False, 
+                   requires_creativity: bool = False, requires_code: bool = False) -> str:
+        """Get optimal model using intelligent router"""
+        if self.override:
+            return self.override
+        
+        if self.router:
+            try:
+                requirements = TaskRequirements(
+                    task_type=task,
+                    priority=self.priority,
+                    requires_reasoning=requires_reasoning,
+                    requires_creativity=requires_creativity,
+                    requires_code=requires_code
+                )
+                llm_key, config = self.router.select_optimal_llm(requirements)
+                return config.model_name
+            except Exception as e:
+                logger.warning(f"LLM router failed, using fallback: {e}")
+        
+        # Fallback to simple selection
+        if task in ["knowledge_organization", "strategy_planning", "meta_learning"]:
+            return "claude-sonnet-4" if self.priority != "cost" else "gpt-4o-mini"
+        elif task in ["pattern_recognition", "optimization"]:
+            return "gpt-4o" if self.priority == "quality" else "gpt-4o-mini"
+        return "claude-sonnet-4"
     
-    def _create_knowledge_engineer(self) -> Agent:
+    def _create_self_evolving_agent(
+        self, agent_id: str, agent_type: str, initial_prompt: str, goals: List[str]
+    ) -> Agent:
+        """Create a self-evolving agent using Lemon AI"""
+        if self.lemon_ai:
+            try:
+                agent_config = self.lemon_ai.create_self_evolving_agent(
+                    agent_id=agent_id,
+                    agent_type=agent_type,
+                    initial_prompt=initial_prompt,
+                    goals=goals
+                )
+                system_prompt = agent_config.get("initial_prompt", initial_prompt)
+            except Exception as e:
+                logger.warning(f"Lemon AI agent creation failed: {e}, using basic agent")
+                system_prompt = initial_prompt
+        else:
+            system_prompt = initial_prompt
+        
         return Agent(
-            agent_name="KnowledgeEngineer",
-            system_prompt="You are a Knowledge Engineering Agent specialized in organizing and structuring knowledge.",
-            model_name=self._get_model("knowledge_organization"),
+            agent_name=agent_id.replace("_", "").title(),
+            system_prompt=system_prompt,
+            model_name=self._get_model(agent_type, requires_reasoning=True),
             max_loops=1,
             verbose=True,
             output_type="json"
+        )
+    
+    def _create_knowledge_engineer(self) -> Agent:
+        return self._create_self_evolving_agent(
+            agent_id="knowledge_engineer",
+            agent_type="knowledge_organization",
+            initial_prompt="You are a Knowledge Engineering Agent specialized in organizing and structuring knowledge.",
+            goals=["Organize knowledge hierarchically", "Build knowledge graphs", "Validate consistency"]
         )
     
     def _create_research_analyst(self) -> Agent:
-        return Agent(
-            agent_name="ResearchAnalyst",
-            system_prompt="You are a Research Analysis Agent specialized in research analysis and synthesis.",
-            model_name=self._get_model("research_analysis"),
-            max_loops=1,
-            verbose=True,
-            output_type="json"
+        return self._create_self_evolving_agent(
+            agent_id="research_analyst",
+            agent_type="research_analysis",
+            initial_prompt="You are a Research Analysis Agent specialized in research analysis and synthesis.",
+            goals=["Conduct literature reviews", "Analyze research trends", "Synthesize findings"]
         )
     
     def _create_pattern_recognizer(self) -> Agent:
-        return Agent(
-            agent_name="PatternRecognizer",
-            system_prompt="You are a Pattern Recognition Agent specialized in identifying patterns and anomalies.",
-            model_name=self._get_model("pattern_recognition"),
-            max_loops=1,
-            verbose=True,
-            output_type="json"
+        return self._create_self_evolving_agent(
+            agent_id="pattern_recognizer",
+            agent_type="pattern_recognition",
+            initial_prompt="You are a Pattern Recognition Agent specialized in identifying patterns and anomalies.",
+            goals=["Identify patterns", "Detect anomalies", "Calculate confidence scores"]
         )
     
     def _create_strategy_planner(self) -> Agent:
-        return Agent(
-            agent_name="StrategyPlanner",
-            system_prompt="You are a Strategy Planning Agent specialized in strategic planning and optimization.",
-            model_name=self._get_model("strategy_planning"),
-            max_loops=1,
-            verbose=True,
-            output_type="json"
+        return self._create_self_evolving_agent(
+            agent_id="strategy_planner",
+            agent_type="strategy_planning",
+            initial_prompt="You are a Strategy Planning Agent specialized in strategic planning and optimization.",
+            goals=["Create strategic plans", "Optimize solutions", "Evaluate strategies"]
         )
     
     def _create_creative_synthesizer(self) -> Agent:
-        return Agent(
-            agent_name="CreativeSynthesizer",
-            system_prompt="You are a Creative Synthesis Agent specialized in creative synthesis and innovation.",
-            model_name=self._get_model("creative_synthesis"),
-            max_loops=1,
-            verbose=True,
-            output_type="json"
+        return self._create_self_evolving_agent(
+            agent_id="creative_synthesizer",
+            agent_type="creative_synthesis",
+            initial_prompt="You are a Creative Synthesis Agent specialized in creative synthesis and innovation.",
+            goals=["Generate novel ideas", "Blend concepts", "Propose innovations"]
         )
     
     def _create_optimization_specialist(self) -> Agent:
-        return Agent(
-            agent_name="OptimizationSpecialist",
-            system_prompt="You are an Optimization Specialist Agent specialized in mathematical and computational optimization.",
-            model_name=self._get_model("optimization"),
-            max_loops=1,
-            verbose=True,
-            output_type="json"
+        return self._create_self_evolving_agent(
+            agent_id="optimization_specialist",
+            agent_type="optimization",
+            initial_prompt="You are an Optimization Specialist Agent specialized in mathematical and computational optimization.",
+            goals=["Solve optimization problems", "Select algorithms", "Verify solutions"]
         )
     
     def _create_meta_learning_coordinator(self) -> Agent:
-        return Agent(
-            agent_name="MetaLearningCoordinator",
-            system_prompt="You are a Meta-Learning Coordinator Agent specialized in coordinating meta-learning and system improvement.",
-            model_name=self._get_model("meta_learning"),
-            max_loops=1,
-            verbose=True,
-            output_type="json"
+        return self._create_self_evolving_agent(
+            agent_id="meta_learning_coordinator",
+            agent_type="meta_learning",
+            initial_prompt="You are a Meta-Learning Coordinator Agent specialized in coordinating meta-learning and system improvement.",
+            goals=["Evaluate system performance", "Optimize learning processes", "Generate improvement plans"]
         )
     
     def _create_ethics_evaluator(self) -> Agent:
-        return Agent(
-            agent_name="EthicsEvaluator",
-            system_prompt="You are an Ethics Evaluator Agent specialized in ethical evaluation and compliance.",
-            model_name=self._get_model("knowledge_organization"),
-            max_loops=1,
-            verbose=True,
-            output_type="json"
+        return self._create_self_evolving_agent(
+            agent_id="ethics_evaluator",
+            agent_type="ethics_evaluation",
+            initial_prompt="You are an Ethics Evaluator Agent specialized in ethical evaluation and compliance.",
+            goals=["Evaluate ethical implications", "Assess compliance", "Propose safeguards"]
         )
     
     def solve_complex_problem(
@@ -289,29 +316,47 @@ class PolyMathOSCollaborationSwarm:
         )
     
     def _gather_agent_contributions(self, problem: Dict) -> List[Dict]:
-        """Gather contributions from all agents in parallel"""
+        """Gather contributions from all agents in parallel with performance tracking"""
         contributions = []
         problem_prompt = f"PROBLEM STATEMENT:\n{json.dumps(problem, indent=2)}\n\nAnalyze this problem from your specialized perspective."
         
         futures = []
         for agent_name, agent in self.agents.items():
-            future = self.executor.submit(agent.run, problem_prompt)
+            future = self.executor.submit(self._run_agent_with_tracking, agent_name, agent, problem_prompt)
             futures.append((agent_name, future))
         
         for agent_name, future in futures:
             try:
-                result = future.result(timeout=60)
-                try:
-                    parsed_result = json.loads(result) if isinstance(result, str) else result
-                except:
-                    parsed_result = {"raw_response": str(result)[:500]}
+                result_data = future.result(timeout=60)
+                contributions.append(result_data["contribution"])
                 
-                contributions.append({
-                    "agent": agent_name,
-                    "specialization": agent_name,
-                    "contribution": parsed_result,
-                    "timestamp": datetime.now().isoformat()
-                })
+                # Track performance and evolve agent
+                if result_data.get("success") and self.lemon_ai:
+                    try:
+                        self.lemon_ai.track_agent_performance(
+                            agent_id=agent_name,
+                            task_id=str(uuid.uuid4()),
+                            success=True,
+                            quality_score=result_data.get("quality_score", 0.8),
+                            execution_time=result_data.get("execution_time", 0.0),
+                            tokens_used=result_data.get("tokens_used", 0)
+                        )
+                        
+                        # Evolve agent if needed
+                        evolution_result = self.lemon_ai.evolve_agent(
+                            agent_id=agent_name,
+                            task_results=result_data["contribution"],
+                            performance_feedback={
+                                "success": True,
+                                "quality_score": result_data.get("quality_score", 0.8),
+                                "feedback": "Task completed successfully"
+                            }
+                        )
+                        
+                        if evolution_result.get("evolved"):
+                            logger.info(f"Agent {agent_name} evolved to version {evolution_result['new_version']}")
+                    except Exception as e:
+                        logger.warning(f"Agent evolution tracking failed: {e}")
             except Exception as e:
                 logger.error(f"Agent {agent_name} failed: {e}")
                 contributions.append({
@@ -319,8 +364,66 @@ class PolyMathOSCollaborationSwarm:
                     "contribution": {"error": str(e)},
                     "timestamp": datetime.now().isoformat()
                 })
+                
+                # Track failure
+                if self.lemon_ai:
+                    try:
+                        self.lemon_ai.track_agent_performance(
+                            agent_id=agent_name,
+                            task_id=str(uuid.uuid4()),
+                            success=False,
+                            quality_score=0.0,
+                            execution_time=0.0
+                        )
+                    except Exception as e:
+                        logger.warning(f"Failed to track agent performance: {e}")
         
         return contributions
+    
+    def _run_agent_with_tracking(self, agent_name: str, agent: Agent, prompt: str) -> Dict:
+        """Run agent with performance tracking"""
+        import time
+        start_time = time.time()
+        
+        try:
+            result = agent.run(prompt)
+            execution_time = time.time() - start_time
+            
+            # Parse result
+            try:
+                parsed_result = json.loads(result) if isinstance(result, str) else result
+                quality_score = 0.9 if isinstance(parsed_result, dict) and "status" in parsed_result else 0.7
+            except:
+                parsed_result = {"raw_response": str(result)[:500]}
+                quality_score = 0.6
+            
+            # Estimate tokens (rough)
+            tokens_used = len(prompt.split()) + len(str(result).split())
+            
+            return {
+                "success": True,
+                "contribution": {
+                    "agent": agent_name,
+                    "specialization": agent_name,
+                    "contribution": parsed_result,
+                    "timestamp": datetime.now().isoformat()
+                },
+                "quality_score": quality_score,
+                "execution_time": execution_time,
+                "tokens_used": tokens_used
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "contribution": {
+                    "agent": agent_name,
+                    "contribution": {"error": str(e)},
+                    "timestamp": datetime.now().isoformat()
+                },
+                "quality_score": 0.0,
+                "execution_time": time.time() - start_time,
+                "tokens_used": 0
+            }
     
     def _synthesize_collective_intelligence(self, problem: Dict, contributions: List[Dict]) -> Dict:
         """Synthesize collective intelligence from individual contributions"""

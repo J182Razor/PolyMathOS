@@ -34,3 +34,7 @@ qiskit-aer
 networkx
 # Multi-Agent System
 swarms
+# Database & Storage
+psycopg2-binary
+supabase
+# Lemon AI (optional - can be installed separately)

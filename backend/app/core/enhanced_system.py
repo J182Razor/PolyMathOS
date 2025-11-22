@@ -10,6 +10,9 @@ from ..modules.enhanced_modules import (
 from ..modules.quantum_optimization import QuantumOptimizationEngine
 from ..modules.quantum_patterns import QuantumPatternRecognizer, QuantumNeuralNetwork
 from ..modules.multi_agent import PolyMathOSCollaborationSwarm
+from ..modules.llm_router import llm_router, IntelligentLLMRouter
+from ..modules.lemon_ai_integration import lemon_ai_integration
+from ..modules.storage_persistence import artifact_manager, supabase_storage, database_persistence
 
 class EnhancedPolyMathOS(PolyMathOS):
     """World-Class Genius Creation Version of PolyMathOS"""
@@ -34,7 +37,18 @@ class EnhancedPolyMathOS(PolyMathOS):
         self.quantum_pattern_recognizer = QuantumPatternRecognizer(self.quantum_optimizer)
         self.quantum_neural_networks = {}
         
-        # Multi-Agent Collaboration System
+        # Intelligent LLM Router
+        self.llm_router = llm_router
+        
+        # Lemon AI Integration for Self-Evolving Agents
+        self.lemon_ai = lemon_ai_integration
+        
+        # Storage & Persistence
+        self.artifact_manager = artifact_manager
+        self.supabase_storage = supabase_storage
+        self.database = database_persistence
+        
+        # Multi-Agent Collaboration System (with self-evolving agents)
         try:
             self.collaboration_swarm = PolyMathOSCollaborationSwarm(priority="quality")
         except Exception as e:

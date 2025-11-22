@@ -29,6 +29,26 @@ class PatternRecognitionRequest(BaseModel):
     user_id: str
     pattern_type: str = "abstract_reasoning"
 
+class LLMSelectionRequest(BaseModel):
+    task_type: str
+    priority: str = "quality"
+    required_context: int = 0
+    requires_reasoning: bool = False
+    requires_creativity: bool = False
+    requires_code: bool = False
+
+class AgentEvolutionRequest(BaseModel):
+    agent_id: str
+    task_results: dict
+    performance_feedback: dict
+
+class ArtifactStoreRequest(BaseModel):
+    artifact_id: str
+    content: dict
+    task_id: str
+    artifact_type: str = "output"
+    metadata: Optional[dict] = None
+
 @app.get("/")
 def read_root():
     return {"status": "active", "system": "PolyMathOS Genius Engine"}
@@ -97,12 +117,127 @@ def system_status():
         "status": "active",
         "quantum_available": genius_system.quantum_optimizer is not None,
         "multi_agent_available": genius_system.collaboration_swarm is not None,
+        "llm_router_available": genius_system.llm_router is not None,
+        "lemon_ai_available": genius_system.lemon_ai is not None,
+        "storage_available": {
+            "artifacts": genius_system.artifact_manager is not None,
+            "supabase": genius_system.supabase_storage.available if genius_system.supabase_storage else False,
+            "database": genius_system.database.available if genius_system.database else False
+        },
         "modules": {
             "quantum_optimization": True,
             "quantum_pattern_recognition": True,
             "multi_agent_collaboration": genius_system.collaboration_swarm is not None,
             "neuroplasticity": True,
-            "metacognitive_training": True
+            "metacognitive_training": True,
+            "intelligent_llm_routing": True,
+            "self_evolving_agents": True
         }
     }
+
+@app.post("/llm/select")
+def select_optimal_llm(request: LLMSelectionRequest):
+    """Intelligently select optimal LLM for a task"""
+    try:
+        from app.modules.llm_router import TaskRequirements
+        
+        requirements = TaskRequirements(
+            task_type=request.task_type,
+            priority=request.priority,
+            required_context=request.required_context,
+            requires_reasoning=request.requires_reasoning,
+            requires_creativity=request.requires_creativity,
+            requires_code=request.requires_code
+        )
+        
+        llm_key, config = genius_system.llm_router.select_optimal_llm(requirements)
+        
+        return {
+            "llm_key": llm_key,
+            "model_name": config.model_name,
+            "provider": config.provider.value,
+            "reasoning": {
+                "quality_score": config.quality_score,
+                "speed_score": config.speed_score,
+                "cost_per_1k": config.cost_per_1k_tokens,
+                "context_window": config.context_window
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/llm/performance")
+def get_llm_performance():
+    """Get LLM performance metrics"""
+    try:
+        return genius_system.llm_router.get_performance_report()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/agents/evolve")
+def evolve_agent(request: AgentEvolutionRequest):
+    """Evolve an agent based on performance feedback"""
+    try:
+        result = genius_system.lemon_ai.evolve_agent(
+            request.agent_id,
+            request.task_results,
+            request.performance_feedback
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/agents/{agent_id}/evolution")
+def get_agent_evolution(agent_id: str):
+    """Get evolution history for an agent"""
+    try:
+        return genius_system.lemon_ai.get_agent_evolution_history(agent_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/storage/artifact")
+def store_artifact(request: ArtifactStoreRequest):
+    """Store an artifact with versioning"""
+    try:
+        artifact = genius_system.artifact_manager.store_artifact(
+            request.artifact_id,
+            request.content,
+            request.task_id,
+            request.artifact_type,
+            request.metadata
+        )
+        
+        # Optionally upload to Supabase
+        if genius_system.supabase_storage.available:
+            public_url = genius_system.supabase_storage.upload_artifact(
+                request.artifact_id,
+                request.content,
+                request.task_id
+            )
+            artifact["public_url"] = public_url
+        
+        return artifact
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/storage/artifact/{artifact_id}")
+def get_artifact(artifact_id: str, version: Optional[int] = None):
+    """Retrieve an artifact"""
+    try:
+        artifact = genius_system.artifact_manager.get_artifact(artifact_id, version)
+        if artifact:
+            return artifact
+        raise HTTPException(status_code=404, detail="Artifact not found")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/storage/task/{task_id}/artifacts")
+def list_task_artifacts(task_id: str):
+    """List all artifacts for a task"""
+    try:
+        return genius_system.artifact_manager.list_artifacts_by_task(task_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
