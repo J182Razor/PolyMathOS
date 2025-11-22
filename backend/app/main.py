@@ -16,6 +16,19 @@ class SessionRequest(BaseModel):
     user_id: str
     session_type: str
 
+class QuantumOptimizationRequest(BaseModel):
+    user_id: str
+    domains: List[str]
+    constraints: dict
+
+class CollaborationRequest(BaseModel):
+    problem_statement: dict
+    user_id: Optional[str] = None
+
+class PatternRecognitionRequest(BaseModel):
+    user_id: str
+    pattern_type: str = "abstract_reasoning"
+
 @app.get("/")
 def read_root():
     return {"status": "active", "system": "PolyMathOS Genius Engine"}
@@ -46,4 +59,50 @@ def start_session(request: SessionRequest):
 @app.get("/progress/{user_id}")
 def get_progress(user_id: str):
     return genius_system.get_progress_report(user_id)
+
+@app.post("/quantum/optimize-path")
+def quantum_optimize_path(request: QuantumOptimizationRequest):
+    """Optimize learning paths using quantum algorithms"""
+    try:
+        return genius_system.quantum_learning_path_optimization(
+            request.user_id, request.domains, request.constraints
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/collaboration/solve")
+def collaborative_solve(request: CollaborationRequest):
+    """Solve complex problems using multi-agent collaboration"""
+    try:
+        return genius_system.collaborative_problem_solving(
+            request.problem_statement, request.user_id
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/quantum/pattern-recognition")
+def quantum_pattern_recognition(request: PatternRecognitionRequest):
+    """Quantum-enhanced pattern recognition training"""
+    try:
+        return genius_system.quantum_pattern_recognition_session(
+            request.user_id, request.pattern_type
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/system/status")
+def system_status():
+    """Get system status and capabilities"""
+    return {
+        "status": "active",
+        "quantum_available": genius_system.quantum_optimizer is not None,
+        "multi_agent_available": genius_system.collaboration_swarm is not None,
+        "modules": {
+            "quantum_optimization": True,
+            "quantum_pattern_recognition": True,
+            "multi_agent_collaboration": genius_system.collaboration_swarm is not None,
+            "neuroplasticity": True,
+            "metacognitive_training": True
+        }
+    }
 

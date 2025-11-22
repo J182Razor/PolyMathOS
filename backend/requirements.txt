@@ -22,4 +22,15 @@ pyyaml
 python-multipart
 python-jose[cryptography]
 passlib[bcrypt]
-
+# Quantum Computing Dependencies
+dimod
+dwave-networkx
+dwave-systems
+pennylane
+qiskit
+qiskit-algorithms
+qiskit-optimization
+qiskit-aer
+networkx
+# Multi-Agent System
+swarms

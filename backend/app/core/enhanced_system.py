@@ -7,6 +7,9 @@ from ..modules.enhanced_modules import (
     NeurofeedbackIntegration, SynestheticLearningInterface,
     QuantumCognitionModule, EEGMonitor, EyeTracker, HRVMonitor, GSRMonitor
 )
+from ..modules.quantum_optimization import QuantumOptimizationEngine
+from ..modules.quantum_patterns import QuantumPatternRecognizer, QuantumNeuralNetwork
+from ..modules.multi_agent import PolyMathOSCollaborationSwarm
 
 class EnhancedPolyMathOS(PolyMathOS):
     """World-Class Genius Creation Version of PolyMathOS"""
@@ -25,6 +28,18 @@ class EnhancedPolyMathOS(PolyMathOS):
         self.neurofeedback = NeurofeedbackIntegration()
         self.synesthetic_interface = SynestheticLearningInterface()
         self.quantum_cognition = QuantumCognitionModule()
+        
+        # Quantum Computing Integration
+        self.quantum_optimizer = QuantumOptimizationEngine(quantum_backend='simulator')
+        self.quantum_pattern_recognizer = QuantumPatternRecognizer(self.quantum_optimizer)
+        self.quantum_neural_networks = {}
+        
+        # Multi-Agent Collaboration System
+        try:
+            self.collaboration_swarm = PolyMathOSCollaborationSwarm(priority="quality")
+        except Exception as e:
+            print(f"Warning: Multi-agent system initialization failed: {e}")
+            self.collaboration_swarm = None
         
         # Biometric integration
         self.biometric_monitors = {
@@ -102,6 +117,59 @@ class EnhancedPolyMathOS(PolyMathOS):
         
         handler = session_protocols.get(session_type, lambda: {"type": "comprehensive", "status": "active"})
         return handler()
+    
+    def quantum_learning_path_optimization(self, user_id: str, domains: list, constraints: dict):
+        """Optimize learning paths using quantum algorithms"""
+        optimization_problem = {
+            'constraints': constraints,
+            'objectives': {'efficiency': 1.0, 'comprehensiveness': 0.8}
+        }
+        
+        quantum_solution = self.quantum_optimizer.qaoa_learning_path_optimizer(
+            constraints, optimization_problem['objectives']
+        )
+        
+        return {
+            'user_id': user_id,
+            'domains': domains,
+            'quantum_optimized_path': quantum_solution.get('optimal_path', []),
+            'optimization_metrics': {
+                'minimum_cost': quantum_solution.get('minimum_cost', 0.5),
+                'convergence': quantum_solution.get('convergence', 0)
+            }
+        }
+    
+    def collaborative_problem_solving(self, problem_statement: dict, user_id: str = None):
+        """Solve complex problems using multi-agent collaboration"""
+        if not self.collaboration_swarm:
+            return {
+                'error': 'Multi-agent collaboration system not available',
+                'fallback': 'Using single-agent reasoning'
+            }
+        
+        result = self.collaboration_swarm.solve_complex_problem(
+            problem_statement=problem_statement,
+            user_id=user_id,
+            session_type="collaborative_genius"
+        )
+        
+        return result.to_dict()
+    
+    def quantum_pattern_recognition_session(self, user_id: str, pattern_type: str = "abstract_reasoning"):
+        """Quantum-enhanced pattern recognition training session"""
+        if pattern_type == "image_recognition":
+            recognizer = self.quantum_pattern_recognizer.quantum_convolutional_neural_network
+        elif pattern_type == "sequential_patterns":
+            recognizer = self.quantum_pattern_recognizer.quantum_attention_mechanism
+        else:
+            recognizer = self.quantum_pattern_recognizer.quantum_kernel_methods
+        
+        return {
+            'user_id': user_id,
+            'pattern_type': pattern_type,
+            'recognizer_type': recognizer.__name__ if hasattr(recognizer, '__name__') else str(recognizer),
+            'session_ready': True
+        }
 
 # Singleton instance
 genius_system = EnhancedPolyMathOS()
