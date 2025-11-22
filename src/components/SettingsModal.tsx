@@ -21,6 +21,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     GROQ_API_KEY: '',
     SUPABASE_URL: '',
     SUPABASE_ANON_KEY: '',
+    BACKEND_API_URL: 'http://localhost:8000',
   });
 
   useEffect(() => {

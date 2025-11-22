@@ -11,6 +11,9 @@ services:
     restart: always
     environment:
       - NODE_ENV=production
+      - VITE_API_URL=http://polymathos-backend:8000
+    depends_on:
+      - backend
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
       interval: 30s
@@ -20,8 +23,29 @@ services:
     networks:
       - polymathos-network
 
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: polymathos-backend
+    ports:
+      - "8000:8000"
+    restart: always
+    volumes:
+      - ./backend/app:/app/app
+      - ./backend/data:/app/data
+    environment:
+      - ENV=production
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - polymathos-network
+
 networks:
   polymathos-network:
     driver: bridge
     name: polymathos-network
-
