@@ -3,12 +3,34 @@ from pydantic import BaseModel
 from typing import List, Optional, Dict
 import json
 from app.core.enhanced_system import genius_system
+from app.core.config_manager import config_manager
 
 app = FastAPI(title="PolyMathOS Genius Engine")
 
 class UserEnrollment(BaseModel):
     user_id: str
     interests: List[str]
+
+class SetupRequest(BaseModel):
+    config: Dict[str, str]
+
+@app.post("/setup/config")
+async def update_config(request: SetupRequest):
+    """Update system configuration and save to .env"""
+    try:
+        results = config_manager.update_bulk(request.config)
+        # Reload system components if necessary
+        # genius_system.reload_config() # Future implementation
+        return {"status": "success", "updated": results}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/setup/config")
+async def get_public_config():
+    """Get non-sensitive configuration"""
+    # Only return safe keys to frontend
+    safe_keys = ["NEXT_PUBLIC_API_URL", "VITE_API_URL", "N8N_WEBHOOK_URL"]
+    return {k: config_manager.get(k, "") for k in safe_keys}
 
 class GeniusModeRequest(BaseModel):
     user_id: str

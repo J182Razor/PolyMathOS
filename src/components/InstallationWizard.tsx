@@ -143,32 +143,46 @@ export const InstallationWizard: React.FC<{
   };
 
   const handleSaveEnvVars = async () => {
-    // Save to localStorage
-    localStorage.setItem('polymathos_env', JSON.stringify(envVariables));
+    setIsLoading(true);
+    try {
+      // Save to localStorage as backup
+      localStorage.setItem('polymathos_env', JSON.stringify(envVariables));
 
-    // Save to n8n if connected
-    if (n8nConnected) {
-      setIsLoading(true);
-      try {
-        for (const [key, value] of Object.entries(envVariables)) {
-          if (value) {
-            await N8NService.setEnvVariable({
-              key,
-              value,
-              description: requiredEnvVars.find((v) => v.key === key)?.description || '',
-              isSecret: requiredEnvVars.find((v) => v.key === key)?.isSecret || false,
-            });
-          }
-        }
-      } catch (error) {
-        console.error('Error saving env vars to n8n:', error);
+      // Save to backend
+      const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/setup/config`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ config: envVariables }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save configuration to backend');
       }
-      setIsLoading(false);
-    }
 
-    // Update Vite env (for development)
-    if (import.meta.env.DEV) {
-      console.log('Environment variables saved:', envVariables);
+      // Save to n8n if connected
+      if (n8nConnected) {
+        try {
+          for (const [key, value] of Object.entries(envVariables)) {
+            if (value) {
+              await N8NService.setEnvVariable({
+                key,
+                value,
+                description: requiredEnvVars.find((v) => v.key === key)?.description || '',
+                isSecret: requiredEnvVars.find((v) => v.key === key)?.isSecret || false,
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Error saving env vars to n8n:', error);
+        }
+      }
+    } catch (error) {
+      console.error('Error saving configuration:', error);
+      alert('Failed to save configuration. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
