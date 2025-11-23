@@ -43,17 +43,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-light-base dark:bg-dark-base transition-colors duration-300">
+    <div className="min-h-screen bg-poly-bg-primary transition-colors duration-300">
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
       {/* Header */}
-      <header className="glass-strong border-b border-silver-300 dark:border-silver-500/20">
+      <header className="glass border-b border-poly-border-primary">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="flex items-center justify-between h-20 py-4">
             <div className="flex items-center space-x-3">
-              <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-silver-300/20 to-silver-500/20 border border-silver-300/30 flex items-center justify-center">
-                <Icon icon={Brain} size="sm" className="text-silver-200" />
+              <div className="relative w-8 h-8 rounded-lg bg-poly-bg-tertiary border border-poly-border-secondary flex items-center justify-center">
+                <Icon icon={Brain} size="sm" className="text-poly-primary-600 dark:text-poly-primary-400" />
               </div>
-              <span className="text-xl font-display font-bold text-shimmer">PolyMathOS</span>
+              <span className="text-xl font-display font-bold text-poly-text-primary">PolyMathOS</span>
             </div>
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="sm" onClick={() => setIsSettingsOpen(true)}>
@@ -72,10 +72,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
         {/* Welcome Section */}
         <div className="mb-12">
-          <h1 className="text-4xl sm:text-5xl font-display font-bold text-royal-600 dark:text-royal-400 mb-4">
-            Welcome back, <span className="text-purple-600 dark:text-purple-400">{user?.firstName || 'Alex'}</span>!
+          <h1 className="text-4xl sm:text-5xl font-display font-bold text-poly-primary-700 dark:text-poly-primary-400 mb-4">
+            Welcome back, <span className="text-poly-accent-600 dark:text-poly-accent-400">{user?.firstName || 'Alex'}</span>!
           </h1>
-          <p className="text-lg text-text-secondary">
+          <p className="text-lg text-poly-text-secondary">
             Ready to continue your learning journey? You're making excellent progress!
           </p>
         </div>
@@ -83,14 +83,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {stats.map((stat, index) => (
-            <Card key={index} hover className="p-8 rounded-xl border-2 border-silver-200 dark:border-silver-700 hover:border-royal-400 dark:hover:border-royal-500 transition-all duration-300">
+            <Card key={index} hover className="p-8 rounded-xl border border-poly-border-primary hover:border-poly-primary-400 transition-all duration-300 bg-poly-bg-secondary">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-text-secondary">{stat.label}</p>
-                  <p className="text-3xl font-bold bg-brand-gradient bg-clip-text text-transparent">{stat.value}</p>
+                  <p className="text-sm font-medium text-poly-text-secondary">{stat.label}</p>
+                  <p className="text-3xl font-bold bg-poly-gradient-primary bg-clip-text text-transparent">{stat.value}</p>
                 </div>
-                <div className="w-16 h-16 rounded-xl bg-royal-50 dark:bg-royal-950/30 border-2 border-royal-200 dark:border-royal-800 flex items-center justify-center shadow-lg shadow-royal-500/10 dark:shadow-royal-500/20">
-                  <Icon icon={stat.icon} size="lg" className="text-royal-600 dark:text-royal-400" />
+                <div className="w-16 h-16 rounded-xl bg-poly-primary-50 dark:bg-poly-primary-900/30 border border-poly-primary-200 dark:border-poly-primary-800 flex items-center justify-center">
+                  <Icon icon={stat.icon} size="lg" className="text-poly-primary-600 dark:text-poly-primary-400" />
                 </div>
               </div>
             </Card>
@@ -101,29 +101,27 @@ export const Dashboard: React.FC<DashboardProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Recent Lessons */}
           <div className="lg:col-span-2">
-            <Card className="p-8 rounded-xl border-2 border-silver-500/20">
-              <h2 className="text-2xl font-display font-semibold text-text-primary mb-8">
+            <Card className="p-8 rounded-xl border border-poly-border-primary bg-poly-bg-secondary">
+              <h2 className="text-2xl font-display font-semibold text-poly-text-primary mb-8">
                 Recent Learning Sessions
               </h2>
               <div className="space-y-4">
                 {recentLessons.map((lesson, index) => (
-                  <div key={index} className="flex items-center justify-between p-5 glass rounded-lg border-2 border-silver-500/10 hover:border-royal-500/30 transition-all duration-300">
+                  <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between p-5 glass rounded-lg border border-poly-border-primary hover:border-poly-primary-300 transition-all duration-300 gap-4 sm:gap-0">
                     <div className="flex-1">
-                      <h3 className="font-medium text-text-primary mb-1">
+                      <h3 className="font-medium text-poly-text-primary mb-1">
                         {lesson.title}
                       </h3>
-                      <p className="text-sm text-text-secondary opacity-80">{lesson.time}</p>
+                      <p className="text-sm text-poly-text-tertiary">{lesson.time}</p>
                     </div>
-                    <div className="flex items-center space-x-4">
-                      <div className="w-24 bg-dark-elevated rounded-full h-2 border border-silver-500/20">
+                    <div className="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-end">
+                      <div className="w-24 bg-poly-bg-tertiary rounded-full h-2 border border-poly-border-secondary">
                         <div 
-                          className="bg-shimmer h-2 rounded-full relative overflow-hidden"
+                          className="bg-poly-primary-500 h-2 rounded-full relative overflow-hidden"
                           style={{ width: `${lesson.progress}%` }}
-                        >
-                          <div className="absolute inset-0 bg-shimmer animate-shimmer"></div>
-                        </div>
+                        />
                       </div>
-                      <span className="text-sm font-medium text-text-secondary w-12">
+                      <span className="text-sm font-medium text-poly-text-secondary w-12 text-right">
                         {lesson.progress}%
                       </span>
                     </div>
@@ -141,7 +139,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="w-full mt-3 border-2 border-silver-300"
+                  className="w-full mt-3 border border-poly-border-primary hover:bg-poly-bg-tertiary text-poly-text-primary"
                   onClick={() => {
                     window.location.hash = '#polymath_dashboard';
                     window.dispatchEvent(new HashChangeEvent('hashchange'));
@@ -158,32 +156,43 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <div className="space-y-6">
             <SpacedRepetitionWidget />
             
-            <Card className="p-8 rounded-xl border-2 border-silver-500/20">
-              <h2 className="text-2xl font-display font-semibold text-text-primary mb-6">
+            <Card className="p-8 rounded-xl border border-poly-border-primary bg-poly-bg-secondary">
+              <h2 className="text-2xl font-display font-semibold text-poly-text-primary mb-6">
                 Quick Actions
               </h2>
               <div className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start text-poly-text-secondary border-poly-border-primary hover:bg-poly-bg-tertiary">
                   <Icon icon={Brain} size="sm" className="mr-2" />
                   Take Cognitive Assessment
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start text-poly-text-secondary border-poly-border-primary hover:bg-poly-bg-tertiary">
                   <Icon icon={Target} size="sm" className="mr-2" />
                   Set Learning Goals
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start text-poly-text-secondary border-poly-border-primary hover:bg-poly-bg-tertiary">
                   <Icon icon={Users} size="sm" className="mr-2" />
                   Join Study Group
                 </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-poly-text-secondary border-poly-border-primary hover:bg-poly-bg-tertiary"
+                  onClick={() => {
+                    window.location.hash = '#resource_library';
+                    window.dispatchEvent(new HashChangeEvent('hashchange'));
+                  }}
+                >
+                  <Icon icon={BookOpen} size="sm" className="mr-2" />
+                  Resource Library
+                </Button>
                 {onOpenBrainwaveGenerator && (
-                  <Button variant="outline" className="w-full justify-start" onClick={onOpenBrainwaveGenerator}>
+                  <Button variant="outline" className="w-full justify-start text-poly-text-secondary border-poly-border-primary hover:bg-poly-bg-tertiary" onClick={onOpenBrainwaveGenerator}>
                     <Icon icon={Radio} size="sm" className="mr-2" />
                     Brainwave Generator
                   </Button>
                 )}
                 <Button
                   variant="outline"
-                  className="w-full justify-start"
+                  className="w-full justify-start text-poly-text-secondary border-poly-border-primary hover:bg-poly-bg-tertiary"
                   onClick={() => {
                     window.location.hash = '#polymath_ai';
                     window.dispatchEvent(new HashChangeEvent('hashchange'));
@@ -195,8 +204,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </div>
             </Card>
 
-            <Card className="p-6">
-              <h2 className="text-xl font-display font-semibold text-text-primary mb-4">
+            <Card className="p-6 bg-poly-bg-secondary border border-poly-border-primary">
+              <h2 className="text-xl font-display font-semibold text-poly-text-primary mb-4">
                 Today's Goal
               </h2>
               <div className="text-center">
@@ -207,7 +216,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2"
-                      className="text-silver-500/30"
+                      className="text-poly-neutral-200 dark:text-poly-neutral-700"
                     />
                     <path
                       d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
@@ -215,14 +224,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       stroke="currentColor"
                       strokeWidth="2"
                       strokeDasharray="75, 100"
-                      className="text-silver-300"
+                      className="text-poly-primary-500"
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xl font-bold text-shimmer">75%</span>
+                    <span className="text-xl font-bold text-poly-text-primary">75%</span>
                   </div>
                 </div>
-                <p className="text-sm text-text-tertiary mb-4">
+                <p className="text-sm text-poly-text-tertiary mb-4">
                   3 of 4 sessions completed
                 </p>
                 <Button variant="primary" size="sm" className="w-full">

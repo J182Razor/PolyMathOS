@@ -24,7 +24,6 @@ class LLMProvider(Enum):
     DEEPSEEK = "deepseek"
     OLLAMA = "ollama"
     VLLM = "vllm"
-    LEMON_AI = "lemon_ai"
 
 @dataclass
 class LLMConfig:
@@ -125,14 +124,6 @@ class IntelligentLLMRouter:
                 speed_score=7.0,
                 quality_score=8.0,
                 context_window=128000
-            ),
-            LLMConfig(
-                provider=LLMProvider.LEMON_AI,
-                model_name="lemon-agent",
-                cost_per_1k_tokens=0.0,  # Local
-                speed_score=8.0,
-                quality_score=9.0,
-                context_window=200000
             )
         ]
         

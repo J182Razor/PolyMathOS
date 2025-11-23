@@ -140,7 +140,7 @@ class CurriculumGenerator:
         skill_lower = skill.lower()
         if any(cs in skill_lower for cs in complex_skills):
             return 'Advanced'
-        elif any(is in skill_lower for is in intermediate_skills):
+        elif any(intermediate_skill in skill_lower for intermediate_skill in intermediate_skills):
             return 'Intermediate'
         else:
             return 'Beginner'

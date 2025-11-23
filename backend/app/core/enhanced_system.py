@@ -7,12 +7,30 @@ from ..modules.enhanced_modules import (
     NeurofeedbackIntegration, SynestheticLearningInterface,
     QuantumCognitionModule, EEGMonitor, EyeTracker, HRVMonitor, GSRMonitor
 )
-from ..modules.quantum_optimization import QuantumOptimizationEngine
-from ..modules.quantum_patterns import QuantumPatternRecognizer, QuantumNeuralNetwork
+# Try to import quantum modules with fallback
+try:
+    from ..modules.quantum_optimization import QuantumOptimizationEngine
+    from ..modules.quantum_patterns import QuantumPatternRecognizer, QuantumNeuralNetwork
+    QUANTUM_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: Quantum modules not available: {e}")
+    QuantumOptimizationEngine = None
+    QuantumPatternRecognizer = None
+    QuantumNeuralNetwork = None
+    QUANTUM_AVAILABLE = False
 from ..modules.multi_agent import PolyMathOSCollaborationSwarm
 from ..modules.llm_router import llm_router, IntelligentLLMRouter
 from ..modules.lemon_ai_integration import lemon_ai_integration
 from ..modules.storage_persistence import artifact_manager, supabase_storage, database_persistence
+from ..modules.polymathos_integration import PolyMathOSLearningSystem
+# Import Swarms Agentic System for all LLM operations
+try:
+    from ..modules.swarms_agentic_system import agentic_system, SwarmsAgenticSystem
+    SWARMS_AGENTIC_AVAILABLE = True
+except ImportError:
+    SWARMS_AGENTIC_AVAILABLE = False
+    agentic_system = None
+    logger.warning("Swarms Agentic System not available")
 
 class EnhancedPolyMathOS(PolyMathOS):
     """World-Class Genius Creation Version of PolyMathOS"""
@@ -32,13 +50,31 @@ class EnhancedPolyMathOS(PolyMathOS):
         self.synesthetic_interface = SynestheticLearningInterface()
         self.quantum_cognition = QuantumCognitionModule()
         
-        # Quantum Computing Integration
-        self.quantum_optimizer = QuantumOptimizationEngine(quantum_backend='simulator')
-        self.quantum_pattern_recognizer = QuantumPatternRecognizer(self.quantum_optimizer)
-        self.quantum_neural_networks = {}
+        # Quantum Computing Integration (optional)
+        if QUANTUM_AVAILABLE and QuantumOptimizationEngine:
+            try:
+                self.quantum_optimizer = QuantumOptimizationEngine(quantum_backend='simulator')
+                self.quantum_pattern_recognizer = QuantumPatternRecognizer(self.quantum_optimizer)
+                self.quantum_neural_networks = {}
+            except Exception as e:
+                print(f"Warning: Quantum optimization failed to initialize: {e}")
+                self.quantum_optimizer = None
+                self.quantum_pattern_recognizer = None
+                self.quantum_neural_networks = {}
+        else:
+            self.quantum_optimizer = None
+            self.quantum_pattern_recognizer = None
+            self.quantum_neural_networks = {}
         
         # Intelligent LLM Router
         self.llm_router = llm_router
+        
+        # Swarms Agentic System - All LLM operations go through this
+        self.agentic_system = agentic_system if SWARMS_AGENTIC_AVAILABLE else None
+        if self.agentic_system:
+            print("✅ Swarms Agentic System initialized - All LLM operations are agentic")
+        else:
+            print("⚠️  Swarms Agentic System not available - Using fallback")
         
         # Lemon AI Integration for Self-Evolving Agents
         self.lemon_ai = lemon_ai_integration
@@ -47,6 +83,9 @@ class EnhancedPolyMathOS(PolyMathOS):
         self.artifact_manager = artifact_manager
         self.supabase_storage = supabase_storage
         self.database = database_persistence
+        
+        # PolyMathOS Learning System (HDAM + Supabase + File Processing)
+        self.learning_system = PolyMathOSLearningSystem()
         
         # Multi-Agent Collaboration System (with self-evolving agents)
         try:

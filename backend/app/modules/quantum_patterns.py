@@ -2,8 +2,16 @@
 Quantum Pattern Recognition and Neural Networks for PolyMathOS
 """
 
-import pennylane as qml
-from pennylane import numpy as np
+# Try to import PennyLane with fallback
+try:
+    import pennylane as qml
+    from pennylane import numpy as np
+    PENNYLANE_AVAILABLE = True
+except (ImportError, AttributeError) as e:
+    print(f"Warning: PennyLane not available in quantum_patterns: {e}")
+    PENNYLANE_AVAILABLE = False
+    qml = None
+    import numpy as np  # Fallback to regular numpy
 from typing import List, Dict, Any, Optional
 import logging
 

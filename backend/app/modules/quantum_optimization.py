@@ -4,10 +4,28 @@ Implements quantum-enhanced optimization algorithms
 """
 
 import dimod
-import dwave_networkx as dnx
-from dwave.system import DWaveSampler, EmbeddingComposite
-import pennylane as qml
-from pennylane import numpy as np
+# Try to import D-Wave components with fallback
+try:
+    import dwave_networkx as dnx
+    from dwave.system import DWaveSampler, EmbeddingComposite
+    DWAVE_AVAILABLE = True
+except ImportError:
+    DWAVE_AVAILABLE = False
+    dnx = None
+    DWaveSampler = None
+    EmbeddingComposite = None
+
+# Try to import PennyLane with fallback
+try:
+    import pennylane as qml
+    from pennylane import numpy as np
+    PENNYLANE_AVAILABLE = True
+except (ImportError, AttributeError) as e:
+    print(f"Warning: PennyLane not available: {e}")
+    PENNYLANE_AVAILABLE = False
+    qml = None
+    import numpy as np  # Fallback to regular numpy
+
 import networkx as nx
 from typing import Dict, List, Any, Optional
 import logging
@@ -35,14 +53,21 @@ class QuantumOptimizationEngine:
         self.variational_circuits = {}
         
         if quantum_backend == 'dwave':
-            try:
-                self.dwave_sampler = EmbeddingComposite(DWaveSampler())
-            except Exception as e:
-                logger.warning(f"D-Wave connection failed: {e}")
+            if DWAVE_AVAILABLE:
+                try:
+                    self.dwave_sampler = EmbeddingComposite(DWaveSampler())
+                except Exception as e:
+                    logger.warning(f"D-Wave connection failed: {e}")
+                    self.backend = 'simulator'
+            else:
+                logger.warning("D-Wave packages not installed. Using simulator.")
                 self.backend = 'simulator'
         
         # Initialize quantum devices for variational algorithms
-        self.qml_device = qml.device('default.qubit', wires=8)
+        if PENNYLANE_AVAILABLE and qml:
+            self.qml_device = qml.device('default.qubit', wires=8)
+        else:
+            self.qml_device = None
         logger.info(f"QuantumOptimizationEngine initialized with backend: {self.backend}")
         
     def quantum_annealing_solver(self, optimization_problem):

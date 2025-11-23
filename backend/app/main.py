@@ -1,6 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict
+import json
 from app.core.enhanced_system import genius_system
 
 app = FastAPI(title="PolyMathOS Genius Engine")
@@ -49,9 +50,70 @@ class ArtifactStoreRequest(BaseModel):
     artifact_type: str = "output"
     metadata: Optional[dict] = None
 
+class LearningPathRequest(BaseModel):
+    user_query: str
+    preferred_domains: Optional[List[str]] = None
+
 @app.get("/")
 def read_root():
     return {"status": "active", "system": "PolyMathOS Genius Engine"}
+
+@app.post("/learning/onboard")
+async def onboard_learning(
+    interests: str = Form(...),
+    files: List[UploadFile] = File(None)
+):
+    """Onboard user with interests and optional files"""
+    try:
+        user_interests = json.loads(interests)
+        uploaded_files_data = []
+        
+        if files:
+            for file in files:
+                content = await file.read()
+                uploaded_files_data.append({
+                    "filename": file.filename,
+                    "content": content,
+                    "metadata": {"content_type": file.content_type}
+                })
+        
+        result = await genius_system.learning_system.onboard_user_with_files(
+            user_interests, uploaded_files_data
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/learning/path")
+async def recommend_learning_path(request: LearningPathRequest):
+    """Generate a personalized learning path based on query and memory"""
+    try:
+        return await genius_system.learning_system.recommend_learning_path(
+            request.user_query, request.preferred_domains
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/learning/upload")
+async def upload_resource(
+    domains: str = Form(...),
+    file: UploadFile = File(...)
+):
+    """Upload a single learning resource"""
+    try:
+        domain_list = json.loads(domains)
+        content = await file.read()
+        
+        # Use the file processor directly through the system
+        result = await genius_system.learning_system.file_processor.process_file(
+            file_content=content,
+            filename=file.filename,
+            domains=domain_list,
+            metadata={"content_type": file.content_type}
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/enroll")
 def enroll_user(enrollment: UserEnrollment):

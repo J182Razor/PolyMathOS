@@ -8,175 +8,165 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Royal Blue (Primary)
+        // Primary Brand Colors
+        'poly-primary': {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+          800: '#075985',
+          900: '#0c4a6e',
+        },
+        // Secondary (Intelligence/Academic)
+        'poly-secondary': {
+          50: '#f5f3ff',
+          100: '#ede9fe',
+          200: '#ddd6fe',
+          300: '#c4b5fd',
+          400: '#a78bfa',
+          500: '#8b5cf6',
+          600: '#7c3aed',
+          700: '#6d28d9',
+          800: '#5b21b6',
+          900: '#4c1d95',
+        },
+        // Accent (Computational/Technical)
+        'poly-accent': {
+          50: '#ecfdf5',
+          100: '#d1fae5',
+          200: '#a7f3d0',
+          300: '#6ee7b7',
+          400: '#34d399',
+          500: '#10b981',
+          600: '#059669',
+          700: '#047857',
+          800: '#065f46',
+          900: '#064e3b',
+        },
+        // Neutrals
+        'poly-neutral': {
+          0: '#ffffff',
+          50: '#fafafa',
+          100: '#f5f5f5',
+          200: '#e5e5e5',
+          300: '#d4d4d4',
+          400: '#a3a3a3',
+          500: '#737373',
+          600: '#525252',
+          700: '#404040',
+          800: '#262626',
+          900: '#171717',
+          950: '#0a0a0a',
+        },
+        // Semantic Colors
+        'poly-success': '#10b981',
+        'poly-warning': '#f59e0b',
+        'poly-error': '#ef4444',
+        'poly-info': '#0ea5e9',
+
+        // Semantic definitions mapping to CSS variables
+        // These must match what is used in index.css @apply
+        'poly-bg-primary': 'var(--poly-bg-primary)',
+        'poly-bg-secondary': 'var(--poly-bg-secondary)',
+        'poly-bg-tertiary': 'var(--poly-bg-tertiary)',
+        
+        'poly-text-primary': 'var(--poly-text-primary)',
+        'poly-text-secondary': 'var(--poly-text-secondary)',
+        'poly-text-tertiary': 'var(--poly-text-tertiary)',
+        'poly-text-disabled': 'var(--poly-text-disabled)',
+        
+        'poly-border-primary': 'var(--poly-border-primary)',
+        'poly-border-secondary': 'var(--poly-border-secondary)',
+
+        // Legacy support mapping
         royal: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6', // Royal Blue Base
-          600: '#2563eb', // Royal Blue Primary
-          700: '#1d4ed8', // Royal Blue Dark
-          800: '#1e40af',
-          900: '#1e3a8a',
-          950: '#172554',
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+          800: '#075985',
+          900: '#0c4a6e',
+          950: '#082f49',
         },
-        // Purple (Secondary)
-        purple: {
-          50: '#faf5ff',
-          100: '#f3e8ff',
-          200: '#e9d5ff',
-          300: '#d8b4fe',
-          400: '#c084fc', // Purple Base
-          500: '#a855f7', // Purple Primary
-          600: '#9333ea', // Purple Dark
-          700: '#7e22ce',
-          800: '#6b21a8',
-          900: '#581c87',
-          950: '#3b0764',
-        },
-        // Silver (Accent)
         silver: {
-          50: '#f8f9fa',
-          100: '#f1f3f5',
-          200: '#e8e8f0', // Silver Light
-          300: '#c0c0d0', // Silver Base
-          400: '#9090a0', // Silver Medium
-          500: '#606070', // Silver Dark
-          600: '#4a4a5a',
-          700: '#3a3a4a',
-          800: '#2a2a3a',
-          900: '#1a1a2a',
+          50: '#fafafa',
+          100: '#f5f5f5',
+          200: '#e5e5e5',
+          300: '#d4d4d4',
+          400: '#a3a3a3',
+          500: '#737373',
+          600: '#525252',
+          700: '#404040',
+          800: '#262626',
+          900: '#171717',
         },
-        // Gold (Accent) - For elegant touches
-        gold: {
-          50: '#FFFAEB',
-          100: '#FCEFC7',
-          200: '#FAE094',
-          300: '#F8CB61',
-          400: '#F5B02E',
-          500: '#F29D0B', // Gold Base
-          600: '#D97F06',
-          700: '#B36003',
-          800: '#924806',
-          900: '#783A06',
-          950: '#451E02',
-        },
-        // Dark Theme (for dark mode) - Enhanced for better contrast
+        // Dark Theme (for dark mode)
         dark: {
-          base: '#05050A', // Deeper black/navy for maximum contrast
-          surface: '#0F111A', // Lighter for cards - critical for depth
-          elevated: '#1A1D2D', // For hover states
-          overlay: '#0F0F15',
+          base: '#0a0a0a',
+          surface: '#171717',
+          elevated: '#262626',
+          overlay: '#0a0a0a',
         },
-        // Light Theme (for light mode) - Vibrant Sky Blue & Silver
+        // Light Theme (for light mode)
         light: {
-          base: '#F0F9FF', // Sky Blue 50
-          surface: '#FFFFFF', // White surface for contrast
-          elevated: '#E0F2FE', // Sky Blue 100
-          overlay: '#BAE6FD', // Sky Blue 200
+          base: '#ffffff',
+          surface: '#fafafa',
+          elevated: '#f5f5f5',
+          overlay: '#e5e5e5',
         },
-        // Text Hierarchy - Theme-aware for light and dark modes
+        // Text Hierarchy
         text: {
-          primary: '#1A1A2A', // Dark text for light mode, overridden in dark mode
-          secondary: '#4A4A5A', // Medium dark for light mode
-          tertiary: '#6B6B7F', // Muted for light mode
-          disabled: '#9090A0', // Disabled state
+          primary: '#171717',
+          secondary: '#404040',
+          tertiary: '#737373',
+          disabled: '#a3a3a3',
         },
-        // Legacy support
-        primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb', // Royal Blue
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-        },
-        secondary: {
-          50: '#faf5ff',
-          100: '#f3e8ff',
-          200: '#e9d5ff',
-          300: '#d8b4fe',
-          400: '#c084fc',
-          500: '#a855f7', // Purple
-          600: '#9333ea',
-          700: '#7e22ce',
-          800: '#6b21a8',
-          900: '#581c87',
-        }
-      },
-      spacing: {
-        '18': '4.5rem',
-        '88': '22rem',
-        '128': '32rem',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'SF Pro Text', 'Helvetica Neue', 'sans-serif'],
+        display: ['Inter', 'SF Pro Display', 'Helvetica Neue', 'sans-serif'],
+        mono: ['JetBrains Mono', 'SF Mono', 'Monaco', 'monospace'],
       },
-      backgroundImage: {
-        'shimmer': 'linear-gradient(135deg, rgba(232, 232, 240, 0.1) 0%, rgba(192, 192, 208, 0.2) 50%, rgba(144, 144, 160, 0.1) 100%)',
-        'shimmer-strong': 'linear-gradient(135deg, rgba(232, 232, 240, 0.3) 0%, rgba(192, 192, 208, 0.5) 50%, rgba(144, 144, 160, 0.3) 100%)',
-        'silver-gradient': 'linear-gradient(135deg, #E8E8F0 0%, #C0C0D0 50%, #9090A0 100%)',
-        'royal-gradient': 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)',
-        'purple-gradient': 'linear-gradient(135deg, #a855f7 0%, #9333ea 50%, #7e22ce 100%)',
-        'brand-gradient': 'linear-gradient(135deg, #2563eb 0%, #a855f7 50%, #c0c0d0 100%)',
-        'glass': 'linear-gradient(135deg, rgba(17, 17, 24, 0.8) 0%, rgba(26, 26, 36, 0.6) 100%)',
-        'glass-light': 'linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(248, 249, 250, 0.6) 100%)',
-      },
-      backdropBlur: {
-        xs: '2px',
+      fontSize: {
+        'display-1': ['3.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '800' }],
+        'display-2': ['2.75rem', { lineHeight: '1.15', letterSpacing: '-0.015em', fontWeight: '700' }],
+        'display-3': ['2.25rem', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '700' }],
+        'heading-1': ['1.875rem', { lineHeight: '1.25', fontWeight: '600' }],
+        'heading-2': ['1.5rem', { lineHeight: '1.3', fontWeight: '600' }],
+        'heading-3': ['1.25rem', { lineHeight: '1.35', fontWeight: '600' }],
+        'body-large': ['1.125rem', { lineHeight: '1.5', fontWeight: '400' }],
+        'body-medium': ['1rem', { lineHeight: '1.55', fontWeight: '400' }],
+        'body-small': ['0.875rem', { lineHeight: '1.5', fontWeight: '400' }],
+        'caption': ['0.75rem', { lineHeight: '1.4', fontWeight: '400' }],
+        'code': ['0.875rem', { lineHeight: '1.6', fontWeight: '400' }],
       },
       boxShadow: {
-        'silver': '0 0 20px rgba(192, 192, 208, 0.2)',
-        'silver-lg': '0 0 40px rgba(192, 192, 208, 0.3)',
-        'silver-xl': '0 0 60px rgba(192, 192, 208, 0.4)',
-        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+        'poly-sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+        'poly-md': '0 4px 6px -1px rgba(0, 0, 0, 0.08)',
+        'poly-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+        'poly-xl': '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+        'poly-primary': '0 4px 12px rgba(14, 165, 233, 0.25)',
+        'poly-glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
+      },
+      backgroundImage: {
+        'poly-gradient-primary': 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+        'poly-gradient-hover': 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
       },
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-in-out',
-        'slide-up': 'slideUp 0.5s ease-out',
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'shimmer': 'shimmer 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'shimmer-fast': 'shimmer 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'border-shimmer': 'borderShimmer 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'text-shimmer': 'textShimmer 3s ease-in-out infinite',
-        'float': 'float 6s ease-in-out infinite',
-        'glow': 'glow 2s ease-in-out infinite alternate',
+        'poly-fade-in': 'polyFadeIn 0.3s ease forwards',
       },
       keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        slideUp: {
-          '0%': { transform: 'translateY(20px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        shimmer: {
-          '0%': { backgroundPosition: '-1000px 0' },
-          '100%': { backgroundPosition: '1000px 0' },
-        },
-        borderShimmer: {
-          '0%, 100%': { borderColor: 'rgba(192, 192, 208, 0.3)' },
-          '50%': { borderColor: 'rgba(232, 232, 240, 0.8)' },
-        },
-        textShimmer: {
-          '0%': { backgroundPosition: '0% 50%' },
-          '100%': { backgroundPosition: '200% 50%' },
-        },
-        float: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-20px)' },
-        },
-        glow: {
-          '0%': { boxShadow: '0 0 20px rgba(192, 192, 208, 0.2)' },
-          '100%': { boxShadow: '0 0 40px rgba(232, 232, 240, 0.4)' },
+        polyFadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
       },
     },

@@ -16,13 +16,23 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Try to import swarms library
+# Import Swarms Agentic System (primary integration)
 try:
-    from swarms import Agent, SequentialWorkflow
+    from .swarms_agentic_system import agentic_system, SwarmsAgenticSystem
+    SWARMS_AGENTIC_AVAILABLE = True
+    logger.info("Swarms Agentic System imported successfully")
+except ImportError as e:
+    SWARMS_AGENTIC_AVAILABLE = False
+    agentic_system = None
+    logger.warning(f"Swarms Agentic System not available: {e}")
+
+# Try to import swarms library directly (fallback)
+try:
+    from swarms import Agent, SequentialWorkflow, Swarm
     SWARMS_AVAILABLE = True
-except ImportError:
+except (ImportError, TypeError, SyntaxError) as e:
     SWARMS_AVAILABLE = False
-    logger.warning("swarms library not available, using fallback Agent class")
+    logger.warning(f"swarms library not available: {e}, using fallback Agent class")
     
     class Agent:
         def __init__(self, **kwargs):
@@ -40,6 +50,13 @@ except ImportError:
                 "agent": self.agent_name,
                 "response": f"[Agent {self.agent_name} would process: {prompt[:100]}...]"
             })
+    
+    class Swarm:
+        def __init__(self, **kwargs):
+            self.agents = kwargs.get("agents", [])
+        
+        def run(self, task: str) -> str:
+            return json.dumps({"status": "swarm_complete", "task": task})
 
 class AgentSpecialization(Enum):
     """Different types of specialized agents"""
@@ -172,7 +189,28 @@ class PolyMathOSCollaborationSwarm:
     def _create_self_evolving_agent(
         self, agent_id: str, agent_type: str, initial_prompt: str, goals: List[str]
     ) -> Agent:
-        """Create a self-evolving agent using Lemon AI"""
+        """Create a self-evolving agent using Swarms Agentic System and Lemon AI"""
+        # Use Swarms Agentic System if available (preferred)
+        if SWARMS_AGENTIC_AVAILABLE and agentic_system:
+            try:
+                # Get agent from agentic system (already self-evolving)
+                if agent_id in agentic_system.agents:
+                    logger.info(f"Using existing agentic agent: {agent_id}")
+                    return agentic_system.agents[agent_id]
+                
+                # Create new agent through agentic system
+                agent = agentic_system._create_self_evolving_agent(
+                    agent_id=agent_id,
+                    agent_type=agent_type,
+                    system_prompt=initial_prompt,
+                    goals=goals
+                )
+                agentic_system.agents[agent_id] = agent
+                return agent
+            except Exception as e:
+                logger.warning(f"Swarms Agentic System agent creation failed: {e}, falling back")
+        
+        # Fallback to direct Swarms Agent with Lemon AI
         if self.lemon_ai:
             try:
                 agent_config = self.lemon_ai.create_self_evolving_agent(
@@ -192,7 +230,7 @@ class PolyMathOSCollaborationSwarm:
             agent_name=agent_id.replace("_", "").title(),
             system_prompt=system_prompt,
             model_name=self._get_model(agent_type, requires_reasoning=True),
-            max_loops=1,
+            max_loops=3,  # Allow more loops for agentic thinking
             verbose=True,
             output_type="json"
         )
@@ -320,55 +358,80 @@ class PolyMathOSCollaborationSwarm:
         contributions = []
         problem_prompt = f"PROBLEM STATEMENT:\n{json.dumps(problem, indent=2)}\n\nAnalyze this problem from your specialized perspective."
         
-        futures = []
-        for agent_name, agent in self.agents.items():
-            future = self.executor.submit(self._run_agent_with_tracking, agent_name, agent, problem_prompt)
-            futures.append((agent_name, future))
-        
-        for agent_name, future in futures:
-            try:
-                result_data = future.result(timeout=60)
-                contributions.append(result_data["contribution"])
-                
-                # Track performance and evolve agent
-                if result_data.get("success") and self.lemon_ai:
-                    try:
-                        self.lemon_ai.track_agent_performance(
-                            agent_id=agent_name,
-                            task_id=str(uuid.uuid4()),
-                            success=True,
-                            quality_score=result_data.get("quality_score", 0.8),
-                            execution_time=result_data.get("execution_time", 0.0),
-                            tokens_used=result_data.get("tokens_used", 0)
-                        )
-                        
-                        # Evolve agent if needed
-                        evolution_result = self.lemon_ai.evolve_agent(
-                            agent_id=agent_name,
-                            task_results=result_data["contribution"],
-                            performance_feedback={
-                                "success": True,
-                                "quality_score": result_data.get("quality_score", 0.8),
-                                "feedback": "Task completed successfully"
-                            }
-                        )
-                        
-                        if evolution_result.get("evolved"):
-                            logger.info(f"Agent {agent_name} evolved to version {evolution_result['new_version']}")
-                    except Exception as e:
-                        logger.warning(f"Agent evolution tracking failed: {e}")
-            except Exception as e:
-                logger.error(f"Agent {agent_name} failed: {e}")
-                contributions.append({
-                    "agent": agent_name,
-                    "contribution": {"error": str(e)},
-                    "timestamp": datetime.now().isoformat()
-                })
-                
-                # Track failure
-                if self.lemon_ai:
-                    try:
-                        self.lemon_ai.track_agent_performance(
+        # Use Swarms Agentic System if available (preferred method)
+        if SWARMS_AGENTIC_AVAILABLE and agentic_system:
+            futures = []
+            for agent_name, agent in self.agents.items():
+                future = self.executor.submit(
+                    self._run_agentic_with_tracking,
+                    agent_name,
+                    problem_prompt,
+                    {"problem": problem}
+                )
+                futures.append((agent_name, future))
+            
+            for agent_name, future in futures:
+                try:
+                    result_data = future.result(timeout=120)  # Longer timeout for agentic processing
+                    contributions.append(result_data["contribution"])
+                except Exception as e:
+                    logger.error(f"Agentic processing failed for {agent_name}: {e}")
+                    contributions.append({
+                        "agent": agent_name,
+                        "contribution": {"error": str(e)},
+                        "timestamp": datetime.now().isoformat()
+                    })
+        else:
+            # Fallback to original method
+            futures = []
+            for agent_name, agent in self.agents.items():
+                future = self.executor.submit(self._run_agent_with_tracking, agent_name, agent, problem_prompt)
+                futures.append((agent_name, future))
+            
+            for agent_name, future in futures:
+                try:
+                    result_data = future.result(timeout=60)
+                    contributions.append(result_data["contribution"])
+                    
+                    # Track performance and evolve agent
+                    if result_data.get("success") and self.lemon_ai:
+                        try:
+                            self.lemon_ai.track_agent_performance(
+                                agent_id=agent_name,
+                                task_id=str(uuid.uuid4()),
+                                success=True,
+                                quality_score=result_data.get("quality_score", 0.8),
+                                execution_time=result_data.get("execution_time", 0.0),
+                                tokens_used=result_data.get("tokens_used", 0)
+                            )
+                            
+                            # Evolve agent if needed
+                            evolution_result = self.lemon_ai.evolve_agent(
+                                agent_id=agent_name,
+                                task_results=result_data["contribution"],
+                                performance_feedback={
+                                    "success": True,
+                                    "quality_score": result_data.get("quality_score", 0.8),
+                                    "feedback": "Task completed successfully"
+                                }
+                            )
+                            
+                            if evolution_result.get("evolved"):
+                                logger.info(f"Agent {agent_name} evolved to version {evolution_result['new_version']}")
+                        except Exception as e:
+                            logger.warning(f"Agent evolution tracking failed: {e}")
+                except Exception as e:
+                    logger.error(f"Agent {agent_name} failed: {e}")
+                    contributions.append({
+                        "agent": agent_name,
+                        "contribution": {"error": str(e)},
+                        "timestamp": datetime.now().isoformat()
+                    })
+                    
+                    # Track failure
+                    if self.lemon_ai:
+                        try:
+                            self.lemon_ai.track_agent_performance(
                             agent_id=agent_name,
                             task_id=str(uuid.uuid4()),
                             success=False,
@@ -380,8 +443,77 @@ class PolyMathOSCollaborationSwarm:
         
         return contributions
     
+    def _run_agentic_with_tracking(self, agent_name: str, prompt: str, context: Dict) -> Dict:
+        """Run agent using Swarms Agentic System with tracking"""
+        if not SWARMS_AGENTIC_AVAILABLE or not agentic_system:
+            raise ValueError("Swarms Agentic System not available")
+        
+        import asyncio
+        import time
+        start_time = time.time()
+        
+        try:
+            # Map agent names to task types
+            task_type_mapping = {
+                "knowledge_engineer": "knowledge_synthesis",
+                "research_analyst": "research",
+                "pattern_recognizer": "synthesis",
+                "strategy_planner": "curriculum",
+                "creative_synthesizer": "content_generation",
+                "optimization_specialist": "curriculum",
+                "meta_learning_coordinator": "personalization",
+                "ethics_evaluator": "assessment"
+            }
+            
+            task_type = task_type_mapping.get(agent_name, "content_generation")
+            
+            # Process agentically
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            response = loop.run_until_complete(
+                agentic_system.process_agentically(
+                    task_type=task_type,
+                    prompt=prompt,
+                    context=context,
+                    priority=self.priority
+                )
+            )
+            loop.close()
+            
+            # Parse response
+            try:
+                contribution_data = json.loads(response.content)
+            except json.JSONDecodeError:
+                contribution_data = {"response": response.content}
+            
+            execution_time = time.time() - start_time
+            
+            return {
+                "contribution": {
+                    "agent": agent_name,
+                    "content": contribution_data,
+                    "model_used": response.model_used,
+                    "tokens_used": response.tokens_used,
+                    "evolution_applied": response.evolution_applied
+                },
+                "success": response.success,
+                "quality_score": 0.9 if response.success else 0.0,
+                "execution_time": execution_time,
+                "tokens_used": response.tokens_used
+            }
+        except Exception as e:
+            logger.error(f"Agentic processing error for {agent_name}: {e}")
+            execution_time = time.time() - start_time
+            return {
+                "contribution": {"agent": agent_name, "error": str(e)},
+                "success": False,
+                "quality_score": 0.0,
+                "execution_time": execution_time,
+                "tokens_used": 0
+            }
+    
     def _run_agent_with_tracking(self, agent_name: str, agent: Agent, prompt: str) -> Dict:
-        """Run agent with performance tracking"""
+        """Run agent with performance tracking (fallback method)"""
         import time
         start_time = time.time()
         

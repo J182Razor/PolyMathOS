@@ -166,6 +166,9 @@ pip install -r requirements.txt
 - **PyTorch**: May need CUDA for GPU support
 - **Quantum libraries**: May need additional setup (see Quantum Computing Setup)
 - **PostgreSQL**: Requires `psycopg2-binary` (included)
+- **PyAudio**: Optional - requires PortAudio (see troubleshooting if needed)
+
+**If you encounter PyAudio installation errors**, it's safe to skip it as it's not used in the core system. See [Troubleshooting](#troubleshooting) section for details.
 
 ### Step 4: Configure Environment
 
@@ -567,6 +570,24 @@ curl -X POST http://localhost:8000/collaboration/solve \
   ```bash
   pip install pennylane qiskit dimod
   ```
+
+**Problem**: PyAudio installation fails (`Failed to build pyaudio`)
+- **Solution**: PyAudio is optional and not used in core system. You can skip it:
+  - The error is safe to ignore - PyAudio is commented out in requirements.txt
+  - If you need audio features later, install system dependencies first:
+    ```bash
+    # macOS
+    brew install portaudio
+    pip install pyaudio
+    
+    # Ubuntu/Debian
+    sudo apt-get install portaudio19-dev
+    pip install pyaudio
+    
+    # Windows
+    # Use conda: conda install pyaudio
+    ```
+  - See `backend/INSTALL_PYAUDIO.md` for detailed instructions
 
 **Problem**: Port 8000 already in use
 - **Solution**: Change port or kill process

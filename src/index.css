@@ -1,33 +1,131 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* CSS Custom Properties - Light Mode (Default) */
+/* CSS Custom Properties - PolyMathOS Light Mode Design System */
 :root {
-  --color-dark-base: #05050A;
-  --color-dark-surface: #0F111A;
-  --color-dark-elevated: #1A1D2D;
-  --color-dark-overlay: #0F0F15;
+  /* Primary Brand Colors */
+  --poly-primary-50: #f0f9ff;
+  --poly-primary-100: #e0f2fe;
+  --poly-primary-200: #bae6fd;
+  --poly-primary-300: #7dd3fc;
+  --poly-primary-400: #38bdf8;
+  --poly-primary-500: #0ea5e9;
+  --poly-primary-600: #0284c7;
+  --poly-primary-700: #0369a1;
+  --poly-primary-800: #075985;
+  --poly-primary-900: #0c4a6e;
+
+  /* Secondary (Intelligence/Academic) */
+  --poly-secondary-50: #f5f3ff;
+  --poly-secondary-100: #ede9fe;
+  --poly-secondary-200: #ddd6fe;
+  --poly-secondary-300: #c4b5fd;
+  --poly-secondary-400: #a78bfa;
+  --poly-secondary-500: #8b5cf6;
+  --poly-secondary-600: #7c3aed;
+  --poly-secondary-700: #6d28d9;
+  --poly-secondary-800: #5b21b6;
+  --poly-secondary-900: #4c1d95;
+
+  /* Accent (Computational/Technical) */
+  --poly-accent-50: #ecfdf5;
+  --poly-accent-100: #d1fae5;
+  --poly-accent-200: #a7f3d0;
+  --poly-accent-300: #6ee7b7;
+  --poly-accent-400: #34d399;
+  --poly-accent-500: #10b981;
+  --poly-accent-600: #059669;
+  --poly-accent-700: #047857;
+  --poly-accent-800: #065f46;
+  --poly-accent-900: #064e3b;
+
+  /* Neutrals */
+  --poly-neutral-0: #ffffff;
+  --poly-neutral-50: #fafafa;
+  --poly-neutral-100: #f5f5f5;
+  --poly-neutral-200: #e5e5e5;
+  --poly-neutral-300: #d4d4d4;
+  --poly-neutral-400: #a3a3a3;
+  --poly-neutral-500: #737373;
+  --poly-neutral-600: #525252;
+  --poly-neutral-700: #404040;
+  --poly-neutral-800: #262626;
+  --poly-neutral-900: #171717;
+  --poly-neutral-950: #0a0a0a;
+
+  /* Semantic Colors */
+  --poly-success: var(--poly-accent-500);
+  --poly-warning: #f59e0b;
+  --poly-error: #ef4444;
+  --poly-info: var(--poly-primary-500);
+
+  /* Typography */
+  --font-display: 'Inter', 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  --font-body: 'Inter', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Monaco', monospace;
+
+  /* Theme Variables (Light Mode Default) */
+  --poly-bg-primary: var(--poly-neutral-0);
+  --poly-bg-secondary: var(--poly-neutral-50);
+  --poly-bg-tertiary: var(--poly-neutral-100);
   
-  --color-silver-light: #E8E8F0;
-  --color-silver-base: #C0C0D0;
-  --color-silver-medium: #9090A0;
-  --color-silver-dark: #606070;
+  --poly-text-primary: var(--poly-neutral-900);
+  --poly-text-secondary: var(--poly-neutral-700);
+  --poly-text-tertiary: var(--poly-neutral-600);
+  --poly-text-disabled: var(--poly-neutral-400);
+  
+  --poly-border-primary: var(--poly-neutral-200);
+  --poly-border-secondary: var(--poly-neutral-300);
+  
+  --poly-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --poly-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+  --poly-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --poly-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  
+  --poly-ring-primary: rgba(14, 165, 233, 0.3);
+
+  /* Legacy Support */
+  --color-dark-base: #0a0a0a;
+  --color-dark-surface: #171717;
+  --color-dark-elevated: #262626;
+  --color-dark-overlay: #0a0a0a;
+  
+  --color-silver-light: var(--poly-neutral-100);
+  --color-silver-base: var(--poly-neutral-300);
+  --color-silver-medium: var(--poly-neutral-400);
+  --color-silver-dark: var(--poly-neutral-600);
 
   --color-gold-light: #FCEFC7;
-  --color-gold-base: #F29D0B;
-
-  /* Light mode text colors */
-  --color-text-primary: #0F172A; /* Darker slate for better contrast on sky blue */
-  --color-text-secondary: #334155;
-  --color-text-tertiary: #64748B;
+  --color-gold-base: #F5B02E;
+  
+  --color-text-primary: var(--poly-text-primary);
+  --color-text-secondary: var(--poly-text-secondary);
+  --color-text-tertiary: var(--poly-text-tertiary);
   --shimmer-duration: 3s;
 }
 
 /* Dark Mode Overrides */
 .dark {
+  --poly-bg-primary: var(--poly-neutral-950);
+  --poly-bg-secondary: var(--poly-neutral-900);
+  --poly-bg-tertiary: var(--poly-neutral-800);
+  
+  --poly-text-primary: var(--poly-neutral-50);
+  --poly-text-secondary: var(--poly-neutral-200);
+  --poly-text-tertiary: var(--poly-neutral-400);
+  --poly-text-disabled: var(--poly-neutral-600);
+  
+  --poly-border-primary: var(--poly-neutral-800);
+  --poly-border-secondary: var(--poly-neutral-700);
+  
+  --poly-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --poly-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --poly-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --poly-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+
   --color-text-primary: #FFFFFF;
   --color-text-secondary: #E2E8F0;
   --color-text-tertiary: #94A3B8;
@@ -36,7 +134,7 @@
 /* Base Styles */
 @layer base {
   * {
-    @apply border-silver-500/20;
+    @apply border-poly-border-primary;
   }
 
   html {
@@ -45,10 +143,10 @@
 
   body {
     @apply m-0 min-h-screen;
-    @apply bg-light-base dark:bg-dark-base;
-    @apply text-text-primary dark:text-white;
     @apply font-sans antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--poly-bg-primary);
+    color: var(--poly-text-primary);
+    font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -62,195 +160,184 @@
 
   /* Typography */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-semibold;
-    @apply text-text-primary dark:text-white;
+    font-family: var(--font-display);
+    color: var(--poly-text-primary);
     letter-spacing: -0.02em;
   }
 
   h1 {
-    @apply text-4xl sm:text-5xl lg:text-6xl;
-    line-height: 1.1;
+    @apply text-display-1;
   }
 
   h2 {
-    @apply text-3xl sm:text-4xl;
-    line-height: 1.2;
+    @apply text-display-2;
   }
 
   h3 {
-    @apply text-2xl sm:text-3xl;
-    line-height: 1.3;
+    @apply text-display-3;
+  }
+  
+  h4 {
+    @apply text-heading-1;
+  }
+  
+  h5 {
+    @apply text-heading-2;
+  }
+  
+  h6 {
+    @apply text-heading-3;
   }
 
   p {
-    @apply text-text-secondary dark:text-slate-200 leading-relaxed;
-    font-size: 1rem;
-    line-height: 1.75;
+    @apply text-body-medium text-poly-text-secondary;
   }
 
   a {
-    @apply text-royal-600 dark:text-royal-400 hover:text-royal-700 dark:hover:text-royal-300 transition-colors duration-200;
+    color: var(--poly-primary-600);
+    transition: color 0.2s ease;
+  }
+  
+  a:hover {
+    color: var(--poly-primary-700);
+  }
+  
+  code, pre {
+    font-family: var(--font-mono);
   }
 }
 
 /* Component Utilities */
 @layer components {
-  /* Glassmorphism Effect */
+  /* Buttons */
+  .poly-btn-primary {
+    @apply bg-poly-gradient-primary text-white border-none rounded-lg px-6 py-3 font-sans font-semibold text-base cursor-pointer transition-all duration-200 shadow-poly-sm hover:shadow-poly-primary hover:-translate-y-px active:translate-y-0 active:shadow-poly-sm;
+    background: linear-gradient(135deg, var(--poly-primary-500), var(--poly-primary-600));
+  }
+
+  .poly-btn-secondary {
+    @apply bg-poly-bg-tertiary text-poly-text-secondary border border-poly-border-primary rounded-lg px-6 py-3 font-sans font-semibold text-base cursor-pointer transition-all duration-200 hover:bg-poly-border-primary hover:border-poly-border-secondary;
+    background-color: var(--poly-neutral-100);
+    color: var(--poly-neutral-700);
+    border: 1px solid var(--poly-neutral-200);
+  }
+
+  .poly-btn-icon {
+    @apply inline-flex items-center justify-center w-10 h-10 rounded-lg bg-poly-bg-tertiary border border-poly-border-primary text-poly-text-secondary cursor-pointer transition-all duration-200 hover:bg-poly-border-primary hover:border-poly-border-secondary;
+    background-color: var(--poly-neutral-100);
+    color: var(--poly-neutral-700);
+    border: 1px solid var(--poly-neutral-200);
+  }
+
+  /* Cards */
+  .poly-card {
+    @apply bg-poly-bg-primary border border-poly-border-primary rounded-2xl p-6 shadow-poly-sm transition-shadow duration-200 hover:shadow-poly-md;
+    background-color: var(--poly-bg-primary);
+    border: 1px solid var(--poly-border-primary);
+  }
+
+  .poly-card-elevated {
+    @apply bg-poly-bg-primary border border-poly-border-primary rounded-2xl p-6 shadow-poly-lg;
+    background-color: var(--poly-bg-primary);
+    border: 1px solid var(--poly-border-primary);
+  }
+
+  .poly-panel {
+    @apply bg-poly-bg-secondary border border-poly-border-primary rounded-xl p-4;
+    background-color: var(--poly-bg-secondary);
+    border: 1px solid var(--poly-border-primary);
+  }
+
+  /* Inputs */
+  .poly-input {
+    @apply w-full px-4 py-3 bg-poly-bg-primary border border-poly-border-secondary rounded-lg font-sans text-base text-poly-text-primary transition-all duration-200 focus:outline-none focus:border-poly-primary-400 focus:ring-2 focus:ring-poly-ring-primary placeholder:text-poly-text-disabled;
+    background-color: var(--poly-bg-primary);
+    border: 1px solid var(--poly-border-secondary);
+    color: var(--poly-text-primary);
+  }
+
+  /* Navigation */
+  .poly-navbar {
+    @apply bg-poly-bg-primary border-b border-poly-border-primary px-6 h-16 flex items-center justify-between;
+    background-color: var(--poly-bg-primary);
+    border-bottom: 1px solid var(--poly-border-primary);
+  }
+
+  .poly-nav-link {
+    @apply text-poly-text-tertiary font-sans font-medium text-base no-underline px-4 py-2 rounded-lg transition-all duration-200 hover:text-poly-text-primary hover:bg-poly-bg-tertiary;
+    color: var(--poly-text-tertiary);
+  }
+
+  .poly-nav-link.active {
+    @apply text-poly-primary-600 bg-poly-primary-50;
+    color: var(--poly-primary-600);
+    background-color: var(--poly-primary-50);
+  }
+
+  /* Status Indicators */
+  .poly-status-success {
+    @apply bg-poly-accent-50 text-poly-accent-700 border border-poly-accent-200;
+    background-color: var(--poly-accent-50);
+    color: var(--poly-accent-700);
+    border: 1px solid var(--poly-accent-200);
+  }
+
+  .poly-status-warning {
+    @apply bg-yellow-50 text-yellow-800 border border-yellow-200;
+  }
+
+  .poly-status-error {
+    @apply bg-red-50 text-red-800 border border-red-200;
+  }
+
+  .poly-status-info {
+    @apply bg-poly-primary-50 text-poly-primary-700 border border-poly-primary-200;
+    background-color: var(--poly-primary-50);
+    color: var(--poly-primary-700);
+    border: 1px solid var(--poly-primary-200);
+  }
+
+  /* Glassmorphism Effect (Updated) */
   .glass {
-    @apply bg-light-surface/80 dark:bg-dark-surface/80 backdrop-blur-xl;
-    @apply border border-silver-400/30 dark:border-silver-500/20;
-    @apply shadow-glass;
+    @apply bg-poly-bg-primary/80 backdrop-blur-xl border border-poly-border-primary shadow-poly-glass;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(229, 229, 229, 0.5);
+  }
+  
+  .dark .glass {
+    background-color: rgba(23, 23, 23, 0.8);
+    border: 1px solid rgba(64, 64, 64, 0.5);
   }
 
-  .glass-strong {
-    @apply bg-light-surface/90 dark:bg-dark-surface/90 backdrop-blur-2xl;
-    @apply border border-silver-400/40 dark:border-silver-300/30;
-    @apply shadow-glass;
+  /* Animation Utilities */
+  .poly-transition-fast {
+    transition: all 0.15s ease;
   }
 
-  /* Shimmer Text Effect */
-  .text-shimmer {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(
-      135deg,
-      var(--color-silver-light) 0%,
-      var(--color-silver-base) 50%,
-      var(--color-silver-light) 100%
-    );
-    background-size: 200% auto;
-    animation: textShimmer var(--shimmer-duration) ease-in-out infinite;
+  .poly-transition-medium {
+    transition: all 0.2s ease;
   }
 
-  /* Gold Shimmer Text Effect */
-  .text-shimmer-gold {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(
-      135deg,
-      var(--color-gold-light) 0%,
-      var(--color-gold-base) 50%,
-      var(--color-gold-light) 100%
-    );
-    background-size: 200% auto;
-    animation: textShimmer var(--shimmer-duration) ease-in-out infinite;
+  .poly-transition-slow {
+    transition: all 0.3s ease;
   }
 
-  /* Shimmer Border Effect */
-  .border-shimmer {
-    @apply border border-silver-300/30;
-    animation: borderShimmer 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  /* Shimmer Background */
-  .bg-shimmer {
-    background: linear-gradient(
-      135deg,
-      rgba(232, 232, 240, 0.1) 0%,
-      rgba(192, 192, 208, 0.2) 50%,
-      rgba(144, 144, 160, 0.1) 100%
-    );
-    background-size: 200% 200%;
-    animation: shimmer var(--shimmer-duration) cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  /* Silver Glow */
-  .silver-glow {
-    @apply shadow-silver;
-    transition: box-shadow 0.3s ease;
-  }
-
-  .silver-glow:hover {
-    @apply shadow-silver-lg;
-  }
-
-  /* Premium Button Base */
-  .btn-premium {
-    @apply relative overflow-hidden;
-    @apply transition-all duration-300;
-    @apply transform-gpu;
-  }
-
-  .btn-premium::before {
-    content: '';
-    @apply absolute inset-0;
-    @apply bg-shimmer opacity-0;
-    @apply transition-opacity duration-300;
-  }
-
-  .btn-premium:hover::before {
-    @apply opacity-100;
-  }
-
-  /* Focus States */
-  .focus-silver {
-    @apply focus:outline-none focus:ring-2 focus:ring-silver-300/50 focus:ring-offset-2 focus:ring-offset-light-base dark:focus:ring-offset-dark-base;
-  }
-
-  /* Scrollbar Styling */
-  .scrollbar-silver::-webkit-scrollbar {
-    @apply w-2;
-  }
-
-  .scrollbar-silver::-webkit-scrollbar-track {
-    @apply bg-dark-surface;
-  }
-
-  .scrollbar-silver::-webkit-scrollbar-thumb {
-    @apply bg-silver-500/50 rounded-full;
-  }
-
-  .scrollbar-silver::-webkit-scrollbar-thumb:hover {
-    @apply bg-silver-400/70;
+  .poly-fade-in {
+    animation: polyFadeIn 0.3s ease forwards;
   }
 }
 
 /* Utility Classes */
 @layer utilities {
-  /* Shimmer Animation */
-  @keyframes shimmer {
-    0% {
-      background-position: -1000px 0;
-    }
-    100% {
-      background-position: 1000px 0;
-    }
-  }
-
-  @keyframes borderShimmer {
-    0%, 100% {
-      border-color: rgba(192, 192, 208, 0.3);
-    }
-    50% {
-      border-color: rgba(232, 232, 240, 0.8);
-    }
-  }
-
-  @keyframes textShimmer {
-    0% {
-      background-position: 0% 50%;
-    }
-    100% {
-      background-position: 200% 50%;
-    }
-  }
-
-  /* Reduced Motion */
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
+  @keyframes polyFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   /* Selection */
   ::selection {
-    @apply bg-silver-300/30 text-text-primary;
-  }
-
-  /* Smooth Transitions */
-  .transition-smooth {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    @apply bg-poly-primary-200 text-poly-text-primary;
+    background-color: var(--poly-primary-200);
+    color: var(--poly-text-primary);
   }
 }

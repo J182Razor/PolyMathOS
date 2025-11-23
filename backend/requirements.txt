@@ -16,25 +16,36 @@ neurokit2
 brian2
 mediapipe
 opencv-python-headless
-pyaudio
+# pyaudio  # Optional: Requires system audio libraries (PortAudio)
+#         # Install system dependencies first:
+#         # macOS: brew install portaudio
+#         # Ubuntu/Debian: sudo apt-get install portaudio19-dev
+#         # Then: pip install pyaudio
 websockets
 pyyaml
 python-multipart
 python-jose[cryptography]
 passlib[bcrypt]
+# Fix pyasn1 version conflict - use versions compatible with python-jose
+pyasn1>=0.5.0
+pyasn1-modules>=0.3.0
 # Quantum Computing Dependencies
 dimod
-dwave-networkx
-dwave-systems
+# dwave-networkx  # Optional: specific version issues on some OS
+# dwave-systems   # Optional: specific version issues on some OS
+# dwave-ocean-sdk # Alternative if above fail
 pennylane
 qiskit
 qiskit-algorithms
 qiskit-optimization
 qiskit-aer
 networkx
-# Multi-Agent System
-swarms
+# Multi-Agent System - Swarms Framework for Agentic LLM Operations
+# Reference: https://github.com/kyegomez/swarms.git
+swarms>=2.0.0
 # Database & Storage
 psycopg2-binary
 supabase
+PyPDF2
+python-docx
 # Lemon AI (optional - can be installed separately)

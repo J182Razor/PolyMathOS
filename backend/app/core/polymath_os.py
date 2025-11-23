@@ -1,7 +1,7 @@
-from .modules.researcher import ScholarlyResearcher
-from .modules.rl_trainer import ReinforcementLearningTrainer
-from .modules.hdam import HDAM
-from .modules.curriculum import CurriculumGenerator
+from ..modules.researcher import ScholarlyResearcher
+from ..modules.rl_trainer import ReinforcementLearningTrainer
+from ..modules.hdam import HDAM
+from ..modules.curriculum import CurriculumGenerator
 
 class PolyMathOS:
     """Main PolyMathOS system integrating all components"""

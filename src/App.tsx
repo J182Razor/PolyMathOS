@@ -26,8 +26,10 @@ import { BrainwaveGenerator } from './components/BrainwaveGenerator';
 import { PolymathAIAssistant } from './components/PolymathAIAssistant';
 import { PolymathAIAssistantEnhanced } from './components/PolymathAIAssistantEnhanced';
 import { InstallationWizard } from './components/InstallationWizard';
+import OnboardingController from './components/onboarding/OnboardingController';
+import ResourceLibrary from './components/ResourceLibrary';
 
-type AppState = 'home' | 'signin' | 'signup' | 'dashboard' | 'polymath_dashboard' | 'learning' | 'assessment' | 'domain_selection' | 'memory_palace' | 'flashcards' | 'deep_work' | 'projects' | 'reflection' | 'mind_map' | 'triz' | 'brainwave_generator' | 'polymath_ai';
+type AppState = 'home' | 'signin' | 'signup' | 'dashboard' | 'polymath_dashboard' | 'learning' | 'assessment' | 'domain_selection' | 'memory_palace' | 'flashcards' | 'deep_work' | 'projects' | 'reflection' | 'mind_map' | 'triz' | 'brainwave_generator' | 'polymath_ai' | 'onboarding' | 'portfolio' | 'resource_library';
 
 interface User {
   email: string;
@@ -95,7 +97,7 @@ function App() {
       firstName: userData.firstName,
       lastName: userData.lastName
     });
-    setCurrentPage('dashboard');
+    setCurrentPage('onboarding');
   };
 
   const handleSignOut = () => {
@@ -143,7 +145,7 @@ function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.substring(1);
-      const validPages: AppState[] = ['polymath_dashboard', 'memory_palace', 'flashcards', 'deep_work', 'projects', 'reflection', 'domain_selection', 'mind_map', 'triz', 'portfolio', 'brainwave_generator', 'polymath_ai'];
+      const validPages: AppState[] = ['polymath_dashboard', 'memory_palace', 'flashcards', 'deep_work', 'projects', 'reflection', 'domain_selection', 'mind_map', 'triz', 'portfolio', 'brainwave_generator', 'polymath_ai', 'resource_library'];
       if (hash && validPages.includes(hash as AppState)) {
         setCurrentPage(hash as AppState);
       }
@@ -225,15 +227,40 @@ function App() {
       case 'brainwave_generator':
         return <BrainwaveGenerator onBack={() => setCurrentPage('dashboard')} />;
       
+      case 'onboarding':
+        return <OnboardingController onComplete={(program) => {
+          // Here we would typically save the program to the backend/user state
+          // For now, we'll just navigate to the dashboard
+          setCurrentPage('dashboard');
+        }} />;
+
+      case 'resource_library':
+        return (
+          <div className="min-h-screen bg-poly-neutral-50">
+            <div className="p-4 max-w-7xl mx-auto">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-4 flex items-center text-poly-neutral-600 hover:text-poly-primary-600 transition-colors px-4 py-2 rounded-lg hover:bg-poly-neutral-100"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back to Dashboard
+              </button>
+            </div>
+            <ResourceLibrary />
+          </div>
+        );
+
       case 'polymath_ai':
         return (
-          <div className="min-h-screen bg-gray-900">
+          <div className="min-h-screen bg-poly-neutral-900">
             <div className="container mx-auto p-4">
               <button
                 onClick={() => setCurrentPage('dashboard')}
-                className="mb-4 text-gray-400 hover:text-gray-100"
+                className="mb-4 text-poly-neutral-400 hover:text-poly-neutral-100 flex items-center transition-colors"
               >
-                ← Back to Dashboard
+                <span className="mr-2">←</span> Back to Dashboard
               </button>
               <div className="h-[calc(100vh-8rem)]">
                 <PolymathAIAssistantEnhanced
@@ -246,6 +273,9 @@ function App() {
             </div>
           </div>
         );
+
+      case 'portfolio':
+        return <PolymathDashboard onSignOut={handleSignOut} user={user} />;
       
       default:
         return (
