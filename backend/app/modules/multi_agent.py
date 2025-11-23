@@ -438,8 +438,8 @@ class PolyMathOSCollaborationSwarm:
                             quality_score=0.0,
                             execution_time=0.0
                         )
-                    except Exception as e:
-                        logger.warning(f"Failed to track agent performance: {e}")
+                        except Exception as e:
+                            logger.warning(f"Failed to track agent performance: {e}")
         
         return contributions
     

@@ -220,3 +220,6 @@ def generate_content_agentically_sync(
     """Synchronous convenience function for agentic content generation"""
     return agentic_llm.generate_content_sync(prompt, task_type, context, priority)
 
+
+
+

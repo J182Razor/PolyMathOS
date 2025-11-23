@@ -528,3 +528,6 @@ class SwarmsAgenticSystem:
 # Global agentic system instance
 agentic_system = SwarmsAgenticSystem()
 
+
+
+
