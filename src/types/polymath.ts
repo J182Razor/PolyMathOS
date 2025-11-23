@@ -54,6 +54,7 @@ export interface MemoryPalaceItem {
   content: string;
   imageUrl?: string;
   audioUrl?: string;
+  domain?: string;
   createdAt: Date;
   lastReviewed?: Date;
 }

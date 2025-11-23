@@ -4,11 +4,11 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { PolymathAIService, SessionType, LearningStyle } from '../services/PolymathAIService';
+import { Brain } from 'lucide-react';
+import { PolymathAIService, SessionType } from '../services/PolymathAIService';
 import { UserProfilerService } from '../services/UserProfilerService';
 import { NLPCoachService } from '../services/NLPCoachService';
 import { Button } from './ui/Button';
-import { Card } from './ui/Card';
 import { Icon } from './ui/Icon';
 
 interface Message {
@@ -247,7 +247,7 @@ What would you like to accelerate today?
       {/* Header */}
       <div className="p-4 border-b border-gray-800">
         <h2 className="text-xl font-bold flex items-center gap-2">
-          <Icon icon="Brain" size="sm" />
+          <Icon icon={Brain} size="sm" />
           PolymathOS AI Assistant
         </h2>
       </div>

@@ -433,7 +433,8 @@ Generate lesson content with:
   private getMetaLearningLevel(profile: any): string {
     if (!profile?.metaLearningSkills) return 'intermediate';
     
-    const avg = Object.values(profile.metaLearningSkills).reduce((a: any, b: any) => a + b, 0) / 4;
+    const values = Object.values(profile.metaLearningSkills) as number[];
+    const avg = values.reduce((a: number, b: number) => a + b, 0) / values.length;
     if (avg >= 4) return 'advanced';
     if (avg >= 3) return 'intermediate';
     return 'beginner';

@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { Settings, Check } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Card } from './ui/Card';
 import { Icon } from './ui/Icon';
@@ -310,7 +311,7 @@ export const InstallationWizard: React.FC<{
           {/* Header */}
           <div className="text-center space-y-4">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-gradient mb-4">
-              <Icon icon="Settings" size="lg" className="text-white" />
+              <Icon icon={Settings} size="lg" className="text-white" />
             </div>
             <h2 className="text-3xl font-bold text-royal-600 dark:text-royal-400">
               PolyMathOS Setup
@@ -335,7 +336,7 @@ export const InstallationWizard: React.FC<{
                     }`}
                   >
                     {step.completed ? (
-                      <Icon icon="Check" size="sm" />
+                      <Icon icon={Check} size="sm" />
                     ) : (
                       <span>{index + 1}</span>
                     )}
