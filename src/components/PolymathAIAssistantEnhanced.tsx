@@ -8,6 +8,7 @@ import { Brain } from 'lucide-react';
 import { PolymathAIService } from '../services/PolymathAIService';
 import { UserProfilerService } from '../services/UserProfilerService';
 import { NLPCoachService } from '../services/NLPCoachService';
+import { LearningSession } from '../services/SessionOrchestratorService';
 import { Button } from './ui/Button';
 import { Icon } from './ui/Icon';
 
