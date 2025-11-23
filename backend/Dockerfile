@@ -4,13 +4,13 @@ WORKDIR /app
 
 # Install system dependencies
 # - build-essential: for compiling Python packages
-# - libgl1-mesa-glx, libglib2.0-0: for OpenCV if needed
+# - libgl1, libglib2.0-0: for OpenCV if needed (libgl1 replaces deprecated libgl1-mesa-glx)
 # - portaudio19-dev: for PyAudio (voice features)
 # - git: for installing packages from git and swarms/lemon-ai evolution
 # - curl: for healthchecks
 RUN apt-get update && apt-get install -y \
     build-essential \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     portaudio19-dev \
     git \
