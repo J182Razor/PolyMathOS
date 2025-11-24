@@ -250,10 +250,14 @@
 
   /* Inputs */
   .poly-input {
-    @apply w-full px-4 py-3 bg-poly-bg-primary border border-poly-border-secondary rounded-lg font-sans text-base text-poly-text-primary transition-all duration-200 focus:outline-none focus:border-poly-primary-400 focus:ring-2 focus:ring-poly-ring-primary placeholder:text-poly-text-disabled;
+    @apply w-full px-4 py-3 bg-poly-bg-primary border border-poly-border-secondary rounded-lg font-sans text-base text-poly-text-primary transition-all duration-200 focus:outline-none focus:border-poly-primary-400 placeholder:text-poly-text-disabled;
     background-color: var(--poly-bg-primary);
     border: 1px solid var(--poly-border-secondary);
     color: var(--poly-text-primary);
+  }
+  
+  .poly-input:focus {
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.3);
   }
 
   /* Navigation */

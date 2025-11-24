@@ -82,7 +82,7 @@ export default {
         'poly-border-primary': 'var(--poly-border-primary)',
         'poly-border-secondary': 'var(--poly-border-secondary)',
         
-        'poly-ring-primary': 'var(--poly-ring-primary)',
+        'poly-ring-primary': 'rgba(14, 165, 233, 0.3)',
 
         // Legacy support mapping
         royal: {
