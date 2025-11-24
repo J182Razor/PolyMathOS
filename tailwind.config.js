@@ -144,9 +144,9 @@ export default {
         'heading-1': ['1.875rem', { lineHeight: '1.25', fontWeight: '600' }],
         'heading-2': ['1.5rem', { lineHeight: '1.3', fontWeight: '600' }],
         'heading-3': ['1.25rem', { lineHeight: '1.35', fontWeight: '600' }],
-        'body-large': ['1.125rem', { lineHeight: '1.5', fontWeight: '400' }],
-        'body-medium': ['1rem', { lineHeight: '1.55', fontWeight: '400' }],
-        'body-small': ['0.875rem', { lineHeight: '1.5', fontWeight: '400' }],
+        'body-large': ['1.25rem', { lineHeight: '1.7', fontWeight: '400' }],
+        'body-medium': ['1.0625rem', { lineHeight: '1.75', fontWeight: '400' }], /* 17px for better readability */
+        'body-small': ['1rem', { lineHeight: '1.6', fontWeight: '400' }], /* 16px minimum */
         'caption': ['0.75rem', { lineHeight: '1.4', fontWeight: '400' }],
         'code': ['0.875rem', { lineHeight: '1.6', fontWeight: '400' }],
       },

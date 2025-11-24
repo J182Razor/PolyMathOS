@@ -72,9 +72,10 @@
   --poly-bg-secondary: var(--poly-neutral-50);
   --poly-bg-tertiary: var(--poly-neutral-100);
   
-  --poly-text-primary: var(--poly-neutral-900);
-  --poly-text-secondary: var(--poly-neutral-700);
-  --poly-text-tertiary: var(--poly-neutral-600);
+  /* Improved text contrast for readability */
+  --poly-text-primary: #0a0a0a; /* Darker for better contrast */
+  --poly-text-secondary: #1a1a1a; /* Darker secondary text */
+  --poly-text-tertiary: var(--poly-neutral-700);
   --poly-text-disabled: var(--poly-neutral-400);
   
   --poly-border-primary: var(--poly-neutral-200);
@@ -147,11 +148,25 @@
     background-color: var(--poly-bg-primary);
     color: var(--poly-text-primary);
     font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     padding: 0;
     margin: 0;
+  }
+  
+  /* Ensure minimum readable font sizes */
+  * {
+    font-size: inherit;
+  }
+  
+  /* Improve text contrast and readability */
+  p, span, div, li, td, th {
+    color: var(--poly-text-primary);
+    font-size: 1rem;
+    line-height: 1.7;
   }
 
   #root {
@@ -163,6 +178,41 @@
     font-family: var(--font-display);
     color: var(--poly-text-primary);
     letter-spacing: -0.02em;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  
+  /* Responsive font sizes for better mobile readability */
+  @media (max-width: 768px) {
+    html {
+      font-size: 16px;
+    }
+    
+    body {
+      font-size: 16px;
+    }
+    
+    h1 {
+      font-size: 2rem;
+    }
+    
+    h2 {
+      font-size: 1.75rem;
+    }
+    
+    h3 {
+      font-size: 1.5rem;
+    }
+    
+    p {
+      font-size: 1rem;
+    }
+  }
+  
+  @media (min-width: 769px) {
+    html {
+      font-size: 16px;
+    }
   }
 
   h1 {
@@ -190,7 +240,11 @@
   }
 
   p {
-    @apply text-body-medium text-poly-text-secondary;
+    @apply text-body-medium;
+    color: var(--poly-text-primary);
+    font-size: 1.0625rem; /* 17px for better readability */
+    line-height: 1.75;
+    font-weight: 400;
   }
 
   a {
@@ -234,6 +288,17 @@
     @apply bg-poly-bg-primary border border-poly-border-primary rounded-2xl p-6 shadow-poly-sm transition-shadow duration-200 hover:shadow-poly-md;
     background-color: var(--poly-bg-primary);
     border: 1px solid var(--poly-border-primary);
+    color: var(--poly-text-primary);
+  }
+  
+  .poly-card * {
+    color: inherit;
+  }
+  
+  .poly-card p, .poly-card span, .poly-card div {
+    color: var(--poly-text-primary);
+    font-size: 1.0625rem;
+    line-height: 1.75;
   }
 
   .poly-card-elevated {
@@ -250,14 +315,21 @@
 
   /* Inputs */
   .poly-input {
-    @apply w-full px-4 py-3 bg-poly-bg-primary border border-poly-border-secondary rounded-lg font-sans text-base text-poly-text-primary transition-all duration-200 focus:outline-none focus:border-poly-primary-400 placeholder:text-poly-text-disabled;
+    @apply w-full px-4 py-3 bg-poly-bg-primary border border-poly-border-secondary rounded-lg font-sans transition-all duration-200 focus:outline-none focus:border-poly-primary-400 placeholder:text-poly-text-disabled;
     background-color: var(--poly-bg-primary);
     border: 1px solid var(--poly-border-secondary);
     color: var(--poly-text-primary);
+    font-size: 1rem;
+    line-height: 1.6;
   }
   
   .poly-input:focus {
     box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.3);
+  }
+  
+  .poly-input::placeholder {
+    color: var(--poly-text-disabled);
+    opacity: 0.7;
   }
 
   /* Navigation */
