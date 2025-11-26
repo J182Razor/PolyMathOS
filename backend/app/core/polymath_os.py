@@ -7,7 +7,7 @@ class PolyMathOS:
     """Main PolyMathOS system integrating all components"""
     
     def __init__(self):
-        print("🚀 Initializing PolyMathOS - The Ultimate Learning Acceleration System")
+        print("[PolyMathOS] Initializing PolyMathOS - The Ultimate Learning Acceleration System")
         self.hdam = HDAM()  # Your existing HDAM system
         self.researcher = ScholarlyResearcher()
         self.rl_trainer = ReinforcementLearningTrainer(self.hdam)
@@ -16,7 +16,7 @@ class PolyMathOS:
         
     def enroll_user(self, user_id: str, interests: list) -> dict:
         """Enroll a new user and generate initial learning path"""
-        print(f"👤 Enrolling user: {user_id}")
+        print(f"[PolyMathOS] Enrolling user: {user_id}")
         
         # Generate personalized learning path
         learning_path = self.curriculum_gen.create_learning_path(user_id, interests)

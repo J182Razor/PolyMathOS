@@ -140,8 +140,8 @@ class QuantumHolographicProcessor:
                 return list(range(n))
             
             # Create QUBO for diverse selection
-            # Objective: maximize sum(s_i * x_i) - λ * sum(s_i * s_j * x_i * x_j)
-            # Convert to minimization: minimize -sum(s_i * x_i) + λ * sum(s_i * s_j * x_i * x_j)
+            # Objective: maximize sum(s_i * x_i) - lambda * sum(s_i * s_j * x_i * x_j)
+            # Convert to minimization: minimize -sum(s_i * x_i) + lambda * sum(s_i * s_j * x_i * x_j)
             
             linear = -similarities.copy()
             Q = np.zeros((n, n), dtype=NP_FLOAT)
@@ -940,28 +940,28 @@ class EnhancedQuantumHolographicHDAM:
             return {
                 "trajectory": [],
                 "base_concept": base_concept,
-                "direction": f"{direction_from} → {direction_to}"
+                "direction": f"{direction_from} -> {direction_to}"
             }
         
         # Format results
-        result_lines = [f"Conceptual extrapolation from '{base_concept}' in direction '{direction_from} → {direction_to}':"]
+        result_lines = [f"Conceptual extrapolation from '{base_concept}' in direction '{direction_from} -> {direction_to}':"]
         for step_info in trajectory:
             result_lines.append(f"Step {step_info['step']}:")
             if step_info["closest_match"]:
                 match = step_info["closest_match"]
                 if match["id"] in self.local_memory:
                     text = self.local_memory[match["id"]]["text"]
-                    result_lines.append(f"  → {text} (similarity: {match['similarity']:.{SIMILARITY_DECIMALS}f})")
+                    result_lines.append(f"  -> {text} (similarity: {match['similarity']:.{SIMILARITY_DECIMALS}f})")
                 else:
-                    result_lines.append(f"  → [Conceptual proximity] (similarity: {match['similarity']:.{SIMILARITY_DECIMALS}f})")
+                    result_lines.append(f"  -> [Conceptual proximity] (similarity: {match['similarity']:.{SIMILARITY_DECIMALS}f})")
             else:
-                result_lines.append("  → [Novel conceptual space]")
+                result_lines.append("  -> [Novel conceptual space]")
         
         return {
             "trajectory": trajectory,
             "result": "\n".join(result_lines),
             "base_concept": base_concept,
-            "direction": f"{direction_from} → {direction_to}"
+            "direction": f"{direction_from} -> {direction_to}"
         }
     
     async def optimize_learning_path(self, goals: List[str], 

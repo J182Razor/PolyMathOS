@@ -1,11 +1,39 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional, Dict
 import json
 from app.core.enhanced_system import genius_system
 from app.core.config_manager import config_manager
 
-app = FastAPI(title="PolyMathOS Genius Engine")
+# Import Learning AI router for the Genius Professor system
+try:
+    from app.api.learning_ai import router as learning_ai_router
+    LEARNING_AI_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: Learning AI router not available: {e}")
+    LEARNING_AI_AVAILABLE = False
+    learning_ai_router = None
+
+app = FastAPI(
+    title="PolyMathOS Genius Engine",
+    description="A comprehensive cognitive enhancement and learning system implementing the Polymath Stack",
+    version="2.0.0"
+)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include Learning AI routes (Genius Professor system)
+if LEARNING_AI_AVAILABLE and learning_ai_router:
+    app.include_router(learning_ai_router)
+    print("[OK] Learning AI (Genius Professor) routes registered")
 
 class UserEnrollment(BaseModel):
     user_id: str
@@ -199,10 +227,12 @@ def system_status():
     """Get system status and capabilities"""
     return {
         "status": "active",
+        "version": "2.0.0",
         "quantum_available": genius_system.quantum_optimizer is not None,
         "multi_agent_available": genius_system.collaboration_swarm is not None,
         "llm_router_available": genius_system.llm_router is not None,
         "lemon_ai_available": genius_system.lemon_ai is not None,
+        "learning_ai_available": LEARNING_AI_AVAILABLE,
         "storage_available": {
             "artifacts": genius_system.artifact_manager is not None,
             "supabase": genius_system.supabase_storage.available if genius_system.supabase_storage else False,
@@ -215,7 +245,20 @@ def system_status():
             "neuroplasticity": True,
             "metacognitive_training": True,
             "intelligent_llm_routing": True,
-            "self_evolving_agents": True
+            "self_evolving_agents": True,
+            # Genius Professor Learning System (Polymath Stack)
+            "genius_professor": LEARNING_AI_AVAILABLE,
+            "fsrs_spaced_repetition": LEARNING_AI_AVAILABLE,
+            "dynamic_quiz_generation": LEARNING_AI_AVAILABLE,
+            "feynman_technique_engine": LEARNING_AI_AVAILABLE,
+            "memory_palace_ai": LEARNING_AI_AVAILABLE,
+            "zettelkasten_knowledge_graph": LEARNING_AI_AVAILABLE,
+            "comprehension_tracking": LEARNING_AI_AVAILABLE
+        },
+        "polymath_stack": {
+            "structure": "Zettelkasten (Luhmann Method)",
+            "process": "Feynman Technique",
+            "visualization": "Memory Palace (Method of Loci)"
         }
     }
 

@@ -37,7 +37,7 @@ class EnhancedPolyMathOS(PolyMathOS):
     
     def __init__(self):
         super().__init__()
-        print("🚀 Initializing Enhanced PolyMathOS - Genius Creation Engine")
+        print("[PolyMathOS] Initializing Enhanced PolyMathOS - Genius Creation Engine")
         
         # Advanced cognitive enhancement modules
         self.neuro_optimizer = NeuroplasticityOptimizer()
@@ -72,9 +72,9 @@ class EnhancedPolyMathOS(PolyMathOS):
         # Swarms Agentic System - All LLM operations go through this
         self.agentic_system = agentic_system if SWARMS_AGENTIC_AVAILABLE else None
         if self.agentic_system:
-            print("✅ Swarms Agentic System initialized - All LLM operations are agentic")
+            print("[OK] Swarms Agentic System initialized - All LLM operations are agentic")
         else:
-            print("⚠️  Swarms Agentic System not available - Using fallback")
+            print("[WARN] Swarms Agentic System not available - Using fallback")
         
         # Lemon AI Integration for Self-Evolving Agents
         self.lemon_ai = lemon_ai_integration
@@ -112,7 +112,7 @@ class EnhancedPolyMathOS(PolyMathOS):
     
     def activate_genius_mode(self, user_id: str):
         """Activate full-stack cognitive enhancement protocol"""
-        print(f"🌟 ACTIVATING GENIUS MODE for {user_id}")
+        print(f"[GENIUS MODE] ACTIVATING for {user_id}")
         
         # 1. Baseline biometric assessment
         baseline_metrics = self._conduct_comprehensive_assessment(user_id)

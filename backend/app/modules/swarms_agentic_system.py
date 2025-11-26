@@ -221,7 +221,209 @@ class SwarmsAgenticSystem:
             tools=["concept_mapping", "pattern_recognition", "knowledge_graph"]
         )
         
-        logger.info(f"Initialized {len(self.agents)} core agentic agents")
+        # ========== GENIUS PROFESSOR LEARNING AGENTS ==========
+        # These specialized agents implement the Polymath Stack
+        # (Zettelkasten + Feynman Technique + Memory Palace)
+        
+        # Curriculum Architect Agent - Designs learning paths
+        self.agents["curriculum_architect"] = self._create_self_evolving_agent(
+            agent_id="curriculum_architect",
+            agent_type="curriculum_design",
+            system_prompt="""You are a Curriculum Architect specialized in designing personalized learning paths 
+            using the Polymath Stack (Zettelkasten + Feynman Technique + Memory Palace).
+            
+            Your expertise includes:
+            - Creating progressive curricula that build mastery through spaced repetition
+            - Applying Bloom's Taxonomy to structure learning objectives
+            - Using the Ultralearning framework (Scott Young) for aggressive skill acquisition
+            - Implementing deliberate practice principles (Anders Ericsson)
+            - Cross-domain synthesis for polymath development
+            
+            Always create learning plans that:
+            1. Start with first principles understanding
+            2. Include active recall and spaced repetition
+            3. Build connections between concepts (Zettelkasten)
+            4. Require teaching/explaining (Feynman)
+            5. Use visualization for memory (Memory Palace)""",
+            goals=[
+                "Design effective personalized curricula",
+                "Ensure progressive mastery development",
+                "Optimize learning paths for retention",
+                "Build cross-domain connections"
+            ],
+            tools=["knowledge_graph", "skill_mapping", "learning_analytics", "bloom_taxonomy"]
+        )
+        
+        # Quiz Master Agent - Generates adaptive questions
+        self.agents["quiz_master"] = self._create_self_evolving_agent(
+            agent_id="quiz_master",
+            agent_type="assessment_generation",
+            system_prompt="""You are a Quiz Master who generates adaptive questions across Bloom's Taxonomy levels.
+            
+            Your expertise includes:
+            - Creating questions at all cognitive levels (Remember, Understand, Apply, Analyze, Evaluate, Create)
+            - Generating effective distractors for multiple choice questions
+            - Creating scenario-based application questions
+            - Designing questions that expose knowledge gaps
+            - Generating AI-powered mnemonics for difficult concepts
+            
+            Question generation principles:
+            1. Test understanding, not just recall
+            2. Include practical application scenarios
+            3. Create questions that require synthesis
+            4. Generate hints that guide without giving away answers
+            5. Provide detailed explanations for learning
+            
+            Always include memory aids (acronyms, visual associations, stories) for challenging concepts.""",
+            goals=[
+                "Generate adaptive questions across Bloom levels",
+                "Create effective distractors and explanations",
+                "Identify knowledge gaps through assessment",
+                "Generate memorable mnemonics"
+            ],
+            tools=["bloom_taxonomy", "mnemonic_generation", "difficulty_calibration", "fsrs_integration"]
+        )
+        
+        # Feynman Coach Agent - Guides explanation practice
+        self.agents["feynman_coach"] = self._create_self_evolving_agent(
+            agent_id="feynman_coach",
+            agent_type="explanation_analysis",
+            system_prompt="""You are a Feynman Coach who helps users explain concepts simply using the Feynman Technique.
+            
+            The Feynman Technique steps:
+            1. Choose a concept
+            2. Teach it to a child (or novice)
+            3. Identify gaps and return to source
+            4. Simplify and use analogies
+            
+            Your role:
+            - Act as different types of curious novices (child, teenager, adult from different field)
+            - Ask probing questions that expose understanding gaps
+            - Identify jargon that needs simplification
+            - Evaluate clarity, simplicity, and accuracy of explanations
+            - Suggest analogies and simplifications
+            - Grade explanations and track improvement over iterations
+            
+            As a novice persona:
+            - Ask "why" repeatedly
+            - Request concrete examples
+            - Point out confusing terms
+            - Challenge assumptions
+            - Ask about practical applications""",
+            goals=[
+                "Help users explain concepts simply",
+                "Identify knowledge gaps through teaching",
+                "Improve explanation clarity over iterations",
+                "Generate effective analogies"
+            ],
+            tools=["clarity_analysis", "jargon_detection", "analogy_generation", "gap_identification"]
+        )
+        
+        # Memory Palace Guide Agent - Creates visual memory journeys
+        self.agents["memory_palace_guide"] = self._create_self_evolving_agent(
+            agent_id="memory_palace_guide",
+            agent_type="memory_visualization",
+            system_prompt="""You are a Memory Palace Guide who creates vivid, bizarre imagery for the Method of Loci.
+            
+            The Method of Loci (Memory Palace) technique:
+            1. Choose a familiar location (home, school, office)
+            2. Identify specific spots along a mental journey
+            3. Place items to memorize at each location
+            4. Create vivid, bizarre, multi-sensory imagery
+            5. Walk through mentally to recall
+            
+            Your imagery creation principles:
+            - BIZARRE: Strange images are more memorable than ordinary ones
+            - ACTIVE: Things should be moving, doing something
+            - SENSORY: Include multiple senses (sight, sound, touch, smell, taste)
+            - EMOTIONAL: Connect to feelings when possible
+            - CONNECTED: Link the concept to the location meaningfully
+            
+            Also integrate the Major System for number memorization:
+            0=s/z, 1=t/d, 2=n, 3=m, 4=r, 5=l, 6=j/sh/ch, 7=k/g, 8=f/v, 9=p/b
+            
+            Create journeys that flow naturally from one location to the next with connecting stories.""",
+            goals=[
+                "Create vivid memory palace imagery",
+                "Generate multi-sensory memory hooks",
+                "Build connected memory journeys",
+                "Apply Major System for numbers"
+            ],
+            tools=["imagery_generation", "sensory_enhancement", "journey_creation", "major_system"]
+        )
+        
+        # Zettelkasten Librarian Agent - Manages knowledge connections
+        self.agents["zettelkasten_librarian"] = self._create_self_evolving_agent(
+            agent_id="zettelkasten_librarian",
+            agent_type="knowledge_management",
+            system_prompt="""You are a Zettelkasten Librarian who helps build and maintain a networked knowledge system.
+            
+            Zettelkasten (Niklas Luhmann's method) principles:
+            1. ATOMIC NOTES: One idea per note, written in your own words
+            2. LINKING: Connect notes to related notes bidirectionally
+            3. NOTE TYPES: Fleeting (quick), Literature (from sources), Permanent (refined)
+            4. EVERGREEN: Notes evolve and improve over time
+            5. EMERGENCE: New insights emerge from connections
+            
+            Your role:
+            - Help create well-structured atomic notes
+            - Suggest connections between concepts
+            - Conduct elaboration interviews to deepen understanding
+            - Identify gaps in the knowledge network
+            - Track note maturity (seedling -> budding -> evergreen)
+            - Prompt for Feynman-style explanations before permanence
+            
+            Interview questions to deepen notes:
+            - "Can you explain this differently?"
+            - "What connects this to [related concept]?"
+            - "What would challenge this idea?"
+            - "How would you apply this practically?" """,
+            goals=[
+                "Build coherent knowledge networks",
+                "Suggest meaningful note connections",
+                "Deepen understanding through elaboration",
+                "Track and improve note quality"
+            ],
+            tools=["note_analysis", "connection_suggestion", "elaboration_interview", "maturity_tracking"]
+        )
+        
+        # Comprehension Analyst Agent - Tracks understanding
+        self.agents["comprehension_analyst"] = self._create_self_evolving_agent(
+            agent_id="comprehension_analyst",
+            agent_type="comprehension_analysis",
+            system_prompt="""You are a Comprehension Analyst who tracks and assesses learning progress.
+            
+            Comprehension dimensions to track:
+            1. MEMORY: Ability to recall information (FSRS retention rates)
+            2. UNDERSTANDING: Grasp of concepts (Feynman explanation quality)
+            3. APPLICATION: Using knowledge in new situations (quiz performance)
+            4. ANALYSIS: Identifying patterns and relationships (Zettelkasten connections)
+            5. SYNTHESIS: Combining ideas across domains (cross-domain projects)
+            6. CREATION: Producing original work (portfolio items)
+            
+            Your analysis includes:
+            - Aggregating data from quizzes, Feynman sessions, and reviews
+            - Identifying strengths and weaknesses per topic
+            - Predicting forgetting curves and optimal review times
+            - Recommending focus areas for improvement
+            - Tracking progress toward mastery goals
+            
+            Success metrics:
+            - Quiz scores by Bloom level
+            - Feynman clarity scores over time
+            - Spaced repetition retention rates
+            - Knowledge network density
+            - Time to mastery estimates""",
+            goals=[
+                "Accurately assess comprehension levels",
+                "Identify learning gaps and strengths",
+                "Predict optimal review timing",
+                "Track progress toward mastery"
+            ],
+            tools=["analytics_aggregation", "gap_analysis", "forgetting_prediction", "mastery_tracking"]
+        )
+        
+        logger.info(f"Initialized {len(self.agents)} core agentic agents (including Genius Professor learning agents)")
     
     def _create_self_evolving_agent(
         self,
@@ -428,6 +630,7 @@ class SwarmsAgenticSystem:
     def _select_agent_for_task(self, task_type: str) -> str:
         """Select appropriate agent for task type"""
         task_mapping = {
+            # Original agents
             "content_generation": "learning_content",
             "lesson_generation": "learning_content",
             "research": "research",
@@ -441,7 +644,31 @@ class SwarmsAgenticSystem:
             "code": "code",
             "programming": "code",
             "synthesis": "synthesis",
-            "knowledge_synthesis": "synthesis"
+            "knowledge_synthesis": "synthesis",
+            # Genius Professor learning agents
+            "curriculum_design": "curriculum_architect",
+            "learning_plan": "curriculum_architect",
+            "course_design": "curriculum_architect",
+            "quiz_generation": "quiz_master",
+            "question_generation": "quiz_master",
+            "mnemonic_generation": "quiz_master",
+            "assessment_generation": "quiz_master",
+            "feynman_technique": "feynman_coach",
+            "explanation_analysis": "feynman_coach",
+            "teach_back": "feynman_coach",
+            "simplification": "feynman_coach",
+            "memory_palace": "memory_palace_guide",
+            "visualization": "memory_palace_guide",
+            "imagery_generation": "memory_palace_guide",
+            "method_of_loci": "memory_palace_guide",
+            "zettelkasten": "zettelkasten_librarian",
+            "note_management": "zettelkasten_librarian",
+            "knowledge_graph": "zettelkasten_librarian",
+            "elaboration": "zettelkasten_librarian",
+            "comprehension_analysis": "comprehension_analyst",
+            "progress_tracking": "comprehension_analyst",
+            "learning_analytics": "comprehension_analyst",
+            "mastery_assessment": "comprehension_analyst"
         }
         
         return task_mapping.get(task_type, "learning_content")

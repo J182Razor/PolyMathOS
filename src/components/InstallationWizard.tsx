@@ -52,11 +52,18 @@ export const InstallationWizard: React.FC<{
 
   const requiredEnvVars: EnvVariable[] = [
     {
+      key: 'OPENAI_API_KEY',
+      value: '',
+      description: 'OpenAI API key for AI reasoning',
+      isSecret: true,
+      required: true,
+    },
+    {
       key: 'NVIDIA_API_KEY',
       value: '',
       description: 'NVIDIA API key from build.nvidia.com',
       isSecret: true,
-      required: true,
+      required: false,
     },
     {
       key: 'GEMINI_API_KEY',
@@ -73,16 +80,9 @@ export const InstallationWizard: React.FC<{
       required: false,
     },
     {
-      key: 'SUPABASE_URL',
+      key: 'TIMESCALE_PASSWORD',
       value: '',
-      description: 'Supabase project URL',
-      isSecret: false,
-      required: true,
-    },
-    {
-      key: 'SUPABASE_ANON_KEY',
-      value: '',
-      description: 'Supabase anonymous key',
+      description: 'TimescaleDB password for Tiger Data',
       isSecret: true,
       required: true,
     },
