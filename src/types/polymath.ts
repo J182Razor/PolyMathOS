@@ -204,6 +204,31 @@ export interface PolymathUser {
     confidence: number;
     timestamp: Date;
   }>;
+  // Assessment Data
+  dopamineProfile?: {
+    motivationLevel: number;
+    rewardSensitivity: number;
+    goalOrientation: number;
+    procrastinationTendency: number;
+  };
+  metaLearningSkills?: {
+    planningAbility: number;
+    selfMonitoring: number;
+    reflectionPractice: number;
+    strategyAdaptation: number;
+  };
+  learningStylePreferences?: {
+    firstPrinciplesThinking: number;
+    feynmanTechnique: number;
+    observationalLearning: number;
+    visualProcessing: number;
+  };
+  personalGoals?: {
+    primaryObjective: string;
+    timeframe: string;
+    motivationSource: string;
+    successMetrics: string[];
+  };
 }
 
 export interface Analytics {

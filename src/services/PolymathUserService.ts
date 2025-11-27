@@ -3,20 +3,20 @@
  * Core service for managing user data, XP, levels, achievements, and domains
  */
 
-import { 
-  PolymathUser, 
-  Domain, 
-  DomainType, 
-  LearningStyle, 
+import {
+  PolymathUser,
+  Domain,
+  DomainType,
+  LearningStyle,
   Achievement,
-  WeeklyGoals 
+  WeeklyGoals
 } from '../types/polymath';
 
 export class PolymathUserService {
   private static instance: PolymathUserService;
   private storageKey = 'polymathos_user_data';
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): PolymathUserService {
     if (!PolymathUserService.instance) {
@@ -32,7 +32,7 @@ export class PolymathUserService {
     try {
       const stored = localStorage.getItem(this.storageKey);
       if (!stored) return null;
-      
+
       const userData = JSON.parse(stored);
       // Convert date strings back to Date objects
       return this.deserializeUser(userData);
@@ -118,7 +118,7 @@ export class PolymathUserService {
   public gainXP(user: PolymathUser, amount: number): { leveledUp: boolean; levelsGained: number } {
     user.xp += amount;
     const newLevel = Math.floor(user.xp / 100) + 1;
-    
+
     if (newLevel > user.level) {
       const levelsGained = newLevel - user.level;
       user.level = newLevel;
@@ -126,7 +126,7 @@ export class PolymathUserService {
       this.saveUser(user);
       return { leveledUp: true, levelsGained };
     }
-    
+
     this.saveUser(user);
     return { leveledUp: false, levelsGained: 0 };
   }
@@ -137,12 +137,12 @@ export class PolymathUserService {
   public updateStreak(user: PolymathUser): void {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     if (user.lastActivity) {
       const lastDate = new Date(user.lastActivity);
       lastDate.setHours(0, 0, 0, 0);
       const daysDiff = Math.floor((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
-      
+
       if (daysDiff === 1) {
         user.streak += 1;
       } else if (daysDiff > 1) {
@@ -151,7 +151,7 @@ export class PolymathUserService {
     } else {
       user.streak = 1;
     }
-    
+
     user.lastActivity = today;
     user.longestStreak = Math.max(user.longestStreak, user.streak);
     this.saveUser(user);
@@ -166,14 +166,14 @@ export class PolymathUserService {
 
     achievement.unlockedAt = new Date();
     user.achievements.push(achievement);
-    
+
     const { leveledUp, levelsGained } = this.gainXP(user, achievement.xpReward);
-    
+
     let message = `${achievement.icon} Achievement Unlocked: ${achievement.name} (+${achievement.xpReward} XP)`;
     if (leveledUp) {
       message += `\n📈 LEVEL UP! Gained ${levelsGained} level(s) - Now Level ${user.level}`;
     }
-    
+
     this.saveUser(user);
     return message;
   }
@@ -272,10 +272,10 @@ export class PolymathUserService {
   public checkAchievements(user: PolymathUser): string[] {
     const messages: string[] = [];
     const catalog = this.getAchievementsCatalog();
-    
+
     for (const achievement of catalog) {
       if (user.achievements.some(a => a.id === achievement.id)) continue;
-      
+
       let conditionMet = false;
       try {
         // Evaluate unlock condition
@@ -288,18 +288,18 @@ export class PolymathUserService {
           .replace('trizApplications', String(user.trizApplications || 0))
           .replace('reflectionJournal.length', String(user.reflectionJournal.length))
           .replace('portfolio.length', String(user.portfolio.length));
-        
+
         conditionMet = eval(condition);
       } catch (error) {
         console.error('Error evaluating achievement condition:', error);
       }
-      
+
       if (conditionMet) {
         const message = this.addAchievement(user, achievement);
         if (message) messages.push(message);
       }
     }
-    
+
     return messages;
   }
 
@@ -320,23 +320,23 @@ export class PolymathUserService {
   private deserializeUser(data: any): PolymathUser {
     // Convert date strings to Date objects
     if (data.lastActivity) data.lastActivity = new Date(data.lastActivity);
-    
+
     // Convert domain dates
     Object.values(data.domains || {}).forEach((domain: any) => {
       if (domain.lastAccessed) domain.lastAccessed = new Date(domain.lastAccessed);
     });
-    
+
     // Convert achievement dates
     (data.achievements || []).forEach((ach: any) => {
       if (ach.unlockedAt) ach.unlockedAt = new Date(ach.unlockedAt);
     });
-    
+
     // Convert flashcard dates
     (data.flashcards || []).forEach((card: any) => {
       if (card.createdAt) card.createdAt = new Date(card.createdAt);
       if (card.nextReview) card.nextReview = new Date(card.nextReview);
     });
-    
+
     // Convert memory palace dates
     Object.values(data.memoryPalaces || {}).forEach((palace: any) => {
       if (palace.createdDate) palace.createdDate = new Date(palace.createdDate);
@@ -345,19 +345,40 @@ export class PolymathUserService {
         if (item.lastReviewed) item.lastReviewed = new Date(item.lastReviewed);
       });
     });
-    
+
     // Convert project dates
     (data.projects || []).forEach((project: any) => {
       if (project.createdAt) project.createdAt = new Date(project.createdAt);
       if (project.completedAt) project.completedAt = new Date(project.completedAt);
     });
-    
+
     // Convert reflection dates
     (data.reflectionJournal || []).forEach((entry: any) => {
       if (entry.timestamp) entry.timestamp = new Date(entry.timestamp);
     });
-    
+
     return data as PolymathUser;
+  }
+
+  /**
+   * Update assessment data
+   */
+  public updateAssessmentData(user: PolymathUser, assessmentData: any): void {
+    user.dopamineProfile = assessmentData.dopamineProfile;
+    user.metaLearningSkills = assessmentData.metaLearningSkills;
+    user.learningStylePreferences = assessmentData.learningStylePreferences;
+    user.personalGoals = assessmentData.personalGoals;
+
+    // Also update learning style based on assessment
+    if (assessmentData.learningStylePreferences) {
+      const prefs = assessmentData.learningStylePreferences;
+      if (prefs.visualProcessing >= 4) user.learningStyle = LearningStyle.VISUAL;
+      else if (prefs.observationalLearning >= 4) user.learningStyle = LearningStyle.VISUAL; // Map to closest
+      else if (prefs.feynmanTechnique >= 4) user.learningStyle = LearningStyle.READING_WRITING; // Map to closest
+      else if (prefs.firstPrinciplesThinking >= 4) user.learningStyle = LearningStyle.READING_WRITING; // Map to closest
+    }
+
+    this.saveUser(user);
   }
 
   /**

@@ -26,7 +26,7 @@ interface EnvVariable {
 }
 
 export const InstallationWizard: React.FC<{
-  onComplete: () => void;
+  onComplete: (user?: any) => void;
   onSkip?: () => void;
 }> = ({ onComplete, onSkip }) => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -113,7 +113,7 @@ export const InstallationWizard: React.FC<{
       // Update N8N service URL
       const testUrl = url.endsWith('/') ? url.slice(0, -1) : url;
       localStorage.setItem('n8n_webhook_url', testUrl);
-      
+
       // Test connection
       const isHealthy = await N8NService.checkHealth();
       if (isHealthy) {
@@ -187,17 +187,46 @@ export const InstallationWizard: React.FC<{
     }
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     // Save all configuration
-    handleSaveEnvVars();
-    onComplete();
+    await handleSaveEnvVars();
+
+    // Create initial user profile
+    const initialUser = {
+      firstName: 'PolyMath',
+      lastName: 'User',
+      email: 'user@polymath.os',
+      level: 'Intermediate',
+      learningStyle: 'Visual',
+      streak: 0,
+      xp: 0,
+      goals: ['Master PolyMathOS'],
+      achievements: [],
+      learningPath: []
+    };
+
+    // Pass data to parent
+    onComplete(initialUser);
   };
 
   const handleSkip = () => {
     if (onSkip) {
       onSkip();
     } else {
-      onComplete();
+      // Create demo user for skip
+      const demoUser = {
+        firstName: 'Demo',
+        lastName: 'User',
+        email: 'demo@example.com',
+        level: 'Beginner',
+        learningStyle: 'Mixed',
+        streak: 0,
+        xp: 0,
+        goals: ['Explore Demo'],
+        achievements: [],
+        learningPath: []
+      };
+      onComplete(demoUser);
     }
   };
 
@@ -241,12 +270,12 @@ export const InstallationWizard: React.FC<{
             <Button
               variant="outline"
               onClick={() => {
-                 // Allow manual bypass
-                 setN8nConnected(true);
-                 if (n8nUrl) {
-                     setEnvVariables(prev => ({ ...prev, N8N_WEBHOOK_URL: n8nUrl }));
-                     localStorage.setItem('n8n_webhook_url', n8nUrl);
-                 }
+                // Allow manual bypass
+                setN8nConnected(true);
+                if (n8nUrl) {
+                  setEnvVariables(prev => ({ ...prev, N8N_WEBHOOK_URL: n8nUrl }));
+                  localStorage.setItem('n8n_webhook_url', n8nUrl);
+                }
               }}
               className="whitespace-nowrap"
             >
@@ -327,13 +356,12 @@ export const InstallationWizard: React.FC<{
               <React.Fragment key={step.id}>
                 <div className="flex items-center flex-1">
                   <div
-                    className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all ${
-                      index === currentStep
-                        ? 'border-royal-500 bg-royal-500 text-white'
-                        : step.completed
+                    className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all ${index === currentStep
+                      ? 'border-royal-500 bg-royal-500 text-white'
+                      : step.completed
                         ? 'border-purple-500 bg-purple-500 text-white'
                         : 'border-silver-400 dark:border-silver-500 text-text-tertiary'
-                    }`}
+                      }`}
                   >
                     {step.completed ? (
                       <Icon icon={Check} size="sm" />
@@ -348,9 +376,8 @@ export const InstallationWizard: React.FC<{
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`flex-1 h-0.5 mx-4 ${
-                      step.completed ? 'bg-purple-500' : 'bg-silver-300 dark:bg-silver-600'
-                    }`}
+                    className={`flex-1 h-0.5 mx-4 ${step.completed ? 'bg-purple-500' : 'bg-silver-300 dark:bg-silver-600'
+                      }`}
                   />
                 )}
               </React.Fragment>

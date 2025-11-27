@@ -105,7 +105,7 @@ export const LearningSession: React.FC<LearningSessionProps> = ({ onComplete, on
 
   const handleSubmitAnswer = () => {
     if (selectedAnswer === null) return;
-    
+
     setShowResult(true);
     if (selectedAnswer === questions[currentQuestion].correctAnswer) {
       setScore(prev => prev + 1);
@@ -145,18 +145,18 @@ export const LearningSession: React.FC<LearningSessionProps> = ({ onComplete, on
 
   if (sessionComplete) {
     const percentage = Math.round((score / questions.length) * 100);
-    
+
     return (
       <div className="min-h-screen bg-dark-base flex items-center justify-center p-4">
         <Card className="p-8 max-w-2xl w-full text-center">
           <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-silver-base/20 to-silver-dark/20 border border-silver-base/30 rounded-full flex items-center justify-center silver-glow">
             <Icon icon={CheckCircle} size="xl" className="text-silver-light" />
           </div>
-          
+
           <h1 className="text-3xl font-display font-bold text-text-primary mb-4">
             Session Complete!
           </h1>
-          
+
           <p className="text-text-secondary mb-8">
             Congratulations! You've completed your learning session.
           </p>
@@ -189,11 +189,11 @@ export const LearningSession: React.FC<LearningSessionProps> = ({ onComplete, on
               {percentage >= 80 ? 'Excellent Work!' : percentage >= 60 ? 'Good Progress!' : 'Keep Learning!'}
             </h3>
             <p className="text-text-secondary text-sm">
-              {percentage >= 80 
+              {percentage >= 80
                 ? 'You have a strong understanding of the material. Ready for advanced topics!'
-                : percentage >= 60 
-                ? 'You\'re on the right track. Review the explanations and try again.'
-                : 'Learning takes time. Review the material and practice more to improve.'
+                : percentage >= 60
+                  ? 'You\'re on the right track. Review the explanations and try again.'
+                  : 'Learning takes time. Review the material and practice more to improve.'
               }
             </p>
           </div>
@@ -243,6 +243,14 @@ export const LearningSession: React.FC<LearningSessionProps> = ({ onComplete, on
                 <Icon icon={Target} size="sm" className="mr-1" />
                 {currentQuestion + 1}/{questions.length}
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onHome}
+                className="border-silver-dark/30 text-silver-base hover:text-silver-light hover:bg-silver-dark/10"
+              >
+                Save & Exit
+              </Button>
             </div>
           </div>
         </div>
@@ -256,7 +264,7 @@ export const LearningSession: React.FC<LearningSessionProps> = ({ onComplete, on
             <span className="text-sm text-silver-base">{Math.round(progress)}%</span>
           </div>
           <div className="w-full bg-dark-elevated rounded-full h-2 border border-silver-dark/20">
-            <div 
+            <div
               className="bg-shimmer h-2 rounded-full relative overflow-hidden transition-all duration-300"
               style={{ width: `${progress}%` }}
             >
@@ -283,17 +291,16 @@ export const LearningSession: React.FC<LearningSessionProps> = ({ onComplete, on
                 key={index}
                 onClick={() => handleAnswerSelect(index)}
                 disabled={showResult}
-                className={`w-full p-4 text-left rounded-lg border-2 transition-all duration-200 ${
-                  selectedAnswer === index
+                className={`w-full p-4 text-left rounded-lg border-2 transition-all duration-200 ${selectedAnswer === index
                     ? showResult
                       ? index === currentQ.correctAnswer
                         ? 'border-green-500/50 bg-green-500/10 text-green-400'
                         : 'border-red-500/50 bg-red-500/10 text-red-400'
                       : 'border-silver-base/50 bg-silver-base/10 text-silver-light'
                     : showResult && index === currentQ.correctAnswer
-                    ? 'border-green-500/50 bg-green-500/10 text-green-400'
-                    : 'border-silver-dark/30 hover:border-silver-base/50 text-text-secondary hover:text-text-primary bg-dark-surface/50'
-                }`}
+                      ? 'border-green-500/50 bg-green-500/10 text-green-400'
+                      : 'border-silver-dark/30 hover:border-silver-base/50 text-text-secondary hover:text-text-primary bg-dark-surface/50'
+                  }`}
               >
                 <div className="flex items-center">
                   <span className="w-6 h-6 rounded-full border-2 border-current mr-3 flex items-center justify-center text-xs font-bold">

@@ -315,11 +315,90 @@ export class N8NService {
   }
 
   /**
+   * Create a new n8n workflow
+   */
+  static async createWorkflow(name: string, nodes: any[], connections: any): Promise<{
+    success: boolean;
+    workflowId?: string;
+    error?: string;
+  }> {
+    try {
+      const apiKey = import.meta.env.VITE_N8N_API_KEY;
+      const baseUrl = import.meta.env.VITE_N8N_MCP_URL ? import.meta.env.VITE_N8N_MCP_URL.replace('/mcp-server/http', '') : this.baseUrl;
+
+      const response = await fetch(`${baseUrl}/api/v1/workflows`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-N8N-API-KEY': apiKey || ''
+        },
+        body: JSON.stringify({
+          name,
+          nodes,
+          connections,
+          settings: { saveManualExecutions: true, callers: [] },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to create workflow: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      return { success: true, workflowId: result.data?.id };
+    } catch (error) {
+      console.error('N8N Create Workflow error:', error);
+      return { success: false, error: 'Failed to create workflow' };
+    }
+  }
+
+  /**
+   * Trigger a specific workflow by ID
+   */
+  static async triggerWorkflow(workflowId: string, data: any): Promise<{
+    success: boolean;
+    data?: any;
+    error?: string;
+  }> {
+    try {
+      // This assumes the workflow has a Webhook node
+      // For direct execution via API, we'd use /api/v1/executions (but that's complex)
+      // Or we use the webhook URL pattern if we know it.
+      // For now, let's assume we use the generic webhook endpoint if configured, 
+      // or try to execute via the API if we have the key.
+
+      const apiKey = import.meta.env.VITE_N8N_API_KEY;
+      const baseUrl = import.meta.env.VITE_N8N_MCP_URL ? import.meta.env.VITE_N8N_MCP_URL.replace('/mcp-server/http', '') : this.baseUrl;
+
+      // Try API execution first if key exists
+      if (apiKey) {
+        const response = await fetch(`${baseUrl}/api/v1/workflows/${workflowId}/execute`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-N8N-API-KEY': apiKey
+          },
+          body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+        return { success: true, data: result };
+      }
+
+      return { success: false, error: 'No API key configured for workflow execution' };
+    } catch (error) {
+      console.error('N8N Trigger Workflow error:', error);
+      return { success: false, error: 'Failed to trigger workflow' };
+    }
+  }
+
+  /**
    * Check if n8n is available
    */
   static async checkHealth(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.baseUrl}/healthz`, {
+      const baseUrl = import.meta.env.VITE_N8N_MCP_URL ? import.meta.env.VITE_N8N_MCP_URL.replace('/mcp-server/http', '') : this.baseUrl;
+      const response = await fetch(`${baseUrl}/healthz`, {
         method: 'GET',
       });
       return response.ok;

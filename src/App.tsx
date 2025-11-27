@@ -28,6 +28,7 @@ import { PolymathAIAssistantEnhanced } from './components/PolymathAIAssistantEnh
 import { InstallationWizard } from './components/InstallationWizard';
 import OnboardingController from './components/onboarding/OnboardingController';
 import ResourceLibrary from './components/ResourceLibrary';
+import { PolymathUserService } from './services/PolymathUserService';
 
 type AppState = 'home' | 'signin' | 'signup' | 'dashboard' | 'polymath_dashboard' | 'learning' | 'assessment' | 'domain_selection' | 'memory_palace' | 'flashcards' | 'deep_work' | 'projects' | 'reflection' | 'mind_map' | 'triz' | 'brainwave_generator' | 'polymath_ai' | 'onboarding' | 'portfolio' | 'resource_library';
 
@@ -48,7 +49,7 @@ function App() {
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
+
     // Default to dark mode for premium dark minimalist design
     if (savedTheme === 'light') {
       setIsDarkMode(false);
@@ -69,7 +70,7 @@ function App() {
   const toggleDarkMode = () => {
     const newDarkMode = !isDarkMode;
     setIsDarkMode(newDarkMode);
-    
+
     if (newDarkMode) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
@@ -160,9 +161,17 @@ function App() {
   const handleCompleteAssessment = (assessmentData: any) => {
     // Store assessment data for AI personalization
     setAssessmentData(assessmentData);
+    // Persist assessment data using PolymathUserService
+    const userService = PolymathUserService.getInstance();
+    let user = userService.getCurrentUser();
+    if (!user) {
+      // Create a placeholder user if none exists
+      user = userService.createUser('Demo User', 'demo@example.com');
+    }
+    userService.updateAssessmentData(user, assessmentData);
     // In a real app, this would be sent to the backend
     if (import.meta.env.DEV) {
-      console.log('Assessment completed:', assessmentData);
+      console.log('Assessment completed and persisted:', assessmentData);
     }
     setCurrentPage('dashboard');
   };
@@ -176,57 +185,57 @@ function App() {
     switch (currentPage) {
       case 'signin':
         return <SignIn onSignIn={handleSignIn} onBack={handleBackToHome} />;
-      
+
       case 'signup':
         return <SignUp onSignUp={handleSignUp} onBack={handleBackToHome} />;
-      
+
       case 'dashboard':
         return <Dashboard onStartLearning={handleStartLearning} onStartAssessment={handleStartAssessment} onSignOut={handleSignOut} onOpenBrainwaveGenerator={() => setCurrentPage('brainwave_generator')} user={user} />;
-      
+
       case 'polymath_dashboard':
         return <PolymathDashboard onSignOut={handleSignOut} user={user} />;
-      
+
       case 'domain_selection':
         return <DomainSelection onComplete={() => setCurrentPage('polymath_dashboard')} onBack={() => setCurrentPage('polymath_dashboard')} />;
-      
+
       case 'memory_palace':
         return <MemoryPalaceBuilder onComplete={() => setCurrentPage('polymath_dashboard')} onBack={() => setCurrentPage('polymath_dashboard')} />;
-      
+
       case 'flashcards':
         return <FlashcardReview onComplete={() => setCurrentPage('polymath_dashboard')} onBack={() => setCurrentPage('polymath_dashboard')} />;
-      
+
       case 'deep_work':
         return <DeepWorkBlock onComplete={() => setCurrentPage('polymath_dashboard')} onBack={() => setCurrentPage('polymath_dashboard')} />;
-      
+
       case 'reflection':
         return <ReflectionJournal onComplete={() => setCurrentPage('polymath_dashboard')} onBack={() => setCurrentPage('polymath_dashboard')} />;
-      
+
       case 'triz':
         return <TRIZApplication onComplete={() => setCurrentPage('polymath_dashboard')} onBack={() => setCurrentPage('polymath_dashboard')} />;
-      
+
       case 'projects':
         return <CrossDomainProject onComplete={() => setCurrentPage('polymath_dashboard')} onBack={() => setCurrentPage('polymath_dashboard')} />;
-      
+
       case 'mind_map':
         return <MindMapBuilder onComplete={() => setCurrentPage('polymath_dashboard')} onBack={() => setCurrentPage('polymath_dashboard')} />;
-      
+
       case 'learning':
         return assessmentData ? (
-          <EnhancedLearningSession 
-            onComplete={handleCompleteLearning} 
-            onHome={() => setCurrentPage('dashboard')} 
+          <EnhancedLearningSession
+            onComplete={handleCompleteLearning}
+            onHome={() => setCurrentPage('dashboard')}
             userProfile={assessmentData}
           />
         ) : (
           <LearningSession onComplete={handleCompleteLearning} onHome={() => setCurrentPage('dashboard')} />
         );
-      
+
       case 'assessment':
         return <CognitiveAssessment onComplete={handleCompleteAssessment} onBack={() => setCurrentPage('dashboard')} />;
-      
+
       case 'brainwave_generator':
         return <BrainwaveGenerator onBack={() => setCurrentPage('dashboard')} />;
-      
+
       case 'onboarding':
         return <OnboardingController onComplete={(program) => {
           // Here we would typically save the program to the backend/user state
@@ -276,12 +285,12 @@ function App() {
 
       case 'portfolio':
         return <PolymathDashboard onSignOut={handleSignOut} user={user} />;
-      
+
       default:
         return (
           <div className="min-h-screen bg-light-base dark:bg-dark-base transition-colors duration-300">
-            <Header 
-              onSignIn={() => setCurrentPage('signin')} 
+            <Header
+              onSignIn={() => setCurrentPage('signin')}
               onGetStarted={() => setCurrentPage('signup')}
               toggleDarkMode={toggleDarkMode}
               darkMode={isDarkMode}
@@ -307,11 +316,59 @@ function App() {
       {renderCurrentPage()}
       {showInstallationWizard && (
         <InstallationWizard
-          onComplete={() => {
+          onComplete={(userData) => {
             localStorage.setItem('polymathos_installation_completed', 'true');
             setShowInstallationWizard(false);
+
+            if (userData) {
+              // Persist user data
+              const userService = PolymathUserService.getInstance();
+
+              // Check if user already exists to avoid overwriting if not needed, 
+              // but here we assume setup means new user or overwrite
+              let user = userService.getCurrentUser();
+              if (!user) {
+                user = userService.createUser(
+                  `${userData.firstName} ${userData.lastName}`,
+                  userData.email
+                );
+              }
+
+              // Update with specific fields from setup
+              // Note: We might need to extend PolymathUser or use specific update methods
+              // For now, we'll update what we can
+              if (userData.learningStyle) {
+                // Map simple string to LearningStyle object if needed, or just store
+                // This assumes updateAssessmentData can handle partial updates or we add a specific method
+                userService.updateAssessmentData(user, {
+                  learningStylePreferences: {
+                    primaryStyle: userData.learningStyle,
+                    secondaryStyle: 'None',
+                    environment: 'Quiet',
+                    timeOfDay: 'Morning',
+                    groupPreference: 'Solo'
+                  }
+                });
+              }
+
+              setUser({
+                email: userData.email,
+                firstName: userData.firstName,
+                lastName: userData.lastName
+              });
+
+              // If it was a demo user (skipped), we might want to set a flag
+              if (userData.email === 'demo@example.com') {
+                // potentially set a demo flag in localStorage
+                localStorage.setItem('polymathos_demo_mode', 'true');
+              } else {
+                localStorage.removeItem('polymathos_demo_mode');
+              }
+            }
           }}
           onSkip={() => {
+            // This prop is actually not used in the new InstallationWizard logic 
+            // as skip calls onComplete with demo user, but keeping for safety
             localStorage.setItem('polymathos_installation_completed', 'true');
             setShowInstallationWizard(false);
           }}
