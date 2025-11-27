@@ -11,6 +11,8 @@ interface LLMConfig {
   geminiApiKey?: string;
   groqApiKey?: string;
   nvidiaApiKey?: string;
+  nvidiaNemotronApiKey?: string;
+  nvidiaMinimaxApiKey?: string;
   useGroqForSpeed?: boolean;
   useGeminiForSynthesis?: boolean;
   useNVIDIAForPerformance?: boolean;
@@ -43,6 +45,8 @@ export class LLMService {
       geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY,
       groqApiKey: import.meta.env.VITE_GROQ_API_KEY,
       nvidiaApiKey: import.meta.env.VITE_NVIDIA_API_KEY,
+      nvidiaNemotronApiKey: import.meta.env.VITE_NVIDIA_NEMOTRON_API_KEY,
+      nvidiaMinimaxApiKey: import.meta.env.VITE_NVIDIA_MINIMAX_API_KEY,
       useGroqForSpeed: true,
       useGeminiForSynthesis: true,
       useNVIDIAForPerformance: true,
@@ -109,10 +113,11 @@ export class LLMService {
       }
 
       // Fallback to mock response if no API keys
-      return this.generateMockResponse(request);
+      // STRICT MODE: Throw error instead of mock
+      throw new Error('No LLM provider configured. Please check your .env file.');
     } catch (error) {
       console.error('LLM generation error:', error);
-      return this.generateMockResponse(request);
+      throw error;
     }
   }
 
@@ -144,13 +149,22 @@ export class LLMService {
         }
       }
 
-      // Try NVIDIA first for GPU-optimized performance
+      // Try NVIDIA (MiniMax 2) first for GPU-optimized performance
       if (this.nvidiaService.isConfigured() && this.config.useNVIDIAForPerformance) {
         try {
+          // Use MiniMax 2 for quick responses if key available, else fallback to default
+          const apiKey = this.config.nvidiaMinimaxApiKey || this.config.nvidiaApiKey;
+          const model = this.config.nvidiaMinimaxApiKey ? 'minimaxai/minimax-m2' : undefined;
+
           const content = await this.nvidiaService.generateText(
             prompt,
             'You are an expert learning assistant that provides concise, helpful responses optimized for learning.',
-            { temperature: 0.7, max_tokens: 500 }
+            {
+              temperature: 0.7,
+              max_tokens: 500,
+              model: model,
+              apiKey: apiKey
+            }
           );
           return {
             content,
@@ -190,7 +204,7 @@ export class LLMService {
         if (response.ok) {
           const data = await response.json();
           const latency = Date.now() - startTime;
-          
+
           return {
             content: data.choices[0]?.message?.content || '',
             model: 'groq',
@@ -225,7 +239,7 @@ export class LLMService {
 
     try {
       const prompt = this.buildGeminiPrompt(request);
-      
+
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${this.config.geminiApiKey}`,
         {
@@ -252,7 +266,7 @@ export class LLMService {
       if (response.ok) {
         const data = await response.json();
         const latency = Date.now() - startTime;
-        
+
         return {
           content: data.candidates?.[0]?.content?.parts?.[0]?.text || '',
           model: 'gemini',
@@ -275,7 +289,7 @@ export class LLMService {
       if (this.config.groqApiKey) {
         return this.generateWithGroq(request);
       }
-      return this.generateMockResponse(request);
+      throw new Error('Gemini failed and no fallback available.');
     }
   }
 
@@ -287,7 +301,7 @@ export class LLMService {
 
     try {
       const prompt = this.buildGroqPrompt(request);
-      
+
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -314,7 +328,7 @@ export class LLMService {
       if (response.ok) {
         const data = await response.json();
         const latency = Date.now() - startTime;
-        
+
         return {
           content: data.choices[0]?.message?.content || '',
           model: 'groq',
@@ -326,7 +340,7 @@ export class LLMService {
       throw new Error('Groq API request failed');
     } catch (error) {
       console.error('Groq API error:', error);
-      return this.generateMockResponse(request);
+      throw error;
     }
   }
 
@@ -338,18 +352,24 @@ export class LLMService {
 
     try {
       const prompt = this.buildNVIDIAPrompt(request);
-      
+
+      // Use Nemotron Ultra for detailed thinking if key available
+      const apiKey = this.config.nvidiaNemotronApiKey || this.config.nvidiaApiKey;
+      const model = this.config.nvidiaNemotronApiKey ? 'nvidia/llama-3.1-nemotron-ultra-253b-v1' : undefined;
+
       const content = await this.nvidiaService.generateText(
         prompt,
         'You are an expert educational content creator specializing in neuroscience-based learning optimization. Create comprehensive, personalized learning content.',
         {
-          temperature: 0.7,
-          max_tokens: 2000,
+          temperature: 0.6, // Slightly lower temp for Nemotron as per user example
+          max_tokens: 4096, // Increased tokens for detailed thinking
+          model: model,
+          apiKey: apiKey
         }
       );
 
       const latency = Date.now() - startTime;
-      
+
       return {
         content,
         model: 'nvidia',
@@ -364,7 +384,7 @@ export class LLMService {
       if (this.config.groqApiKey) {
         return this.generateWithGroq(request);
       }
-      return this.generateMockResponse(request);
+      throw new Error('NVIDIA failed and no fallback available.');
     }
   }
 
@@ -422,7 +442,7 @@ Generate lesson content with:
 
   private getLearningStyle(profile: any): string {
     if (!profile?.learningStylePreferences) return 'balanced';
-    
+
     const prefs = profile.learningStylePreferences;
     if (prefs.visualProcessing >= 4) return 'visual';
     if (prefs.feynmanTechnique >= 4) return 'explanatory';
@@ -432,7 +452,7 @@ Generate lesson content with:
 
   private getMetaLearningLevel(profile: any): string {
     if (!profile?.metaLearningSkills) return 'intermediate';
-    
+
     const values = Object.values(profile.metaLearningSkills) as number[];
     const avg = values.reduce((a: number, b: number) => a + b, 0) / values.length;
     if (avg >= 4) return 'advanced';
@@ -441,25 +461,7 @@ Generate lesson content with:
   }
 
   private generateMockResponse(request: LessonGenerationRequest): LLMResponse {
-    return {
-      content: `# ${request.topic}: Personalized Learning Experience
-
-## Introduction
-Welcome to your personalized learning journey on ${request.topic}! Based on your cognitive profile, we've optimized this lesson for maximum retention and engagement.
-
-## Core Concepts
-This lesson will cover the fundamental principles of ${request.topic}, broken down using first principles thinking to ensure deep understanding.
-
-## Interactive Elements
-- Practice exercises tailored to your learning style
-- Real-time feedback and micro-rewards
-- Meta-learning checkpoints for self-assessment
-
-## Next Steps
-Complete the exercises and reflect on your learning to unlock the next level.`,
-      model: 'gemini',
-      latency: 100,
-    };
+    throw new Error('LLM Generation Failed: No API keys configured. Please add VITE_GEMINI_API_KEY, VITE_GROQ_API_KEY, or VITE_NVIDIA_API_KEY to your .env file.');
   }
 
   private generateFallbackResponse(prompt: string): string {
@@ -496,7 +498,7 @@ The system will automatically use:
             'You are an expert educator analyzing student explanations using the Feynman technique. Identify clarity, gaps, and provide constructive feedback. Always return valid JSON.',
             { temperature: 0.5, max_tokens: 500 }
           );
-          
+
           try {
             const analysis = JSON.parse(content);
             return {
@@ -553,7 +555,7 @@ The system will automatically use:
       // Fallback analysis
       const wordCount = explanation.split(' ').length;
       const hasSimpleLanguage = !explanation.match(/\b(neurotransmitter|synaptic|neuroplasticity)\b/i);
-      
+
       return {
         clarity: wordCount > 20 && hasSimpleLanguage ? 85 : 60,
         gaps: wordCount < 20 ? ['Explanation is too brief'] : [],

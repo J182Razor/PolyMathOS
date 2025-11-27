@@ -43,21 +43,48 @@ export class MCPService {
     }
 
     /**
+     * Helper to call an MCP endpoint
+     */
+    private async callMCPEndpoint(endpointEnvVar: string, payload: any): Promise<any> {
+        const url = import.meta.env[endpointEnvVar];
+        if (!url) {
+            throw new Error(`MCP Endpoint not configured: ${endpointEnvVar}`);
+        }
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Add auth headers if needed, e.g. from another env var
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`MCP Call failed: ${response.statusText}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error(`Error calling MCP ${endpointEnvVar}:`, error);
+            throw error;
+        }
+    }
+
+    /**
      * NotebookLM: Analyze a set of documents or a topic
      */
     public async analyzeWithNotebookLM(topic: string, context?: string): Promise<ResearchResult[]> {
         console.log(`[MCP] NotebookLM analyzing: ${topic}`);
-        // In a real implementation, this would call the NotebookLM MCP server
-        // For now, we simulate the response or delegate to LLMService if needed
 
-        return [
-            {
-                source: 'NotebookLM',
-                title: `Analysis of ${topic}`,
-                summary: `NotebookLM has analyzed the available sources for ${topic}. Key insights include...`,
-                confidence: 0.95
-            }
-        ];
+        // Call real endpoint
+        // Expects VITE_MCP_NOTEBOOKLM_URL
+        const result = await this.callMCPEndpoint('VITE_MCP_NOTEBOOKLM_URL', { topic, context });
+
+        // Map result to ResearchResult[]
+        // Assuming the MCP returns a standard format or we map it here
+        return result.results || [];
     }
 
     /**
@@ -65,17 +92,12 @@ export class MCPService {
      */
     public async searchArxiv(query: string, maxResults: number = 5): Promise<ResearchResult[]> {
         console.log(`[MCP] Searching Arxiv for: ${query}`);
-        // This would connect to the Arxiv MCP
 
-        return [
-            {
-                source: 'Arxiv',
-                title: `Recent Advances in ${query}`,
-                summary: 'A comprehensive survey of the latest research...',
-                url: 'https://arxiv.org/abs/example',
-                confidence: 0.9
-            }
-        ];
+        // Call real endpoint
+        // Expects VITE_MCP_ARXIV_URL
+        const result = await this.callMCPEndpoint('VITE_MCP_ARXIV_URL', { query, max_results: maxResults });
+
+        return result.papers || [];
     }
 
     /**
@@ -88,20 +110,14 @@ export class MCPService {
     }> {
         console.log(`[MCP] Starting Deep Research on: ${topic}`);
 
-        // 1. Search Arxiv
-        const papers = await this.searchArxiv(topic);
-
-        // 2. Analyze with NotebookLM (simulated)
-        const analysis = await this.analyzeWithNotebookLM(topic);
+        // Call real endpoint
+        // Expects VITE_MCP_DEEP_RESEARCH_URL
+        const result = await this.callMCPEndpoint('VITE_MCP_DEEP_RESEARCH_URL', { topic });
 
         return {
-            summary: `Deep research into ${topic} reveals significant activity.`,
-            sources: [...papers, ...analysis],
-            plan: [
-                'Review foundational papers',
-                'Analyze conflicting theories',
-                'Synthesize practical applications'
-            ]
+            summary: result.summary,
+            sources: result.sources,
+            plan: result.plan
         };
     }
 
@@ -110,8 +126,16 @@ export class MCPService {
      */
     public async ingestDocument(collection: string, document: string, metadata: any): Promise<boolean> {
         console.log(`[MCP] ChromaDB Ingesting into ${collection}`);
-        // Connect to chroma-mcp
-        // Tool: chroma.add_documents
+
+        // Call real endpoint
+        // Expects VITE_MCP_CHROMA_URL
+        await this.callMCPEndpoint('VITE_MCP_CHROMA_URL', {
+            action: 'add_documents',
+            collection_name: collection,
+            documents: [document],
+            metadatas: [metadata]
+        });
+
         return true;
     }
 
@@ -120,16 +144,27 @@ export class MCPService {
      */
     public async queryCollection(collection: string, query: string, nResults: number = 5): Promise<ResearchResult[]> {
         console.log(`[MCP] ChromaDB Querying ${collection}: ${query}`);
-        // Connect to chroma-mcp
-        // Tool: chroma.query_collection
 
-        return [
-            {
+        // Call real endpoint
+        // Expects VITE_MCP_CHROMA_URL
+        const result = await this.callMCPEndpoint('VITE_MCP_CHROMA_URL', {
+            action: 'query',
+            collection_name: collection,
+            query_texts: [query],
+            n_results: nResults
+        });
+
+        // Map Chroma result to ResearchResult
+        // Chroma returns { documents: [[]], metadatas: [[]], distances: [[]] }
+        if (result.documents && result.documents[0]) {
+            return result.documents[0].map((doc: string, index: number) => ({
                 source: 'ChromaDB',
-                title: `Result from ${collection}`,
-                summary: `Relevant content matching "${query}"...`,
-                confidence: 0.85
-            }
-        ];
+                title: result.metadatas[0][index]?.title || 'Unknown Source',
+                summary: doc,
+                confidence: 1 - (result.distances ? result.distances[0][index] : 0) // Distance to confidence approximation
+            }));
+        }
+
+        return [];
     }
 }

@@ -102,12 +102,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   ];
 
   // Only show placeholder lessons for demo user
-  const recentLessons = isDemoUser ? [
-    { title: 'Advanced JavaScript Concepts', progress: 85, time: '2 hours ago' },
-    { title: 'Machine Learning Fundamentals', progress: 60, time: '1 day ago' },
-    { title: 'React Hooks Deep Dive', progress: 100, time: '2 days ago' },
-    { title: 'Data Structures & Algorithms', progress: 45, time: '3 days ago' }
-  ] : [];
+  const recentLessons: { title: string; progress: number; time: string }[] = []; // Real data implementation: fetch from user profile or service
 
   return (
     <div className="min-h-screen bg-poly-bg-primary transition-colors duration-300">

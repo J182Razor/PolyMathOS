@@ -31,23 +31,23 @@ interface DopamineOptimizedLesson {
   description: string;
   estimatedDuration: number;
   difficultyLevel: 'beginner' | 'intermediate' | 'advanced';
-  
+
   // Dopamine Loading Elements
   anticipationHooks: string[];
   microRewards: MicroReward[];
   progressMilestones: ProgressMilestone[];
   surpriseElements: SurpriseElement[];
-  
+
   // Meta-Learning Components
   planningPhase: PlanningPhase;
   monitoringCheckpoints: MonitoringCheckpoint[];
   reflectionPrompts: ReflectionPrompt[];
-  
+
   // Genius Learning Methods
   firstPrinciplesBreakdown: FirstPrinciplesBreakdown;
   feynmanExplanationTasks: FeynmanTask[];
   observationalExercises: ObservationalExercise[];
-  
+
   // Content Structure
   sections: LessonSection[];
   assessments: Assessment[];
@@ -159,7 +159,7 @@ interface AdaptiveElement {
 
 export class NeuroAILessonService {
   private static instance: NeuroAILessonService;
-  
+
   public static getInstance(): NeuroAILessonService {
     if (!NeuroAILessonService.instance) {
       NeuroAILessonService.instance = new NeuroAILessonService();
@@ -175,55 +175,55 @@ export class NeuroAILessonService {
     userProfile: AssessmentProfile,
     previousPerformance?: any
   ): Promise<DopamineOptimizedLesson> {
-    
+
     // Analyze user's dopamine profile to optimize reward timing
     const rewardFrequency = this.calculateOptimalRewardFrequency(userProfile.dopamineProfile);
     const difficultyLevel = this.determineDifficultyLevel(userProfile, previousPerformance);
-    
+
     // Generate dopamine-optimized content structure
     const anticipationHooks = this.generateAnticipationHooks(topic, userProfile);
     const microRewards = this.generateMicroRewards(userProfile.dopamineProfile, rewardFrequency);
     const progressMilestones = this.generateProgressMilestones(userProfile);
     const surpriseElements = this.generateSurpriseElements(topic, userProfile);
-    
+
     // Create meta-learning components
     const planningPhase = this.generatePlanningPhase(topic, userProfile);
     const monitoringCheckpoints = this.generateMonitoringCheckpoints(userProfile.metaLearningSkills);
     const reflectionPrompts = this.generateReflectionPrompts(userProfile);
-    
+
     // Apply genius learning methods
     const firstPrinciplesBreakdown = this.generateFirstPrinciplesBreakdown(topic, userProfile);
     const feynmanTasks = this.generateFeynmanTasks(topic, userProfile);
     const observationalExercises = this.generateObservationalExercises(topic, userProfile);
-    
+
     // Generate adaptive content sections
     const sections = await this.generateLessonSections(topic, userProfile, difficultyLevel);
     const assessments = this.generateAdaptiveAssessments(topic, userProfile);
     const adaptiveElements = this.generateAdaptiveElements(userProfile);
-    
+
     return {
       id: `lesson_${Date.now()}`,
       title: `${topic}: Personalized PolyMathOS Experience`,
       description: `AI-optimized lesson tailored to your unique cognitive profile and learning goals`,
       estimatedDuration: this.calculateOptimalDuration(userProfile),
       difficultyLevel,
-      
+
       // Dopamine optimization
       anticipationHooks,
       microRewards,
       progressMilestones,
       surpriseElements,
-      
+
       // Meta-learning integration
       planningPhase,
       monitoringCheckpoints,
       reflectionPrompts,
-      
+
       // Genius methods
       firstPrinciplesBreakdown,
       feynmanExplanationTasks: feynmanTasks,
       observationalExercises,
-      
+
       // Content structure
       sections,
       assessments,
@@ -235,20 +235,20 @@ export class NeuroAILessonService {
     // Higher reward sensitivity = more frequent micro-rewards
     // Lower motivation = more frequent encouragement
     const baseFrequency = 0.2; // Every 20% by default
-    
+
     const sensitivityMultiplier = dopamineProfile.rewardSensitivity / 5;
     const motivationAdjustment = (6 - dopamineProfile.motivationLevel) / 10;
-    
+
     return Math.max(0.1, baseFrequency * sensitivityMultiplier + motivationAdjustment);
   }
 
   private determineDifficultyLevel(
-    userProfile: AssessmentProfile, 
+    userProfile: AssessmentProfile,
     previousPerformance?: any
   ): 'beginner' | 'intermediate' | 'advanced' {
     // Consider meta-learning skills and previous performance
     const metaLearningAverage = Object.values(userProfile.metaLearningSkills).reduce((a, b) => a + b, 0) / 4;
-    
+
     if (metaLearningAverage >= 4) return 'advanced';
     if (metaLearningAverage >= 3) return 'intermediate';
     return 'beginner';
@@ -261,26 +261,26 @@ export class NeuroAILessonService {
       `Learn the counterintuitive truth about ${topic} that will change your perspective`,
       `Master the secret technique that makes ${topic} 10x easier to understand`
     ];
-    
+
     // Personalize based on motivation source
     if (userProfile.personalGoals.motivationSource.toLowerCase().includes('career')) {
       hooks.push(`See how ${topic} can accelerate your career advancement`);
     }
-    
+
     return hooks.slice(0, 2); // Return 2 most relevant hooks
   }
 
   private generateMicroRewards(
-    dopamineProfile: AssessmentProfile['dopamineProfile'], 
+    dopamineProfile: AssessmentProfile['dopamineProfile'],
     frequency: number
   ): MicroReward[] {
     const rewards: MicroReward[] = [];
     const rewardTypes = ['visual', 'text', 'achievement'] as const;
-    
+
     // Generate rewards based on sensitivity level
-    const intensity = dopamineProfile.rewardSensitivity >= 4 ? 'high' : 
-                     dopamineProfile.rewardSensitivity >= 3 ? 'medium' : 'low';
-    
+    const intensity = dopamineProfile.rewardSensitivity >= 4 ? 'high' :
+      dopamineProfile.rewardSensitivity >= 3 ? 'medium' : 'low';
+
     for (let i = 0; i < 10; i++) {
       rewards.push({
         trigger: `progress_${i * 10}%`,
@@ -289,7 +289,7 @@ export class NeuroAILessonService {
         dopamineIntensity: intensity
       });
     }
-    
+
     return rewards;
   }
 
@@ -311,7 +311,7 @@ export class NeuroAILessonService {
         high: 'LEGENDARY: Neural Network Master!'
       }
     };
-    
+
     return content[type][intensity as keyof typeof content[typeof type]];
   }
 
@@ -390,10 +390,10 @@ export class NeuroAILessonService {
 
   private generateMonitoringCheckpoints(metaLearningSkills: AssessmentProfile['metaLearningSkills']): MonitoringCheckpoint[] {
     const checkpoints: MonitoringCheckpoint[] = [];
-    
+
     // More checkpoints for users with lower self-monitoring skills
     const checkpointFrequency = metaLearningSkills.selfMonitoring >= 4 ? 3 : 5;
-    
+
     for (let i = 1; i <= checkpointFrequency; i++) {
       const position = (i / (checkpointFrequency + 1)) * 100;
       checkpoints.push({
@@ -411,7 +411,7 @@ export class NeuroAILessonService {
         ]
       });
     }
-    
+
     return checkpoints;
   }
 
@@ -541,15 +541,15 @@ export class NeuroAILessonService {
   }
 
   private async generateLessonSections(
-    topic: string, 
-    userProfile: AssessmentProfile, 
+    topic: string,
+    userProfile: AssessmentProfile,
     difficultyLevel: string
   ): Promise<LessonSection[]> {
     // Integrate with LLM service for AI-generated content
     try {
       const { LLMService } = await import('./LLMService');
       const llmService = LLMService.getInstance();
-      
+
       const llmResponse = await llmService.generateLessonContent({
         topic,
         userProfile,
@@ -559,68 +559,9 @@ export class NeuroAILessonService {
       // Parse LLM response and structure into sections
       return this.parseLLMResponseToSections(llmResponse.content, topic);
     } catch (error) {
-      console.error('LLM integration error, using template:', error);
-      // Fallback to template
+      console.error('LLM integration error:', error);
+      throw error; // Rethrow to let UI handle the missing configuration
     }
-    
-    return [
-      {
-        id: 'intro',
-        title: 'Curiosity Activation',
-        type: 'introduction',
-        content: `Welcome to your personalized ${topic} journey! Based on your cognitive profile, we've designed this experience to maximize your learning potential.`,
-        interactiveElements: [
-          {
-            type: 'visualization',
-            content: 'Interactive preview of what you\'ll master',
-            rewardMechanism: 'anticipation_building'
-          }
-        ],
-        dopamineTriggers: ['curiosity_gap', 'personal_relevance', 'achievement_preview']
-      },
-      {
-        id: 'core',
-        title: 'Foundation Building',
-        type: 'core_content',
-        content: 'Core concepts presented through your optimal learning style',
-        interactiveElements: [
-          {
-            type: 'quiz',
-            content: 'Micro-assessments with immediate feedback',
-            rewardMechanism: 'progress_celebration'
-          }
-        ],
-        dopamineTriggers: ['mastery_progress', 'understanding_clicks', 'connection_insights']
-      },
-      {
-        id: 'practice',
-        title: 'Active Application',
-        type: 'practice',
-        content: 'Hands-on exercises tailored to your goals',
-        interactiveElements: [
-          {
-            type: 'simulation',
-            content: 'Real-world scenario practice',
-            rewardMechanism: 'skill_demonstration'
-          }
-        ],
-        dopamineTriggers: ['competence_building', 'challenge_completion', 'skill_unlock']
-      },
-      {
-        id: 'synthesis',
-        title: 'Neural Network Integration',
-        type: 'synthesis',
-        content: 'Connect new knowledge to your existing understanding',
-        interactiveElements: [
-          {
-            type: 'reflection',
-            content: 'Guided insight generation',
-            rewardMechanism: 'wisdom_achievement'
-          }
-        ],
-        dopamineTriggers: ['insight_moments', 'pattern_recognition', 'mastery_confirmation']
-      }
-    ];
   }
 
   private generateAdaptiveAssessments(topic: string, userProfile: AssessmentProfile): Assessment[] {
@@ -685,13 +626,13 @@ export class NeuroAILessonService {
   private calculateOptimalDuration(userProfile: AssessmentProfile): number {
     // Base duration: 30 minutes
     let duration = 30;
-    
+
     // Adjust based on attention and motivation levels
     const avgMotivation = Object.values(userProfile.dopamineProfile).reduce((a, b) => a + b, 0) / 4;
-    
+
     if (avgMotivation >= 4) duration += 15; // High motivation = longer sessions
     if (avgMotivation <= 2) duration -= 10; // Low motivation = shorter sessions
-    
+
     return Math.max(15, Math.min(60, duration)); // Between 15-60 minutes
   }
 
@@ -706,7 +647,7 @@ export class NeuroAILessonService {
   ): any {
     // This would analyze user behavior and update their profile
     // for even better personalization in future lessons
-    
+
     return {
       performanceScore: this.calculatePerformanceScore(userResponses, timeSpent),
       adaptationRecommendations: this.generateAdaptationRecommendations(engagementMetrics),
@@ -716,23 +657,18 @@ export class NeuroAILessonService {
 
   private calculatePerformanceScore(responses: any[], timeSpent: number): number {
     // Implement performance scoring algorithm
-    return 85; // Placeholder
+    // Real implementation would calculate based on response correctness
+    return 0;
   }
 
   private generateAdaptationRecommendations(metrics: any): string[] {
-    return [
-      'Increase visual elements based on high engagement with diagrams',
-      'Reduce text density in favor of interactive elements',
-      'Add more frequent checkpoints for better pacing'
-    ];
+    // Real implementation would analyze metrics
+    return [];
   }
 
   private suggestNextLessons(responses: any[]): string[] {
-    return [
-      'Advanced applications of current topic',
-      'Related concepts that build on this foundation',
-      'Cross-domain connections to expand understanding'
-    ];
+    // Real implementation would suggest based on performance
+    return [];
   }
 
   private getLearningStyleDescription(userProfile: AssessmentProfile): string {
@@ -747,9 +683,9 @@ export class NeuroAILessonService {
     // Simple parsing - in production, use more sophisticated parsing
     const sections: LessonSection[] = [];
     const lines = content.split('\n').filter(line => line.trim());
-    
+
     let currentSection: Partial<LessonSection> | null = null;
-    
+
     for (const line of lines) {
       if (line.startsWith('# ')) {
         // New section
@@ -772,7 +708,7 @@ export class NeuroAILessonService {
         currentSection.content += line + '\n';
       }
     }
-    
+
     if (currentSection) {
       sections.push(currentSection as LessonSection);
     }

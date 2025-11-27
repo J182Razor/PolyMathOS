@@ -78,10 +78,12 @@ export class NVIDIAAIService {
       max_tokens?: number;
       top_p?: number;
       model?: string;
+      apiKey?: string;
     }
   ): Promise<NVIDIAChatResponse> {
-    if (!this.config.apiKey) {
-      throw new Error('NVIDIA API key not configured. Set VITE_NVIDIA_API_KEY in your .env file');
+    const apiKey = options?.apiKey || this.config.apiKey;
+    if (!apiKey) {
+      throw new Error('NVIDIA API key not configured. Set VITE_NVIDIA_API_KEY in your .env file or pass it in options');
     }
 
     const request: NVIDIAChatRequest = {
@@ -97,7 +99,7 @@ export class NVIDIAAIService {
       const response = await fetch(`${this.config.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.config.apiKey}`,
+          'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(request),
@@ -126,14 +128,15 @@ export class NVIDIAAIService {
       temperature?: number;
       max_tokens?: number;
       model?: string;
+      apiKey?: string;
     }
   ): Promise<string> {
     const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [];
-    
+
     if (systemPrompt) {
       messages.push({ role: 'system', content: systemPrompt });
     }
-    
+
     messages.push({ role: 'user', content: prompt });
 
     const response = await this.chatCompletion(messages, options);
