@@ -54,6 +54,45 @@ export class LLMService {
       n8nWebhookUrl: import.meta.env.VITE_N8N_WEBHOOK_URL,
     };
     this.nvidiaService = NVIDIAAIService.getInstance();
+    this.loadSettingsFromState();
+  }
+
+  /**
+   * Load API keys from AppStateService (user settings)
+   * Falls back to environment variables if not set in settings
+   */
+  private loadSettingsFromState(): void {
+    try {
+      // Try to load from AppStateService (browser localStorage)
+      if (typeof window !== 'undefined') {
+        const savedEnv = localStorage.getItem('polymathos_env');
+        if (savedEnv) {
+          const envVars = JSON.parse(savedEnv);
+          // Update config with user-provided API keys (if available)
+          if (envVars.GEMINI_API_KEY) this.config.geminiApiKey = envVars.GEMINI_API_KEY;
+          if (envVars.GROQ_API_KEY) this.config.groqApiKey = envVars.GROQ_API_KEY;
+          if (envVars.NVIDIA_API_KEY) this.config.nvidiaApiKey = envVars.NVIDIA_API_KEY;
+        }
+      }
+    } catch (error) {
+      console.warn('Could not load settings from AppStateService:', error);
+    }
+  }
+
+  /**
+   * Get current API keys (checks AppStateService first, then env vars)
+   */
+  public getApiKeys(): {
+    geminiApiKey?: string;
+    groqApiKey?: string;
+    nvidiaApiKey?: string;
+  } {
+    this.loadSettingsFromState();
+    return {
+      geminiApiKey: this.config.geminiApiKey,
+      groqApiKey: this.config.groqApiKey,
+      nvidiaApiKey: this.config.nvidiaApiKey,
+    };
   }
 
   public static getInstance(): LLMService {

@@ -1,4 +1,3 @@
-import { LLMService } from './LLMService';
 import { PolymathUser } from '../types/polymath';
 
 export interface LearningSource {
@@ -28,11 +27,9 @@ export interface LearningModule {
 
 export class LearningPlanService {
     private static instance: LearningPlanService;
-    private llmService: LLMService;
+    private API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
-    private constructor() {
-        this.llmService = LLMService.getInstance();
-    }
+    private constructor() { }
 
     public static getInstance(): LearningPlanService {
         if (!LearningPlanService.instance) {
@@ -42,217 +39,100 @@ export class LearningPlanService {
     }
 
     /**
-     * Create a learning plan based on the selected mode
+     * Create a learning plan via the backend API
      */
     public async createLearningPlan(
         topic: string,
         mode: 'fast' | 'polymath',
         user: PolymathUser
     ): Promise<LearningPlan> {
-        if (mode === 'fast') {
-            return this.createFastPlan(topic, user);
-        } else {
-            return this.createPolyMathPlan(topic, user);
-        }
-    }
-
-    /**
-     * Fast Mode: Quick generation using LLM directly
-     */
-    private async createFastPlan(topic: string, user: PolymathUser): Promise<LearningPlan> {
-        const prompt = `Create a structured learning plan for "${topic}".
-    User Level: ${user.level}
-    Learning Style: ${user.learningStyle}
-    Goal: ${user.personalGoals?.primaryObjective || 'General Knowledge'}
-    
-    Return JSON format with:
-    - modules: array of { title, description, keyConcepts (array), activities (array), estimatedTime }
-    - sources: array of { title, url, type } (generic recommendations)`;
-
-        const response = await this.llmService.generateQuickResponse(prompt);
-
-        // Parse response (assuming LLM returns JSON or we parse it)
-        let parsedContent: any = { modules: [], sources: [] };
         try {
-            const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-                parsedContent = JSON.parse(jsonMatch[0]);
+            // Map frontend user preferences to backend request
+            const requestBody = {
+                user_id: user.id || 'default_user', // Ensure we have a user ID
+                goals: {
+                    topic: topic,
+                    subtopics: [],
+                    goal_type: 'mastery',
+                    timeframe: '1 month',
+                    daily_time_minutes: 60,
+                    target_comprehension: 85,
+                    include_feynman: true,
+                    include_memory_palace: true,
+                    include_zettelkasten: true
+                },
+                archetype: 'physicist' // Default or derive from user profile
+            };
+
+            const response = await fetch(`${this.API_URL}/api/learning/plan`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Add auth token if available
+                    // 'Authorization': `Bearer ${localStorage.getItem('polymath_auth_token')}`
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to create learning plan: ${response.statusText}`);
             }
-        } catch (e) {
-            console.warn('Failed to parse fast plan JSON', e);
-            parsedContent = {
+
+            const planData = await response.json();
+
+            // Map backend response to frontend LearningPlan interface
+            return {
+                id: planData.id,
+                topic: planData.goals.topic,
+                mode: mode,
+                modules: this.mapPhasesToModules(planData.phases),
+                sources: [], // Backend might not return sources in the same format yet, or we need to extract them
+                createdAt: new Date(planData.created_at)
+            };
+
+        } catch (error) {
+            console.error('Error creating learning plan:', error);
+            // Fallback to a basic plan if API fails
+            return {
+                id: Date.now().toString(),
+                topic,
+                mode,
                 modules: [
                     {
                         title: 'Introduction to ' + topic,
-                        description: 'Core concepts and fundamentals',
-                        keyConcepts: ['Basics', 'History', 'Key Terms'],
-                        activities: ['Read overview', 'Watch intro video'],
+                        description: 'Core concepts and fundamentals (Offline Fallback)',
+                        keyConcepts: ['Basics', 'History'],
+                        activities: ['Read overview'],
                         estimatedTime: '30 mins'
                     }
                 ],
-                sources: []
+                sources: [],
+                createdAt: new Date()
             };
         }
+    }
 
-        return {
-            id: Date.now().toString(),
-            topic,
-            mode: 'fast',
-            modules: parsedContent.modules || [],
-            sources: parsedContent.sources || [],
-            createdAt: new Date()
-        };
+    private mapPhasesToModules(phases: any[]): LearningModule[] {
+        return phases.map(phase => ({
+            title: phase.name,
+            description: phase.description,
+            keyConcepts: phase.objectives || [],
+            activities: phase.activities || [],
+            estimatedTime: `${phase.estimated_days} days`
+        }));
     }
 
     /**
-     * PolyMath Mode: Deep research and comprehensive planning via n8n and MCPs
-     */
-    private async createPolyMathPlan(topic: string, user: PolymathUser): Promise<LearningPlan> {
-        // 1. Initialize Services
-        const mcpService = (await import('./MCPService')).MCPService.getInstance();
-        let sources: LearningSource[] = [];
-        let researchSummary = '';
-
-        // 2. Conduct Deep Research via MCPs
-        try {
-            console.log('Starting Deep Research for:', topic);
-            const deepResearch = await mcpService.conductDeepResearch(topic);
-            researchSummary = deepResearch.summary;
-
-            // Convert MCP results to LearningSources
-            sources = deepResearch.sources.map(s => ({
-                title: s.title,
-                url: s.url || '',
-                type: 'article', // Default to article, could refine based on source
-                description: s.summary
-            }));
-        } catch (e) {
-            console.warn('MCP Research failed, falling back to basic search', e);
-            // Fallback to basic search
-            sources = await this.findLearningSources(topic);
-        }
-
-        // 3. Try to create a custom n8n workflow for this topic
-        try {
-            const workflowName = `PolyMath Learning: ${topic}`;
-            // Simple workflow template: Webhook -> LLM -> Respond
-            const nodes = [
-                {
-                    "parameters": { "path": "webhook", "responseMode": "lastNode", "options": {} },
-                    "name": "Webhook",
-                    "type": "n8n-nodes-base.webhook",
-                    "typeVersion": 1,
-                    "position": [100, 300]
-                },
-                {
-                    "parameters": {
-                        "content": `Generate a deep learning plan for ${topic}. 
-                        Research Context: ${researchSummary}
-                        User context: ${JSON.stringify(user.personalGoals)}`
-                    },
-                    "name": "AI Agent",
-                    "type": "n8n-nodes-base.agent", // Hypothetical node or use HTTP Request to LLM
-                    "typeVersion": 1,
-                    "position": [300, 300]
-                }
-            ];
-            const connections = { "Webhook": { "main": [[{ "node": "AI Agent", "type": "main", "index": 0 }]] } };
-
-            const n8n = (await import('./N8NService')).N8NService;
-            const workflow = await n8n.createWorkflow(workflowName, nodes, connections);
-
-            if (workflow.success) {
-                console.log('Created n8n workflow:', workflow.workflowId);
-            }
-        } catch (e) {
-            console.warn('Failed to create n8n workflow, falling back to internal engine', e);
-        }
-
-        // 4. Analyze Sources & Generate Plan (Internal LLM fallback/augmentation)
-        const prompt = `Create a comprehensive "PolyMath" learning plan for "${topic}" based on these resources:
-    ${sources.map(s => `- ${s.title} (${s.type}): ${s.url}`).join('\n')}
-    
-    Research Summary: ${researchSummary}
-    
-    User Profile:
-    - Dopamine Sensitivity: ${user.dopamineProfile?.rewardSensitivity || 'Moderate'}
-    - Meta-Learning: ${user.metaLearningSkills ? 'Assessed' : 'Unknown'}
-    
-    Requirements:
-    - Deep dive into first principles
-    - Cross-disciplinary connections
-    - Project-based application
-    
-    Return JSON format with:
-    - modules: array of { title, description, keyConcepts, activities, estimatedTime }`;
-
-        const response = await this.llmService.generateLessonContent({
-            topic,
-            userProfile: user,
-            context: prompt
-        });
-
-        let modules: LearningModule[] = [];
-        try {
-            const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-                const parsed = JSON.parse(jsonMatch[0]);
-                modules = parsed.modules || [];
-            }
-        } catch (e) {
-            console.warn('Failed to parse PolyMath plan JSON', e);
-            modules = [
-                {
-                    title: 'Deep Dive into ' + topic,
-                    description: 'Advanced analysis and application',
-                    keyConcepts: ['First Principles', 'System Architecture', 'Advanced Patterns'],
-                    activities: ['Build a project', 'Teach a concept', 'Analyze case studies'],
-                    estimatedTime: '2 hours'
-                }
-            ];
-        }
-
-        return {
-            id: Date.now().toString(),
-            topic,
-            mode: 'polymath',
-            modules,
-            sources,
-            createdAt: new Date()
-        };
-    }
-
-    /**
-     * Find high-quality learning sources
+     * Find high-quality learning sources (Placeholder or API call)
      */
     public async findLearningSources(topic: string): Promise<LearningSource[]> {
-        const prompt = `List 5 high-quality, real learning resources for "${topic}".
-    Include: 1 Book, 1 Video/Course, 1 Article/Paper, 2 others.
-    Return JSON: [{ title, url, type, author, description }]`;
-
-        const response = await this.llmService.generateQuickResponse(prompt);
-
-        try {
-            const jsonMatch = response.content.match(/\[[\s\S]*\]/);
-            if (jsonMatch) {
-                return JSON.parse(jsonMatch[0]);
-            }
-        } catch (e) {
-            // Fallback
-        }
-
+        // This could also be an API call if implemented on backend
         return [
             {
                 title: `${topic}: The Definitive Guide`,
                 url: `https://example.com/learn/${topic.replace(/\s+/g, '-').toLowerCase()}`,
                 type: 'article',
                 description: 'Comprehensive overview of core concepts.'
-            },
-            {
-                title: `Mastering ${topic}`,
-                url: 'https://youtube.com/results?search_query=' + encodeURIComponent(topic),
-                type: 'video',
-                description: 'Deep dive video series.'
             }
         ];
     }

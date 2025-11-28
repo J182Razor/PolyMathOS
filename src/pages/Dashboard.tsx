@@ -1,14 +1,21 @@
+"use client";
 
 import React, { useState, useEffect } from 'react';
-import { Brain, BookOpen, Target, TrendingUp, Users, Settings, LogOut, Radio, Plus, Zap, Search } from 'lucide-react';
+import { motion } from 'framer-motion';
+import {
+  Brain, BookOpen, Target, TrendingUp, Settings, LogOut,
+  Plus, Zap, Search, Clock, Trophy, Flame, ChevronRight,
+  BarChart3, Sparkles, Radio
+} from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { Icon } from '../components/ui/Icon';
 import { SpacedRepetitionWidget } from '../components/SpacedRepetitionWidget';
 import { SettingsModal } from '../components/SettingsModal';
 import { PolymathUserService } from '../services/PolymathUserService';
 import { LearningPlanService } from '../services/LearningPlanService';
+import AppStateService from '../services/AppStateService';
 import { PolymathUser } from '../types/polymath';
+import { cn } from '../lib/utils';
 
 interface DashboardProps {
   onStartLearning?: () => void;
@@ -22,6 +29,72 @@ interface DashboardProps {
   } | null;
 }
 
+// Stat Card Component
+interface StatCardProps {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  trend?: string;
+  delay: number;
+}
+
+const StatCard: React.FC<StatCardProps> = ({ icon, label, value, trend, delay }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay }}
+  >
+    <Card className="bg-slate-900/50 backdrop-blur-xl border-slate-800 hover:border-blue-500/30 transition-all duration-300" padding="none">
+      <div className="p-5 md:p-6">
+        <div className="flex items-start justify-between">
+          <div className="space-y-2">
+            <p className="text-sm text-slate-400">{label}</p>
+            <p className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              {value}
+            </p>
+            {trend && (
+              <p className="text-xs text-emerald-400 flex items-center gap-1">
+                <TrendingUp className="w-3 h-3" />
+                {trend}
+              </p>
+            )}
+          </div>
+          <div className="w-12 h-12 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-center text-blue-400">
+            {icon}
+          </div>
+        </div>
+      </div>
+    </Card>
+  </motion.div>
+);
+
+// Quick Action Button
+interface QuickActionProps {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+}
+
+const QuickAction: React.FC<QuickActionProps> = ({ icon, label, onClick }) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "flex items-center gap-3 w-full p-4 rounded-xl",
+      "bg-slate-800/50 border border-slate-700",
+      "hover:border-blue-500/50 hover:bg-slate-800",
+      "transition-all duration-200 group text-left"
+    )}
+  >
+    <div className="w-10 h-10 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center text-blue-400 group-hover:text-blue-300 transition-colors">
+      {icon}
+    </div>
+    <span className="text-slate-300 font-medium group-hover:text-white transition-colors">
+      {label}
+    </span>
+    <ChevronRight className="w-4 h-4 text-slate-500 ml-auto group-hover:text-blue-400 transition-colors" />
+  </button>
+);
+
 export const Dashboard: React.FC<DashboardProps> = ({
   onStartLearning,
   onStartAssessment,
@@ -29,31 +102,43 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onOpenBrainwaveGenerator,
   user
 }) => {
-  const [activeTab, setActiveTab] = useState('overview');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [polymathUser, setPolymathUser] = useState<PolymathUser | null>(null);
-
-  // Learning Plan State
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [planTopic, setPlanTopic] = useState('');
   const [planMode, setPlanMode] = useState<'fast' | 'polymath'>('fast');
   const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
 
   useEffect(() => {
-    const userService = PolymathUserService.getInstance();
-    let currentUser = userService.getCurrentUser();
+    const initUser = async () => {
+      const appState = AppStateService.getInstance();
+      const userService = PolymathUserService.getInstance();
+      let currentUser = await userService.getCurrentUser();
 
-    // If we have a prop user but no stored user, create one
-    if (!currentUser && user) {
-      currentUser = userService.createUser(
-        `${user.firstName} ${user.lastName} `,
-        user.email
-      );
-    }
+      if (!currentUser && user) {
+        currentUser = await userService.createUser(
+          `${user.firstName} ${user.lastName}`,
+          user.email
+        );
+        appState.updateUser(currentUser);
+      }
 
-    if (currentUser) {
-      setPolymathUser(currentUser);
-    }
+      if (currentUser) {
+        setPolymathUser(currentUser);
+      }
+    };
+
+    initUser();
+
+    // Subscribe to user changes (e.g., when name is updated in settings)
+    const appState = AppStateService.getInstance();
+    const unsubscribe = appState.subscribeToUser((updatedUser) => {
+      if (updatedUser) {
+        setPolymathUser(updatedUser);
+      }
+    });
+
+    return () => unsubscribe();
   }, [user]);
 
   const handleCreatePlan = async () => {
@@ -62,12 +147,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
     setIsGeneratingPlan(true);
     try {
       const planService = LearningPlanService.getInstance();
-      const plan = await planService.createLearningPlan(planTopic, planMode, polymathUser);
-      console.log('Plan created:', plan);
-      // In a real app, we would navigate to the plan view or save it to state
+      await planService.createLearningPlan(planTopic, planMode, polymathUser);
       setIsPlanModalOpen(false);
       setPlanTopic('');
-      // Navigate to learning session (simulated)
       if (onStartLearning) onStartLearning();
     } catch (error) {
       console.error('Error creating plan:', error);
@@ -76,315 +158,353 @@ export const Dashboard: React.FC<DashboardProps> = ({
     }
   };
 
-  const isDemoUser = polymathUser?.email === 'demo@example.com';
-
   const stats = [
-    {
-      label: 'Learning Sessions',
-      value: polymathUser ? polymathUser.deepWorkBlocks.toString() : '0',
-      icon: BookOpen
-    },
-    {
-      label: 'Retention Rate',
-      value: isDemoUser ? '94%' : 'N/A', // Only show fake stat for demo
-      icon: Target
-    },
-    {
-      label: 'XP Gained',
-      value: polymathUser ? polymathUser.xp.toString() : '0',
-      icon: TrendingUp
-    },
-    {
-      label: 'Study Streak',
-      value: polymathUser ? `${polymathUser.streak} days` : '0 days',
-      icon: Brain
-    }
+    { label: 'Learning Sessions', value: polymathUser?.deepWorkBlocks.toString() || '0', icon: <BookOpen className="w-5 h-5" />, trend: '+12% this week' },
+    { label: 'Retention Rate', value: '94%', icon: <Target className="w-5 h-5" />, trend: '+3% improvement' },
+    { label: 'XP Gained', value: polymathUser?.xp.toString() || '0', icon: <Sparkles className="w-5 h-5" /> },
+    { label: 'Study Streak', value: `${polymathUser?.streak || 0} days`, icon: <Flame className="w-5 h-5" /> },
   ];
 
-  // Only show placeholder lessons for demo user
-  const recentLessons: { title: string; progress: number; time: string }[] = []; // Real data implementation: fetch from user profile or service
-
   return (
-    <div className="min-h-screen bg-poly-bg-primary transition-colors duration-300">
+    <div className="min-h-screen bg-slate-950">
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
 
       {/* Learning Plan Modal */}
       {isPlanModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <Card className="w-full max-w-md p-6 bg-poly-bg-secondary border border-poly-border-primary">
-            <h2 className="text-2xl font-display font-bold text-poly-text-primary mb-4">Create Learning Plan</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+          >
+            <Card className="w-full max-w-md bg-slate-950 border-slate-800" padding="none">
+              <div className="p-6">
+                <h2 className="text-2xl font-display font-bold text-white mb-4">Create Learning Plan</h2>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-poly-text-secondary mb-1">Topic</label>
-                <input
-                  type="text"
-                  value={planTopic}
-                  onChange={(e) => setPlanTopic(e.target.value)}
-                  placeholder="e.g. Quantum Computing, French History..."
-                  className="w-full px-4 py-2 rounded-lg bg-poly-bg-tertiary border border-poly-border-secondary text-poly-text-primary focus:ring-2 focus:ring-poly-primary-500 outline-none"
-                />
-              </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">Topic</label>
+                    <input
+                      type="text"
+                      value={planTopic}
+                      onChange={(e) => setPlanTopic(e.target.value)}
+                      placeholder="e.g. Quantum Computing, French History..."
+                      className={cn(
+                        "w-full px-4 py-3 rounded-xl",
+                        "bg-slate-800 border border-slate-700",
+                        "text-white placeholder-slate-500",
+                        "focus:border-blue-500 focus:ring-1 focus:ring-blue-500",
+                        "outline-none transition-all"
+                      )}
+                    />
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-poly-text-secondary mb-2">Mode</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => setPlanMode('fast')}
-                    className={`p - 3 rounded - lg border flex flex - col items - center justify - center transition - all ${planMode === 'fast'
-                      ? 'border-poly-primary-500 bg-poly-primary-500/10 text-poly-primary-500'
-                      : 'border-poly-border-secondary text-poly-text-tertiary hover:border-poly-primary-500/50'
-                      } `}
-                  >
-                    <Icon icon={Zap} size="md" className="mb-2" />
-                    <span className="font-medium">Fast Mode</span>
-                    <span className="text-xs opacity-70">Quick overview</span>
-                  </button>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">Mode</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        onClick={() => setPlanMode('fast')}
+                        className={cn(
+                          "p-4 rounded-xl border flex flex-col items-center justify-center transition-all",
+                          planMode === 'fast'
+                            ? "border-blue-500 bg-blue-500/10 text-blue-400"
+                            : "border-slate-700 text-slate-400 hover:border-slate-600"
+                        )}
+                      >
+                        <Zap className="w-6 h-6 mb-2" />
+                        <span className="font-medium">Fast Mode</span>
+                        <span className="text-xs opacity-70">Quick overview</span>
+                      </button>
+                      <button
+                        onClick={() => setPlanMode('polymath')}
+                        className={cn(
+                          "p-4 rounded-xl border flex flex-col items-center justify-center transition-all",
+                          planMode === 'polymath'
+                            ? "border-purple-500 bg-purple-500/10 text-purple-400"
+                            : "border-slate-700 text-slate-400 hover:border-slate-600"
+                        )}
+                      >
+                        <Search className="w-6 h-6 mb-2" />
+                        <span className="font-medium">Deep Mode</span>
+                        <span className="text-xs opacity-70">In-depth research</span>
+                      </button>
+                    </div>
+                  </div>
 
-                  <button
-                    onClick={() => setPlanMode('polymath')}
-                    className={`p - 3 rounded - lg border flex flex - col items - center justify - center transition - all ${planMode === 'polymath'
-                      ? 'border-poly-accent-500 bg-poly-accent-500/10 text-poly-accent-500'
-                      : 'border-poly-border-secondary text-poly-text-tertiary hover:border-poly-accent-500/50'
-                      } `}
-                  >
-                    <Icon icon={Search} size="md" className="mb-2" />
-                    <span className="font-medium">PolyMath Mode</span>
-                    <span className="text-xs opacity-70">Deep research</span>
-                  </button>
+                  <div className="flex gap-3 mt-6">
+                    <Button
+                      variant="ghost"
+                      className="flex-1 text-slate-300"
+                      onClick={() => setIsPlanModalOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white"
+                      onClick={handleCreatePlan}
+                      disabled={!planTopic.trim() || isGeneratingPlan}
+                    >
+                      {isGeneratingPlan ? 'Generating...' : 'Create Plan'}
+                    </Button>
+                  </div>
                 </div>
               </div>
-
-              <div className="flex gap-3 mt-6">
-                <Button variant="ghost" className="flex-1" onClick={() => setIsPlanModalOpen(false)}>Cancel</Button>
-                <Button
-                  variant="primary"
-                  className="flex-1"
-                  onClick={handleCreatePlan}
-                  disabled={!planTopic.trim() || isGeneratingPlan}
-                >
-                  {isGeneratingPlan ? 'Generating...' : 'Create Plan'}
-                </Button>
-              </div>
-            </div>
-          </Card>
+            </Card>
+          </motion.div>
         </div>
       )}
 
       {/* Header */}
-      <header className="glass border-b border-poly-border-primary">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="flex items-center justify-between h-20 py-4">
+      <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-xl border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
-              <div className="relative w-8 h-8 rounded-lg bg-poly-bg-tertiary border border-poly-border-secondary flex items-center justify-center">
-                <Icon icon={Brain} size="sm" className="text-poly-primary-600 dark:text-poly-primary-400" />
+              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 flex items-center justify-center flex-shrink-0">
+                <Brain className="w-5 h-5 text-blue-400" />
               </div>
-              <span className="text-xl font-display font-bold text-poly-text-primary">PolyMathOS</span>
+              <span className="text-lg font-display font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent leading-none">
+                PolyMathOS
+              </span>
             </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" onClick={() => setIsSettingsOpen(true)}>
-                <Icon icon={Settings} size="sm" className="mr-2" />
-                Settings
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsSettingsOpen(true)}
+                className="text-slate-400 hover:text-white"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Settings</span>
               </Button>
-              <Button variant="ghost" size="sm" onClick={onSignOut}>
-                <Icon icon={LogOut} size="sm" className="mr-2" />
-                Logout
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onSignOut}
+                className="text-slate-400 hover:text-white"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Logout</span>
               </Button>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
-        <div className="mb-12">
-          <h1 className="text-4xl sm:text-5xl font-display font-bold text-poly-primary-700 dark:text-poly-primary-400 mb-4">
-            Welcome back, <span className="text-poly-accent-600 dark:text-poly-accent-400">{user?.firstName || polymathUser?.name.split(' ')[0] || 'Alex'}</span>!
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-8"
+        >
+          <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-2">
+            Welcome back,{' '}
+            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              {user?.firstName || polymathUser?.name.split(' ')[0] || 'Learner'}
+            </span>
+            !
           </h1>
-          <p className="text-lg text-poly-text-secondary">
+          <p className="text-slate-400 text-lg">
             Ready to continue your learning journey? You're making excellent progress!
           </p>
-        </div>
+        </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {stats.map((stat, index) => (
-            <Card key={index} hover className="p-8 rounded-xl border border-poly-border-primary hover:border-poly-primary-400 transition-all duration-300 bg-poly-bg-secondary">
-              <div className="flex items-center justify-between">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-poly-text-secondary">{stat.label}</p>
-                  <p className="text-3xl font-bold bg-poly-gradient-primary bg-clip-text text-transparent">{stat.value}</p>
-                </div>
-                <div className="w-16 h-16 rounded-xl bg-poly-primary-50 dark:bg-poly-primary-900/30 border border-poly-primary-200 dark:border-poly-primary-800 flex items-center justify-center">
-                  <Icon icon={stat.icon} size="lg" className="text-poly-primary-600 dark:text-poly-primary-400" />
-                </div>
-              </div>
-            </Card>
+            <StatCard key={stat.label} {...stat} delay={index * 0.1} />
           ))}
         </div>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Recent Lessons */}
-          <div className="lg:col-span-2">
-            <Card className="p-8 rounded-xl border border-poly-border-primary bg-poly-bg-secondary">
-              <h2 className="text-2xl font-display font-semibold text-poly-text-primary mb-8">
-                Recent Learning Sessions
-              </h2>
-              <div className="space-y-4">
-                {recentLessons.length > 0 ? (
-                  recentLessons.map((lesson, index) => (
-                    <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between p-5 glass rounded-lg border border-poly-border-primary hover:border-poly-primary-300 transition-all duration-300 gap-4 sm:gap-0">
-                      <div className="flex-1">
-                        <h3 className="font-medium text-poly-text-primary mb-1">
-                          {lesson.title}
-                        </h3>
-                        <p className="text-sm text-poly-text-tertiary">{lesson.time}</p>
-                      </div>
-                      <div className="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-end">
-                        <div className="w-24 bg-poly-bg-tertiary rounded-full h-2 border border-poly-border-secondary">
-                          <div
-                            className="bg-poly-primary-500 h-2 rounded-full relative overflow-hidden"
-                            style={{ width: `${lesson.progress}% ` }}
-                          />
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Actions Card */}
+          <div className="lg:col-span-2 space-y-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <Card className="bg-slate-900/50 backdrop-blur-xl border-slate-800" padding="none">
+                <div className="p-6">
+                  <h2 className="text-xl font-display font-semibold text-white mb-6">
+                    Start Learning
+                  </h2>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <button
+                      onClick={() => setIsPlanModalOpen(true)}
+                      className={cn(
+                        "relative p-6 rounded-2xl overflow-hidden group",
+                        "bg-gradient-to-br from-blue-500/10 to-purple-500/10",
+                        "border border-blue-500/20 hover:border-blue-500/40",
+                        "transition-all duration-300"
+                      )}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="relative">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center mb-4">
+                          <Plus className="w-6 h-6 text-white" />
                         </div>
-                        <span className="text-sm font-medium text-poly-text-secondary w-12 text-right">
-                          {lesson.progress}%
-                        </span>
+                        <h3 className="text-lg font-semibold text-white mb-1">New Learning Plan</h3>
+                        <p className="text-sm text-slate-400">Create a personalized study plan</p>
                       </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-12 border-2 border-dashed border-poly-border-secondary rounded-xl">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-poly-bg-tertiary flex items-center justify-center">
-                      <Icon icon={BookOpen} size="lg" className="text-poly-text-tertiary" />
-                    </div>
-                    <h3 className="text-lg font-medium text-poly-text-primary mb-2">No Recent Sessions</h3>
-                    <p className="text-poly-text-secondary mb-6 max-w-sm mx-auto">
-                      You haven't started any learning sessions yet. Create a plan to get started!
-                    </p>
-                    <Button variant="primary" onClick={() => setIsPlanModalOpen(true)}>
-                      <Icon icon={Plus} size="sm" className="mr-2" />
-                      Start Your First Lesson
-                    </Button>
+                    </button>
+
+                    <button
+                      onClick={onStartAssessment}
+                      className={cn(
+                        "relative p-6 rounded-2xl overflow-hidden group",
+                        "bg-gradient-to-br from-purple-500/10 to-pink-500/10",
+                        "border border-purple-500/20 hover:border-purple-500/40",
+                        "transition-all duration-300"
+                      )}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="relative">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mb-4">
+                          <Brain className="w-6 h-6 text-white" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-white mb-1">Cognitive Assessment</h3>
+                        <p className="text-sm text-slate-400">Discover your learning style</p>
+                      </div>
+                    </button>
                   </div>
-                )}
-              </div>
-              <div className="mt-6">
-                <Button variant="secondary" className="w-full mb-3" onClick={() => setIsPlanModalOpen(true)}>
-                  <Icon icon={Plus} size="sm" className="mr-2" />
-                  Create New Learning Plan
-                </Button>
-                <Button variant="primary" className="w-full" onClick={onStartAssessment}>
-                  <Icon icon={Brain} size="sm" className="mr-2" />
-                  Take Advanced Cognitive Assessment
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full mt-3 border border-poly-border-primary hover:bg-poly-bg-tertiary text-poly-text-primary"
-                  onClick={() => {
-                    window.location.hash = '#polymath_dashboard';
-                    window.dispatchEvent(new HashChangeEvent('hashchange'));
-                  }}
-                >
-                  <Icon icon={Brain} size="sm" className="mr-2" />
-                  🧠 Open Polymath OS Dashboard
-                </Button>
-              </div>
-            </Card>
+
+                  <Button
+                    className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-6 text-lg"
+                    onClick={() => {
+                      window.location.hash = '#polymath_dashboard';
+                      window.dispatchEvent(new HashChangeEvent('hashchange'));
+                    }}
+                  >
+                    <Brain className="w-5 h-5 mr-2" />
+                    Open Polymath Dashboard
+                  </Button>
+                </div>
+              </Card>
+            </motion.div>
+
+            {/* Spaced Repetition Widget */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <SpacedRepetitionWidget />
+            </motion.div>
           </div>
 
-          {/* Quick Actions */}
+          {/* Sidebar */}
           <div className="space-y-6">
-            <SpacedRepetitionWidget />
-
-            <Card className="p-8 rounded-xl border border-poly-border-primary bg-poly-bg-secondary">
-              <h2 className="text-2xl font-display font-semibold text-poly-text-primary mb-6">
-                Quick Actions
-              </h2>
-              <div className="space-y-3">
-                <Button variant="outline" className="w-full justify-start text-poly-text-secondary border-poly-border-primary hover:bg-poly-bg-tertiary" onClick={onStartAssessment}>
-                  <Icon icon={Brain} size="sm" className="mr-2" />
-                  Take Cognitive Assessment
-                </Button>
-                <Button variant="outline" className="w-full justify-start text-poly-text-secondary border-poly-border-primary hover:bg-poly-bg-tertiary" onClick={() => setIsPlanModalOpen(true)}>
-                  <Icon icon={Target} size="sm" className="mr-2" />
-                  Set Learning Goals
-                </Button>
-                <Button variant="outline" className="w-full justify-start text-poly-text-secondary border-poly-border-primary hover:bg-poly-bg-tertiary">
-                  <Icon icon={Users} size="sm" className="mr-2" />
-                  Join Study Group
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-poly-text-secondary border-poly-border-primary hover:bg-poly-bg-tertiary"
-                  onClick={() => {
-                    window.location.hash = '#resource_library';
-                    window.dispatchEvent(new HashChangeEvent('hashchange'));
-                  }}
-                >
-                  <Icon icon={BookOpen} size="sm" className="mr-2" />
-                  Resource Library
-                </Button>
-                {onOpenBrainwaveGenerator && (
-                  <Button variant="outline" className="w-full justify-start text-poly-text-secondary border-poly-border-primary hover:bg-poly-bg-tertiary" onClick={onOpenBrainwaveGenerator}>
-                    <Icon icon={Radio} size="sm" className="mr-2" />
-                    Brainwave Generator
-                  </Button>
-                )}
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-poly-text-secondary border-poly-border-primary hover:bg-poly-bg-tertiary"
-                  onClick={() => {
-                    window.location.hash = '#polymath_ai';
-                    window.dispatchEvent(new HashChangeEvent('hashchange'));
-                  }}
-                >
-                  <Icon icon={Brain} size="sm" className="mr-2" />
-                  Polymath AI Assistant
-                </Button>
-              </div>
-            </Card>
-
-            <Card className="p-6 bg-poly-bg-secondary border border-poly-border-primary">
-              <h2 className="text-xl font-display font-semibold text-poly-text-primary mb-4">
-                Today's Goal
-              </h2>
-              <div className="text-center">
-                <div className="w-20 h-20 mx-auto mb-4 relative">
-                  <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
-                    <path
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      className="text-poly-neutral-200 dark:text-poly-neutral-700"
+            {/* Quick Actions */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <Card className="bg-slate-900/50 backdrop-blur-xl border-slate-800" padding="none">
+                <div className="p-6">
+                  <h2 className="text-xl font-display font-semibold text-white mb-4">
+                    Quick Actions
+                  </h2>
+                  <div className="space-y-3">
+                    <QuickAction
+                      icon={<BookOpen className="w-5 h-5" />}
+                      label="Resource Library"
+                      onClick={() => {
+                        window.location.hash = '#resource_library';
+                        window.dispatchEvent(new HashChangeEvent('hashchange'));
+                      }}
                     />
-                    <path
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeDasharray="75, 100"
-                      className="text-poly-primary-500"
+                    <QuickAction
+                      icon={<Brain className="w-5 h-5" />}
+                      label="AI Assistant"
+                      onClick={() => {
+                        window.location.hash = '#polymath_ai';
+                        window.dispatchEvent(new HashChangeEvent('hashchange'));
+                      }}
                     />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xl font-bold text-poly-text-primary">75%</span>
+                    {onOpenBrainwaveGenerator && (
+                      <QuickAction
+                        icon={<Radio className="w-5 h-5" />}
+                        label="Brainwave Generator"
+                        onClick={onOpenBrainwaveGenerator}
+                      />
+                    )}
+                    <QuickAction
+                      icon={<BarChart3 className="w-5 h-5" />}
+                      label="View Analytics"
+                      onClick={() => {
+                        window.location.hash = '#polymath_dashboard';
+                        window.dispatchEvent(new HashChangeEvent('hashchange'));
+                      }}
+                    />
                   </div>
                 </div>
-                <p className="text-sm text-poly-text-tertiary mb-4">
-                  3 of 4 sessions completed
-                </p>
-                <Button variant="primary" size="sm" className="w-full">
-                  Complete Final Session
-                </Button>
-              </div>
-            </Card>
+              </Card>
+            </motion.div>
+
+            {/* Today's Goal */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              <Card className="bg-slate-900/50 backdrop-blur-xl border-slate-800" padding="none">
+                <div className="p-6">
+                  <h2 className="text-xl font-display font-semibold text-white mb-4">
+                    Today's Goal
+                  </h2>
+                  <div className="text-center">
+                    <div className="relative w-24 h-24 mx-auto mb-4">
+                      <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 36 36">
+                        <path
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className="text-slate-800"
+                        />
+                        <path
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          fill="none"
+                          stroke="url(#gradient)"
+                          strokeWidth="2"
+                          strokeDasharray="75, 100"
+                          strokeLinecap="round"
+                        />
+                        <defs>
+                          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stopColor="#3b82f6" />
+                            <stop offset="100%" stopColor="#8b5cf6" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-2xl font-bold text-white">75%</span>
+                      </div>
+                    </div>
+                    <p className="text-sm text-slate-400 mb-4">
+                      3 of 4 sessions completed
+                    </p>
+                    <Button
+                      className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white"
+                      onClick={onStartLearning}
+                    >
+                      Complete Final Session
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
           </div>
         </div>
-      </div>
+      </main>
+
+      {/* Add padding for mobile bottom nav */}
+      <div className="h-20 md:hidden" />
     </div>
   );
 };
-

@@ -17,6 +17,7 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime
 import uuid
 import logging
+from ..core.enhanced_system import genius_system
 
 logger = logging.getLogger(__name__)
 
@@ -84,23 +85,6 @@ class QuizResponse(BaseModel):
 class StartFeynmanRequest(BaseModel):
     concept: str
     topic: str
-    target_audience: str = "child"  # child, teenager, adult_novice, expert_other_field
-
-class SubmitExplanationRequest(BaseModel):
-    session_id: str
-    explanation: str
-
-class AnswerQuestionRequest(BaseModel):
-    session_id: str
-    iteration_id: str
-    question_id: str
-    response: str
-
-class FeynmanSessionResponse(BaseModel):
-    id: str
-    concept: str
-    target_audience: str
-    status: str
     iterations: List[Dict[str, Any]]
     created_at: datetime
 
@@ -271,7 +255,11 @@ async def create_learning_plan(request: CreateLearningPlanRequest):
             "created_at": now
         }
         
-        learning_plans_db[plan_id] = plan
+        # Save to database
+        saved = genius_system.database.save_learning_plan(plan)
+        if not saved:
+            logger.warning(f"Failed to save learning plan {plan_id} to database, using in-memory fallback")
+            learning_plans_db[plan_id] = plan
         
         return LearningPlanResponse(**plan)
         
@@ -283,7 +271,13 @@ async def create_learning_plan(request: CreateLearningPlanRequest):
 @router.get("/plan/{plan_id}", response_model=LearningPlanResponse)
 async def get_learning_plan(plan_id: str):
     """Get a specific learning plan"""
-    plan = learning_plans_db.get(plan_id)
+    # Try database first
+    plan = genius_system.database.get_learning_plan(plan_id)
+    
+    # Fallback to in-memory if not found (or if DB failed)
+    if not plan:
+        plan = learning_plans_db.get(plan_id)
+        
     if not plan:
         raise HTTPException(status_code=404, detail="Learning plan not found")
     return LearningPlanResponse(**plan)
@@ -292,7 +286,13 @@ async def get_learning_plan(plan_id: str):
 @router.get("/plans/{user_id}")
 async def get_user_learning_plans(user_id: str):
     """Get all learning plans for a user"""
-    plans = [p for p in learning_plans_db.values() if p["user_id"] == user_id]
+    # Try database
+    plans = genius_system.database.get_user_learning_plans(user_id)
+    
+    # If empty, check in-memory (legacy/fallback)
+    if not plans:
+        plans = [p for p in learning_plans_db.values() if p["user_id"] == user_id]
+        
     return {"plans": plans}
 
 
@@ -357,7 +357,11 @@ async def generate_quiz(request: GenerateQuizRequest):
             "created_at": now
         }
         
-        quizzes_db[quiz_id] = quiz
+        # Save to database
+        saved = genius_system.database.save_quiz(quiz)
+        if not saved:
+            logger.warning(f"Failed to save quiz {quiz_id} to database, using in-memory fallback")
+            quizzes_db[quiz_id] = quiz
         
         return QuizResponse(**quiz)
         
@@ -369,7 +373,13 @@ async def generate_quiz(request: GenerateQuizRequest):
 @router.post("/quiz/submit")
 async def submit_quiz(request: SubmitQuizRequest):
     """Submit quiz answers and get feedback"""
-    quiz = quizzes_db.get(request.quiz_id)
+    # Try database first
+    quiz = genius_system.database.get_quiz(request.quiz_id)
+    
+    # Fallback
+    if not quiz:
+        quiz = quizzes_db.get(request.quiz_id)
+        
     if not quiz:
         raise HTTPException(status_code=404, detail="Quiz not found")
     
@@ -407,45 +417,17 @@ async def submit_quiz(request: SubmitQuizRequest):
     }
     
     # Store attempt
-    if request.user_id not in quiz_attempts_db:
-        quiz_attempts_db[request.user_id] = []
-    quiz_attempts_db[request.user_id].append(attempt)
+    saved = genius_system.database.save_quiz_attempt(attempt)
+    if not saved:
+        if request.user_id not in quiz_attempts_db:
+            quiz_attempts_db[request.user_id] = []
+        quiz_attempts_db[request.user_id].append(attempt)
     
     return attempt
 
 
 # ============ Feynman Technique Endpoints ============
 
-@router.post("/feynman/start", response_model=FeynmanSessionResponse)
-async def start_feynman_session(request: StartFeynmanRequest):
-    """Start a new Feynman Technique session"""
-    session_id = str(uuid.uuid4())
-    now = datetime.now()
-    
-    session = {
-        "id": session_id,
-        "concept": request.concept,
-        "topic": request.topic,
-        "target_audience": request.target_audience,
-        "iterations": [],
-        "status": "in_progress",
-        "created_at": now
-    }
-    
-    feynman_sessions_db[session_id] = session
-    
-    return FeynmanSessionResponse(**session)
-
-
-@router.post("/feynman/analyze")
-async def analyze_feynman_explanation(request: SubmitExplanationRequest):
-    """Analyze a Feynman explanation"""
-    session = feynman_sessions_db.get(request.session_id)
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
-    
-    try:
-        from ..modules.swarms_agentic_system import agentic_system
         
         result = await agentic_system.process_agentically(
             task_type="feynman_technique",
@@ -506,6 +488,36 @@ async def get_feynman_session(session_id: str):
     return FeynmanSessionResponse(**session)
 
 
+@router.post("/feynman/question/response")
+async def submit_question_response(request: SubmitQuestionResponseRequest):
+    """Submit a response to a novice question"""
+    # Try database first
+    session = genius_system.database.get_feynman_session(request.session_id)
+    
+    # Fallback
+    if not session:
+        session = feynman_sessions_db.get(request.session_id)
+        
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+        
+    # Find iteration and question (This logic requires session to have full structure)
+    # Since DB might return simplified structure, we might need to handle this.
+    # For now assuming session structure matches.
+    
+    # Mock logic for now as we don't have full iteration structure in DB get yet?
+    # Wait, get_feynman_session returns 'iterations' as JSONB, so it should be fine.
+    
+    # In a real implementation we would update the specific question response
+    # and maybe trigger an LLM analysis.
+    
+    return {
+        "feedback": "That makes sense! (Backend Mock)",
+        "addressedGap": True,
+        "followUpQuestion": None
+    }
+
+
 # ============ Memory Palace Endpoints ============
 
 @router.post("/palace/create", response_model=PalaceResponse)
@@ -550,7 +562,11 @@ async def create_memory_palace(request: CreatePalaceRequest):
         "created_at": now
     }
     
-    memory_palaces_db[palace_id] = palace
+    # Save to database
+    saved = genius_system.database.save_memory_palace(palace)
+    if not saved:
+        logger.warning(f"Failed to save Memory Palace {palace_id} to database, using in-memory fallback")
+        memory_palaces_db[palace_id] = palace
     
     return PalaceResponse(**palace)
 
@@ -558,7 +574,13 @@ async def create_memory_palace(request: CreatePalaceRequest):
 @router.post("/palace/imagery")
 async def generate_palace_imagery(request: GenerateImageryRequest):
     """Generate AI imagery for a palace locus"""
-    palace = memory_palaces_db.get(request.palace_id)
+    # Try database first
+    palace = genius_system.database.get_memory_palace(request.palace_id)
+    
+    # Fallback
+    if not palace:
+        palace = memory_palaces_db.get(request.palace_id)
+        
     if not palace:
         raise HTTPException(status_code=404, detail="Palace not found")
     
@@ -600,6 +622,12 @@ async def generate_palace_imagery(request: GenerateImageryRequest):
         locus["concept"] = request.concept
         locus["imagery"] = imagery
         
+        # Save updated palace
+        saved = genius_system.database.save_memory_palace(palace)
+        if not saved:
+            if request.palace_id not in memory_palaces_db:
+                memory_palaces_db[request.palace_id] = palace
+        
         return {"locus_id": request.locus_id, "imagery": imagery}
         
     except Exception as e:
@@ -610,7 +638,13 @@ async def generate_palace_imagery(request: GenerateImageryRequest):
 @router.get("/palace/{palace_id}", response_model=PalaceResponse)
 async def get_memory_palace(palace_id: str):
     """Get a memory palace"""
-    palace = memory_palaces_db.get(palace_id)
+    # Try database first
+    palace = genius_system.database.get_memory_palace(palace_id)
+    
+    # Fallback
+    if not palace:
+        palace = memory_palaces_db.get(palace_id)
+        
     if not palace:
         raise HTTPException(status_code=404, detail="Palace not found")
     return PalaceResponse(**palace)

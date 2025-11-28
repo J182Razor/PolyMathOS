@@ -334,6 +334,82 @@ class DatabasePersistence:
                         metadata JSONB
                     )
                 """)
+
+                # Learning Plans table
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS learning_plans (
+                        plan_id VARCHAR(255) PRIMARY KEY,
+                        user_id VARCHAR(255),
+                        topic VARCHAR(500),
+                        mode VARCHAR(50),
+                        modules JSONB,
+                        sources JSONB,
+                        status VARCHAR(50),
+                        progress JSONB,
+                        metadata JSONB,
+                        created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+
+                # Quizzes table
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS quizzes (
+                        quiz_id VARCHAR(255) PRIMARY KEY,
+                        topic VARCHAR(500),
+                        questions JSONB,
+                        bloom_distribution JSONB,
+                        adaptive_difficulty BOOLEAN,
+                        fsrs_integration BOOLEAN,
+                        created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                        metadata JSONB
+                    )
+                """)
+
+                # Quiz Attempts table
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS quiz_attempts (
+                        attempt_id VARCHAR(255) PRIMARY KEY,
+                        quiz_id VARCHAR(255),
+                        user_id VARCHAR(255),
+                        answers JSONB,
+                        score INTEGER,
+                        max_score INTEGER,
+                        percent_correct FLOAT,
+                        timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+
+                # Feynman Sessions table
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS feynman_sessions (
+                        session_id VARCHAR(255) PRIMARY KEY,
+                        concept VARCHAR(500),
+                        topic VARCHAR(500),
+                        target_audience VARCHAR(100),
+                        iterations JSONB,
+                        status VARCHAR(50),
+                        created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+
+                # Memory Palaces table
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS memory_palaces (
+                        palace_id VARCHAR(255) PRIMARY KEY,
+                        name VARCHAR(255),
+                        template VARCHAR(100),
+                        user_id VARCHAR(255),
+                        description TEXT,
+                        loci JSONB,
+                        journey JSONB,
+                        review_count INTEGER DEFAULT 0,
+                        retention_rate FLOAT DEFAULT 0,
+                        created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
                 
                 # Tasks table
                 cur.execute("""
@@ -621,7 +697,353 @@ class DatabasePersistence:
         except Exception as e:
             logger.error(f"Failed to get user analytics: {e}")
             return None
+    def save_learning_plan(self, plan_data: Dict) -> bool:
+        """Save learning plan to database"""
+        if not self.available or not self.conn:
+            return False
+        
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO learning_plans 
+                    (plan_id, user_id, topic, mode, modules, sources, status, progress, metadata)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (plan_id) DO UPDATE SET
+                        modules = EXCLUDED.modules,
+                        sources = EXCLUDED.sources,
+                        status = EXCLUDED.status,
+                        progress = EXCLUDED.progress,
+                        metadata = EXCLUDED.metadata,
+                        updated_at = CURRENT_TIMESTAMP
+                """, (
+                    plan_data.get('id'),
+                    plan_data.get('user_id'),
+                    plan_data.get('goals', {}).get('topic', 'Unknown'),
+                    plan_data.get('mode', 'polymath'),
+                    json.dumps(plan_data.get('phases', [])), # Mapping phases to modules
+                    json.dumps(plan_data.get('sources', [])),
+                    plan_data.get('status', 'active'),
+                    json.dumps(plan_data.get('progress', {})),
+                    json.dumps(plan_data.get('goals', {})) # Store goals in metadata/goals
+                ))
+                self.conn.commit()
+                return True
+        except Exception as e:
+            logger.error(f"Failed to save learning plan: {e}")
+            self.conn.rollback()
+            return False
 
+    def get_learning_plan(self, plan_id: str) -> Optional[Dict]:
+        """Get learning plan from database"""
+        if not self.available or not self.conn:
+            return None
+        
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute("""
+                    SELECT plan_id, user_id, topic, mode, modules, sources, status, progress, metadata, created_at
+                    FROM learning_plans
+                    WHERE plan_id = %s
+                """, (plan_id,))
+                
+                row = cur.fetchone()
+                if row:
+                    # Reconstruct to match LearningPlanResponse structure
+                    metadata = row[8] or {}
+                    return {
+                        "id": row[0],
+                        "user_id": row[1],
+                        "goals": metadata, # Assuming goals are stored in metadata
+                        "phases": row[4], # modules -> phases
+                        "current_phase_index": 0, # Default
+                        "start_date": row[9].isoformat() if row[9] else None,
+                        "estimated_end_date": None, # Calculate or store
+                        "progress": row[7],
+                        "created_at": row[9].isoformat() if row[9] else None
+                    }
+                return None
+        except Exception as e:
+            logger.error(f"Failed to get learning plan: {e}")
+            return None
+
+    def get_user_learning_plans(self, user_id: str) -> List[Dict]:
+        """Get all learning plans for a user"""
+        if not self.available or not self.conn:
+            return []
+        
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute("""
+                    SELECT plan_id, user_id, topic, mode, modules, sources, status, progress, metadata, created_at
+                    FROM learning_plans
+                    WHERE user_id = %s
+                    ORDER BY created_at DESC
+                """, (user_id,))
+                
+                plans = []
+                for row in cur.fetchall():
+                    metadata = row[8] or {}
+                    plans.append({
+                        "id": row[0],
+                        "user_id": row[1],
+                        "goals": metadata,
+                        "phases": row[4],
+                        "current_phase_index": 0,
+                        "start_date": row[9].isoformat() if row[9] else None,
+                        "estimated_end_date": None,
+                        "progress": row[7],
+                        "created_at": row[9].isoformat() if row[9] else None
+                    })
+                return plans
+        except Exception as e:
+            logger.error(f"Failed to get user learning plans: {e}")
+            return []
+
+    def save_quiz(self, quiz_data: Dict) -> bool:
+        """Save quiz to database"""
+        if not self.available or not self.conn:
+            return False
+        
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO quizzes 
+                    (quiz_id, topic, questions, bloom_distribution, adaptive_difficulty, fsrs_integration, created_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (quiz_id) DO NOTHING
+                """, (
+                    quiz_data.get('id'),
+                    quiz_data.get('topic'),
+                    json.dumps(quiz_data.get('questions', [])),
+                    json.dumps(quiz_data.get('bloom_distribution', {})),
+                    quiz_data.get('adaptive_difficulty', True),
+                    quiz_data.get('fsrs_integration', True),
+                    quiz_data.get('created_at')
+                ))
+                self.conn.commit()
+                return True
+        except Exception as e:
+            logger.error(f"Failed to save quiz: {e}")
+            self.conn.rollback()
+            return False
+
+    def get_quiz(self, quiz_id: str) -> Optional[Dict]:
+        """Get quiz from database"""
+        if not self.available or not self.conn:
+            return None
+        
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute("""
+                    SELECT quiz_id, topic, questions, bloom_distribution, adaptive_difficulty, fsrs_integration, created_at
+                    FROM quizzes
+                    WHERE quiz_id = %s
+                """, (quiz_id,))
+                
+                row = cur.fetchone()
+                if row:
+                    return {
+                        "id": row[0],
+                        "topic": row[1],
+                        "questions": row[2],
+                        "bloom_distribution": row[3],
+                        "adaptive_difficulty": row[4],
+                        "fsrs_integration": row[5],
+                        "created_at": row[6].isoformat() if row[6] else None
+                    }
+                return None
+        except Exception as e:
+            logger.error(f"Failed to get quiz: {e}")
+            return None
+
+    def save_quiz_attempt(self, attempt_data: Dict) -> bool:
+        """Save quiz attempt to database"""
+        if not self.available or not self.conn:
+            return False
+        
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO quiz_attempts 
+                    (attempt_id, quiz_id, user_id, answers, score, max_score, percent_correct, timestamp)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """, (
+                    attempt_data.get('id'),
+                    attempt_data.get('quiz_id'),
+                    attempt_data.get('user_id'),
+                    json.dumps(attempt_data.get('answers', [])),
+                    attempt_data.get('score'),
+                    attempt_data.get('max_score'),
+                    attempt_data.get('percent_correct'),
+                    attempt_data.get('timestamp')
+                ))
+                self.conn.commit()
+                return True
+        except Exception as e:
+            logger.error(f"Failed to save quiz attempt: {e}")
+            self.conn.rollback()
+            return False
+
+    def get_user_quiz_attempts(self, user_id: str) -> List[Dict]:
+        """Get all quiz attempts for a user"""
+        if not self.available or not self.conn:
+            return []
+        
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute("""
+                    SELECT attempt_id, quiz_id, user_id, answers, score, max_score, percent_correct, timestamp
+                    FROM quiz_attempts
+                    WHERE user_id = %s
+                    ORDER BY timestamp DESC
+                """, (user_id,))
+                
+                attempts = []
+                for row in cur.fetchall():
+                    attempts.append({
+                        "id": row[0],
+                        "quiz_id": row[1],
+                        "user_id": row[2],
+                        "answers": row[3],
+                        "score": row[4],
+                        "max_score": row[5],
+                        "percent_correct": row[6],
+                        "timestamp": row[7].isoformat() if row[7] else None
+                    })
+                return attempts
+        except Exception as e:
+            logger.error(f"Failed to get user quiz attempts: {e}")
+            return []
+
+    def save_feynman_session(self, session_data: Dict) -> bool:
+        """Save Feynman session to database"""
+        if not self.available or not self.conn:
+            return False
+        
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO feynman_sessions 
+                    (session_id, concept, topic, target_audience, iterations, status, created_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (session_id) DO UPDATE SET
+                        iterations = EXCLUDED.iterations,
+                        status = EXCLUDED.status,
+                        updated_at = CURRENT_TIMESTAMP
+                """, (
+                    session_data.get('id'),
+                    session_data.get('concept'),
+                    session_data.get('topic'),
+                    session_data.get('target_audience'),
+                    json.dumps(session_data.get('iterations', [])),
+                    session_data.get('status', 'active'),
+                    session_data.get('created_at')
+                ))
+                self.conn.commit()
+                return True
+        except Exception as e:
+            logger.error(f"Failed to save Feynman session: {e}")
+            self.conn.rollback()
+            return False
+
+    def get_feynman_session(self, session_id: str) -> Optional[Dict]:
+        """Get Feynman session from database"""
+        if not self.available or not self.conn:
+            return None
+        
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute("""
+                    SELECT session_id, concept, topic, target_audience, iterations, status, created_at
+                    FROM feynman_sessions
+                    WHERE session_id = %s
+                """, (session_id,))
+                
+                row = cur.fetchone()
+                if row:
+                    return {
+                        "id": row[0],
+                        "concept": row[1],
+                        "topic": row[2],
+                        "target_audience": row[3],
+                        "iterations": row[4],
+                        "status": row[5],
+                        "created_at": row[6].isoformat() if row[6] else None
+                    }
+                return None
+        except Exception as e:
+            logger.error(f"Failed to get Feynman session: {e}")
+            return None
+
+    def save_memory_palace(self, palace_data: Dict) -> bool:
+        """Save Memory Palace to database"""
+        if not self.available or not self.conn:
+            return False
+        
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO memory_palaces 
+                    (palace_id, name, template, user_id, description, loci, journey, review_count, retention_rate, created_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (palace_id) DO UPDATE SET
+                        name = EXCLUDED.name,
+                        description = EXCLUDED.description,
+                        loci = EXCLUDED.loci,
+                        journey = EXCLUDED.journey,
+                        review_count = EXCLUDED.review_count,
+                        retention_rate = EXCLUDED.retention_rate,
+                        updated_at = CURRENT_TIMESTAMP
+                """, (
+                    palace_data.get('id'),
+                    palace_data.get('name'),
+                    palace_data.get('template'),
+                    palace_data.get('user_id'),
+                    palace_data.get('description'),
+                    json.dumps(palace_data.get('loci', [])),
+                    json.dumps(palace_data.get('journey', [])),
+                    palace_data.get('review_count', 0),
+                    palace_data.get('retention_rate', 0),
+                    palace_data.get('created_at')
+                ))
+                self.conn.commit()
+                return True
+        except Exception as e:
+            logger.error(f"Failed to save Memory Palace: {e}")
+            self.conn.rollback()
+            return False
+
+    def get_memory_palace(self, palace_id: str) -> Optional[Dict]:
+        """Get Memory Palace from database"""
+        if not self.available or not self.conn:
+            return None
+        
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute("""
+                    SELECT palace_id, name, template, user_id, description, loci, journey, review_count, retention_rate, created_at
+                    FROM memory_palaces
+                    WHERE palace_id = %s
+                """, (palace_id,))
+                
+                row = cur.fetchone()
+                if row:
+                    return {
+                        "id": row[0],
+                        "name": row[1],
+                        "template": row[2],
+                        "user_id": row[3],
+                        "description": row[4],
+                        "loci": row[5],
+                        "journey": row[6],
+                        "review_count": row[7],
+                        "retention_rate": row[8],
+                        "created_at": row[9].isoformat() if row[9] else None
+                    }
+                return None
+        except Exception as e:
+            logger.error(f"Failed to get Memory Palace: {e}")
+            return None
 
 # Global storage instances
 artifact_manager = ArtifactManager()

@@ -147,7 +147,7 @@ export const DeepWorkBlock: React.FC<DeepWorkBlockProps> = ({ onComplete, onBack
                 <select
                   value={selectedDomain}
                   onChange={(e) => setSelectedDomain(e.target.value)}
-                  className="w-full px-4 py-3 border border-silver-dark/30 rounded-lg focus-silver bg-dark-surface text-text-primary"
+                  className="w-full px-4 py-3 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 bg-slate-800 text-white"
                 >
                   {domains.map((domain) => (
                     <option key={domain.name} value={domain.name}>

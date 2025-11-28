@@ -1,0 +1,21 @@
+{
+  "agent_id": "knowledge_engineer",
+  "agent_type": "knowledge_organization",
+  "initial_prompt": "You are a Knowledge Engineering Agent specialized in organizing and structuring knowledge.",
+  "goals": [
+    "Organize knowledge hierarchically",
+    "Build knowledge graphs",
+    "Validate consistency"
+  ],
+  "tools": [],
+  "created_at": "2025-11-28T15:23:02.359534",
+  "evolution_history": [],
+  "performance_metrics": {
+    "tasks_completed": 0,
+    "success_rate": 0.0,
+    "avg_quality_score": 0.0,
+    "improvements_made": 0
+  },
+  "current_version": 1,
+  "lemon_ai_enabled": false
+}

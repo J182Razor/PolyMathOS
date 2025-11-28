@@ -8,6 +8,7 @@ import { Brain } from 'lucide-react';
 import { PolymathAIService, SessionType } from '../services/PolymathAIService';
 import { UserProfilerService } from '../services/UserProfilerService';
 import { NLPCoachService } from '../services/NLPCoachService';
+import { useUser } from '../hooks/useAppState';
 import { Button } from './ui/Button';
 import { Icon } from './ui/Icon';
 
@@ -28,17 +29,17 @@ export const PolymathAIAssistant: React.FC = () => {
   const aiService = PolymathAIService.getInstance();
   const profilerService = UserProfilerService.getInstance();
   const coachService = NLPCoachService.getInstance();
+  const currentUser = useUser(); // Reactive user state
 
   useEffect(() => {
     // Check if user is already registered
-    const currentUser = aiService.getCurrentUser();
     if (currentUser) {
       setUserRegistered(true);
       addMessage('assistant', `Welcome back, ${currentUser.name}! Ready to accelerate your learning?`);
     } else {
       addMessage('assistant', '🤖 Welcome to PolymathOS AI! Type "register [your name]" to begin your cognitive acceleration journey.');
     }
-  }, []);
+  }, [currentUser]);
 
   useEffect(() => {
     scrollToBottom();

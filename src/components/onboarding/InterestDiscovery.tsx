@@ -4,9 +4,10 @@ import { motion } from 'framer-motion';
 interface InterestDiscoveryProps {
   userData: any;
   onNext: (data: any) => void;
+  onBack?: () => void;
 }
 
-const InterestDiscovery: React.FC<InterestDiscoveryProps> = ({ userData, onNext }) => {
+const InterestDiscovery: React.FC<InterestDiscoveryProps> = ({ userData, onNext, onBack }) => {
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
   const [customDomains, setCustomDomains] = useState<string[]>([]);
 
@@ -125,13 +126,23 @@ const InterestDiscovery: React.FC<InterestDiscoveryProps> = ({ userData, onNext 
         )}
       </div>
 
-      <button
-        onClick={() => onNext({ ...userData, domains: [...selectedDomains, ...customDomains] })}
-        disabled={selectedDomains.length === 0 && customDomains.length === 0}
-        className="poly-btn-primary w-full"
-      >
-        Discover Learning Resources
-      </button>
+      <div className="flex gap-3">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="poly-btn-secondary flex-1"
+          >
+            Back
+          </button>
+        )}
+        <button
+          onClick={() => onNext({ ...userData, domains: [...selectedDomains, ...customDomains] })}
+          disabled={selectedDomains.length === 0 && customDomains.length === 0}
+          className={`poly-btn-primary ${onBack ? 'flex-1' : 'w-full'}`}
+        >
+          Discover Learning Resources
+        </button>
+      </div>
     </motion.div>
   );
 };

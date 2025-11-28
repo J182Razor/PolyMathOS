@@ -9,6 +9,7 @@ import { PolymathAIService } from '../services/PolymathAIService';
 import { UserProfilerService } from '../services/UserProfilerService';
 import { NLPCoachService } from '../services/NLPCoachService';
 import { LearningSession } from '../services/SessionOrchestratorService';
+import { useUser } from '../hooks/useAppState';
 import { Button } from './ui/Button';
 import { Icon } from './ui/Icon';
 
@@ -34,16 +35,16 @@ export const PolymathAIAssistantEnhanced: React.FC<{
   const aiService = PolymathAIService.getInstance();
   const profilerService = UserProfilerService.getInstance();
   const coachService = NLPCoachService.getInstance();
+  const currentUser = useUser(); // Reactive user state
 
   useEffect(() => {
-    const currentUser = aiService.getCurrentUser();
     if (currentUser) {
       setUserRegistered(true);
       addMessage('assistant', `Welcome back, ${currentUser.name}! I'm your ultimate polymath creator. I can create complete learning experiences, generate content, and orchestrate all PolyMathOS features. What would you like to learn today?`);
     } else {
       addMessage('assistant', '🤖 Welcome to PolymathOS AI - The Ultimate Polymath Creator!\n\nI can:\n• Create complete, customized learning sessions\n• Generate flashcards, memory palaces, mind maps\n• Orchestrate all PolyMathOS features\n• Build personalized learning experiences\n\nType "register [your name]" to begin!');
     }
-  }, []);
+  }, [currentUser]);
 
   useEffect(() => {
     scrollToBottom();

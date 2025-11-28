@@ -4,9 +4,10 @@ import { motion } from 'framer-motion';
 interface ResourceScannerProps {
   userData: any;
   onNext: (data: any) => void;
+  onBack?: () => void;
 }
 
-const ResourceScanner: React.FC<ResourceScannerProps> = ({ userData, onNext }) => {
+const ResourceScanner: React.FC<ResourceScannerProps> = ({ userData, onNext, onBack }) => {
   const [scanProgress, setScanProgress] = useState(0);
   const [currentTask, setCurrentTask] = useState('Initializing discovery engines...');
   const [foundResources, setFoundResources] = useState(0);

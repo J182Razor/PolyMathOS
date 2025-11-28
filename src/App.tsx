@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { Header } from './components/sections/Header';
 import { Hero } from './components/sections/Hero';
 import { Features } from './components/sections/Features';
@@ -23,11 +24,11 @@ import { TRIZApplication } from './components/TRIZApplication';
 import { CrossDomainProject } from './components/CrossDomainProject';
 import { MindMapBuilder } from './components/MindMapBuilder';
 import { BrainwaveGenerator } from './components/BrainwaveGenerator';
-import { PolymathAIAssistant } from './components/PolymathAIAssistant';
 import { PolymathAIAssistantEnhanced } from './components/PolymathAIAssistantEnhanced';
 import { InstallationWizard } from './components/InstallationWizard';
 import OnboardingController from './components/onboarding/OnboardingController';
 import ResourceLibrary from './components/ResourceLibrary';
+import { MobileNavigation } from './components/MobileNavigation';
 import { PolymathUserService } from './services/PolymathUserService';
 
 type AppState = 'home' | 'signin' | 'signup' | 'dashboard' | 'polymath_dashboard' | 'learning' | 'assessment' | 'domain_selection' | 'memory_palace' | 'flashcards' | 'deep_work' | 'projects' | 'reflection' | 'mind_map' | 'triz' | 'brainwave_generator' | 'polymath_ai' | 'onboarding' | 'portfolio' | 'resource_library';
@@ -40,26 +41,16 @@ interface User {
 
 function App() {
   const [currentPage, setCurrentPage] = useState<AppState>('home');
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [assessmentData, setAssessmentData] = useState<any>(null);
   const [showInstallationWizard, setShowInstallationWizard] = useState(false);
 
-  // Initialize dark mode - default to dark for premium experience
+  // Initialize dark mode
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Always start in dark mode for this design
+    document.documentElement.classList.add('dark');
 
-    // Default to dark mode for premium dark minimalist design
-    if (savedTheme === 'light') {
-      setIsDarkMode(false);
-      document.documentElement.classList.remove('dark');
-    } else {
-      setIsDarkMode(true);
-      document.documentElement.classList.add('dark');
-    }
-
-    // Check if installation is needed
     const installationCompleted = localStorage.getItem('polymathos_installation_completed');
     const n8nUrl = localStorage.getItem('n8n_webhook_url');
     if (!installationCompleted && !n8nUrl) {
@@ -70,19 +61,15 @@ function App() {
   const toggleDarkMode = () => {
     const newDarkMode = !isDarkMode;
     setIsDarkMode(newDarkMode);
-
     if (newDarkMode) {
       document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
     }
   };
 
   // Navigation handlers
   const handleSignIn = (email: string, password: string) => {
-    // Simulate authentication
     setUser({
       email,
       firstName: 'Alex',
@@ -92,7 +79,6 @@ function App() {
   };
 
   const handleSignUp = (userData: any) => {
-    // Simulate registration
     setUser({
       email: userData.email,
       firstName: userData.firstName,
@@ -122,27 +108,12 @@ function App() {
     }
   };
 
-  const handleSignInClick = () => {
-    setCurrentPage('signin');
+  // Handle navigation from mobile nav
+  const handleMobileNavigate = (page: string) => {
+    setCurrentPage(page as AppState);
   };
 
-  const handleBackToHome = () => {
-    setCurrentPage('home');
-  };
-
-  const handleStartLearning = () => {
-    setCurrentPage('learning');
-  };
-
-  const handleStartAssessment = () => {
-    setCurrentPage('assessment');
-  };
-
-  const handleGoToPolymathDashboard = () => {
-    setCurrentPage('polymath_dashboard');
-  };
-
-  // Handle hash-based navigation for Polymath features
+  // Hash-based navigation
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.substring(1);
@@ -153,44 +124,44 @@ function App() {
     };
 
     window.addEventListener('hashchange', handleHashChange);
-    handleHashChange(); // Check on mount
+    handleHashChange();
 
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  const handleCompleteAssessment = (assessmentData: any) => {
-    // Store assessment data for AI personalization
+  const handleCompleteAssessment = async (assessmentData: any) => {
     setAssessmentData(assessmentData);
-    // Persist assessment data using PolymathUserService
     const userService = PolymathUserService.getInstance();
-    let user = userService.getCurrentUser();
-    if (!user) {
-      // Create a placeholder user if none exists
-      user = userService.createUser('Demo User', 'demo@example.com');
+    let currentUser = await userService.getCurrentUser();
+    if (!currentUser) {
+      currentUser = await userService.createUser('Demo User', 'demo@example.com');
     }
-    userService.updateAssessmentData(user, assessmentData);
-    // In a real app, this would be sent to the backend
-    if (import.meta.env.DEV) {
-      console.log('Assessment completed and persisted:', assessmentData);
-    }
+    await userService.updateAssessmentData(currentUser, assessmentData);
     setCurrentPage('dashboard');
   };
 
-  const handleCompleteLearning = () => {
-    setCurrentPage('dashboard');
-  };
+  // Determine if mobile nav should show
+  const showMobileNav = user && !['home', 'signin', 'signup', 'onboarding'].includes(currentPage);
 
   // Render current page
   const renderCurrentPage = () => {
     switch (currentPage) {
       case 'signin':
-        return <SignIn onSignIn={handleSignIn} onBack={handleBackToHome} />;
+        return <SignIn onSignIn={handleSignIn} onBack={() => setCurrentPage('home')} />;
 
       case 'signup':
-        return <SignUp onSignUp={handleSignUp} onBack={handleBackToHome} />;
+        return <SignUp onSignUp={handleSignUp} onBack={() => setCurrentPage('home')} />;
 
       case 'dashboard':
-        return <Dashboard onStartLearning={handleStartLearning} onStartAssessment={handleStartAssessment} onSignOut={handleSignOut} onOpenBrainwaveGenerator={() => setCurrentPage('brainwave_generator')} user={user} />;
+        return (
+          <Dashboard
+            onStartLearning={() => setCurrentPage('learning')}
+            onStartAssessment={() => setCurrentPage('assessment')}
+            onSignOut={handleSignOut}
+            onOpenBrainwaveGenerator={() => setCurrentPage('brainwave_generator')}
+            user={user}
+          />
+        );
 
       case 'polymath_dashboard':
         return <PolymathDashboard onSignOut={handleSignOut} user={user} />;
@@ -222,12 +193,12 @@ function App() {
       case 'learning':
         return assessmentData ? (
           <EnhancedLearningSession
-            onComplete={handleCompleteLearning}
+            onComplete={() => setCurrentPage('dashboard')}
             onHome={() => setCurrentPage('dashboard')}
             userProfile={assessmentData}
           />
         ) : (
-          <LearningSession onComplete={handleCompleteLearning} onHome={() => setCurrentPage('dashboard')} />
+          <LearningSession onComplete={() => setCurrentPage('dashboard')} onHome={() => setCurrentPage('dashboard')} />
         );
 
       case 'assessment':
@@ -237,19 +208,19 @@ function App() {
         return <BrainwaveGenerator onBack={() => setCurrentPage('dashboard')} />;
 
       case 'onboarding':
-        return <OnboardingController onComplete={(program) => {
-          // Here we would typically save the program to the backend/user state
-          // For now, we'll just navigate to the dashboard
-          setCurrentPage('dashboard');
-        }} />;
+        return (
+          <OnboardingController
+            onComplete={() => setCurrentPage('dashboard')}
+          />
+        );
 
       case 'resource_library':
         return (
-          <div className="min-h-screen bg-poly-neutral-50">
+          <div className="min-h-screen bg-slate-950">
             <div className="p-4 max-w-7xl mx-auto">
               <button
                 onClick={() => setCurrentPage('dashboard')}
-                className="mb-4 flex items-center text-poly-neutral-600 hover:text-poly-primary-600 transition-colors px-4 py-2 rounded-lg hover:bg-poly-neutral-100"
+                className="mb-4 flex items-center text-slate-400 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-slate-800"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -258,28 +229,30 @@ function App() {
               </button>
             </div>
             <ResourceLibrary />
+            <div className="h-20 md:hidden" />
           </div>
         );
 
       case 'polymath_ai':
         return (
-          <div className="min-h-screen bg-poly-neutral-900">
+          <div className="min-h-screen bg-slate-950">
             <div className="container mx-auto p-4">
               <button
                 onClick={() => setCurrentPage('dashboard')}
-                className="mb-4 text-poly-neutral-400 hover:text-poly-neutral-100 flex items-center transition-colors"
+                className="mb-4 text-slate-400 hover:text-white flex items-center transition-colors"
               >
                 <span className="mr-2">←</span> Back to Dashboard
               </button>
               <div className="h-[calc(100vh-8rem)]">
                 <PolymathAIAssistantEnhanced
-                  onNavigate={(target, config) => {
+                  onNavigate={(target) => {
                     window.location.hash = `#${target}`;
                     window.dispatchEvent(new HashChangeEvent('hashchange'));
                   }}
                 />
               </div>
             </div>
+            <div className="h-20 md:hidden" />
           </div>
         );
 
@@ -288,7 +261,7 @@ function App() {
 
       default:
         return (
-          <div className="min-h-screen bg-light-base dark:bg-dark-base transition-colors duration-300">
+          <div className="min-h-screen bg-slate-950 text-white">
             <Header
               onSignIn={() => setCurrentPage('signin')}
               onGetStarted={() => setCurrentPage('signup')}
@@ -313,34 +286,39 @@ function App() {
 
   return (
     <>
-      {renderCurrentPage()}
+      <AnimatePresence mode="wait">
+        {renderCurrentPage()}
+      </AnimatePresence>
+
+      {/* Mobile Navigation */}
+      <AnimatePresence>
+        {showMobileNav && (
+          <MobileNavigation
+            currentPage={currentPage}
+            onNavigate={handleMobileNavigate}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Installation Wizard */}
       {showInstallationWizard && (
         <InstallationWizard
-          onComplete={(userData) => {
+          onComplete={async (userData) => {
             localStorage.setItem('polymathos_installation_completed', 'true');
             setShowInstallationWizard(false);
 
             if (userData) {
-              // Persist user data
               const userService = PolymathUserService.getInstance();
-
-              // Check if user already exists to avoid overwriting if not needed, 
-              // but here we assume setup means new user or overwrite
-              let user = userService.getCurrentUser();
-              if (!user) {
-                user = userService.createUser(
+              let newUser = await userService.getCurrentUser();
+              if (!newUser) {
+                newUser = await userService.createUser(
                   `${userData.firstName} ${userData.lastName}`,
                   userData.email
                 );
               }
 
-              // Update with specific fields from setup
-              // Note: We might need to extend PolymathUser or use specific update methods
-              // For now, we'll update what we can
               if (userData.learningStyle) {
-                // Map simple string to LearningStyle object if needed, or just store
-                // This assumes updateAssessmentData can handle partial updates or we add a specific method
-                userService.updateAssessmentData(user, {
+                await userService.updateAssessmentData(newUser, {
                   learningStylePreferences: {
                     primaryStyle: userData.learningStyle,
                     secondaryStyle: 'None',
@@ -357,9 +335,7 @@ function App() {
                 lastName: userData.lastName
               });
 
-              // If it was a demo user (skipped), we might want to set a flag
               if (userData.email === 'demo@example.com') {
-                // potentially set a demo flag in localStorage
                 localStorage.setItem('polymathos_demo_mode', 'true');
               } else {
                 localStorage.removeItem('polymathos_demo_mode');
@@ -367,8 +343,6 @@ function App() {
             }
           }}
           onSkip={() => {
-            // This prop is actually not used in the new InstallationWizard logic 
-            // as skip calls onComplete with demo user, but keeping for safety
             localStorage.setItem('polymathos_installation_completed', 'true');
             setShowInstallationWizard(false);
           }}
@@ -379,4 +353,3 @@ function App() {
 }
 
 export default App;
-

@@ -19,6 +19,19 @@ const OnboardingController: React.FC<OnboardingControllerProps> = ({ onComplete 
     setStep(step + 1);
   };
 
+  const handleBack = () => {
+    if (step > 1) {
+      setStep(step - 1);
+    }
+  };
+
+  const handleStepClick = (stepNumber: number) => {
+    // Allow clicking on progress indicators to go back to previous steps
+    if (stepNumber < step) {
+      setStep(stepNumber);
+    }
+  };
+
   const handleComplete = (createdProgram: any) => {
     setProgram(createdProgram);
     setStep(5);
@@ -27,17 +40,17 @@ const OnboardingController: React.FC<OnboardingControllerProps> = ({ onComplete 
   const renderStep = () => {
     switch (step) {
       case 1:
-        return <WelcomeScreen onNext={handleNext} />;
+        return <WelcomeScreen onNext={handleNext} onBack={undefined} />;
       case 2:
-        return <InterestDiscovery userData={userData} onNext={handleNext} />;
+        return <InterestDiscovery userData={userData} onNext={handleNext} onBack={handleBack} />;
       case 3:
-        return <ResourceScanner userData={userData} onNext={handleNext} />;
+        return <ResourceScanner userData={userData} onNext={handleNext} onBack={handleBack} />;
       case 4:
-        return <CurriculumBuilder userData={userData} onComplete={handleComplete} />;
+        return <CurriculumBuilder userData={userData} onComplete={handleComplete} onBack={handleBack} />;
       case 5:
-        return <OnboardingComplete program={program} onStartLearning={onComplete} />;
+        return <OnboardingComplete program={program} onStartLearning={onComplete} onBack={handleBack} />;
       default:
-        return <WelcomeScreen onNext={handleNext} />;
+        return <WelcomeScreen onNext={handleNext} onBack={undefined} />;
     }
   };
 
@@ -48,12 +61,16 @@ const OnboardingController: React.FC<OnboardingControllerProps> = ({ onComplete 
         <div className="mb-8">
           <div className="flex justify-between items-center max-w-md mx-auto mb-4">
             {[1, 2, 3, 4].map((num) => (
-              <div key={num} className="flex flex-col items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+              <div 
+                key={num} 
+                className="flex flex-col items-center cursor-pointer"
+                onClick={() => handleStepClick(num)}
+              >
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
                   step >= num 
                     ? 'bg-poly-primary-500 text-white' 
                     : 'bg-poly-neutral-200 text-poly-neutral-500'
-                }`}>
+                } ${num < step ? 'hover:bg-poly-primary-400 hover:scale-110' : ''}`}>
                   {num}
                 </div>
                 {num < 4 && (

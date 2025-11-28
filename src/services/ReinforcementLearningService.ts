@@ -12,11 +12,11 @@
  */
 
 import { GeniusProfessorService } from './GeniusProfessorService';
-import { ComprehensionTrackerService } from './ComprehensionTrackerService';
+import { ComprehensionTrackerService, ComprehensionDimension } from './ComprehensionTrackerService';
 import { FSRSService } from './FSRSService';
 import { DynamicQuizService } from './DynamicQuizService';
 
-export type LearningMethod = 
+export type LearningMethod =
   | 'quiz'
   | 'feynman'
   | 'memory_palace'
@@ -85,12 +85,12 @@ export interface MethodRecommendation {
 
 export class ReinforcementLearningService {
   private static instance: ReinforcementLearningService;
-  
+
   private profiles: Map<string, UserLearningProfile> = new Map();
   private learningRate: number = 0.1; // Alpha - how quickly to update Q-values
   private discountFactor: number = 0.95; // Gamma - future reward importance
   private defaultExplorationRate: number = 0.15; // Epsilon - exploration vs exploitation
-  
+
   // Services
   private geniusProfessor: GeniusProfessorService;
   private comprehensionTracker: ComprehensionTrackerService;
@@ -159,10 +159,10 @@ export class ReinforcementLearningService {
     outcome: LearningEvent['outcome']
   ): LearningEvent {
     const profile = this.getUserProfile(userId);
-    
+
     // Calculate reward signal
     const reward = this.calculateReward(outcome);
-    
+
     // Create learning event
     const event: LearningEvent = {
       id: this.generateId(),
@@ -173,28 +173,28 @@ export class ReinforcementLearningService {
       reward,
       timestamp: new Date()
     };
-    
+
     // Add to history
     profile.learningHistory.push(event);
     if (profile.learningHistory.length > 1000) {
       profile.learningHistory.shift(); // Keep last 1000 events
     }
-    
+
     // Update Q-value using Q-learning update rule
     // Q(s,a) = Q(s,a) + α[r + γ*max(Q(s',a')) - Q(s,a)]
     const state = this.getStateRepresentation(context);
     const currentQ = profile.methodWeights[method];
-    
+
     // Estimate next state value (simplified - would use actual next state in full RL)
     const nextStateValue = this.estimateNextStateValue(profile, context, outcome);
-    
+
     // Q-learning update
     const newQ = currentQ + this.learningRate * (reward + this.discountFactor * nextStateValue - currentQ);
     profile.methodWeights[method] = Math.max(0, Math.min(1, newQ)); // Clamp to [0,1]
-    
+
     // Update method performance tracking
     this.updateMethodPerformance(profile, method, outcome);
-    
+
     // Update context-specific performance
     const contextKey = this.getContextKey(context);
     if (!profile.preferredMethods.find(m => m.method === method)) {
@@ -209,7 +209,7 @@ export class ReinforcementLearningService {
         contexts: {}
       });
     }
-    
+
     const methodPerf = profile.preferredMethods.find(m => m.method === method)!;
     methodPerf.totalAttempts++;
     if (outcome.success) methodPerf.successCount++;
@@ -217,22 +217,22 @@ export class ReinforcementLearningService {
     methodPerf.averageTimeMinutes = (methodPerf.averageTimeMinutes * (methodPerf.totalAttempts - 1) + outcome.timeSpent) / methodPerf.totalAttempts;
     methodPerf.lastUsed = new Date();
     methodPerf.effectiveness = this.calculateEffectiveness(methodPerf);
-    
+
     // Update context-specific success rate
     if (!methodPerf.contexts[contextKey]) {
       methodPerf.contexts[contextKey] = 0;
     }
     methodPerf.contexts[contextKey] = (methodPerf.contexts[contextKey] * 0.9) + (outcome.success ? 0.1 : 0);
-    
+
     profile.lastUpdated = new Date();
-    
+
     // Reduce exploration rate over time (annealing)
     if (profile.learningHistory.length > 50) {
       profile.explorationRate = Math.max(0.05, profile.explorationRate * 0.99);
     }
-    
+
     this.saveData();
-    
+
     // Also record in comprehension tracker
     this.comprehensionTracker.recordEvent({
       userId,
@@ -247,7 +247,7 @@ export class ReinforcementLearningService {
         success: outcome.success
       }
     });
-    
+
     return event;
   }
 
@@ -257,31 +257,31 @@ export class ReinforcementLearningService {
   private calculateReward(outcome: LearningEvent['outcome']): number {
     // Multi-factor reward calculation
     let reward = 0;
-    
+
     // Success contributes positively
     if (outcome.success) {
       reward += 0.3;
     } else {
       reward -= 0.2;
     }
-    
+
     // Score contributes (normalized to [-0.3, 0.3])
     reward += (outcome.score / 100 - 0.5) * 0.6;
-    
+
     // Comprehension gain is highly valuable
     reward += Math.min(outcome.comprehensionGain / 20, 0.3);
-    
+
     // Retention is critical
     reward += outcome.retentionScore / 100 * 0.2;
-    
+
     // Engagement matters
     reward += (outcome.engagementScore / 10 - 0.5) * 0.1;
-    
+
     // Time efficiency bonus (faster is better, but not at expense of quality)
     if (outcome.timeSpent < 30 && outcome.success) {
       reward += 0.1; // Efficiency bonus
     }
-    
+
     return Math.max(-1, Math.min(1, reward)); // Clamp to [-1, 1]
   }
 
@@ -293,7 +293,7 @@ export class ReinforcementLearningService {
     const timeOfDay = context.timeOfDay.substring(0, 3);
     const energyLevel = Math.floor(context.energyLevel / 2); // 0-5
     const difficulty = Math.floor(context.topicDifficulty / 2); // 0-5
-    
+
     return `${context.topic}_${archetype}_${timeOfDay}_${energyLevel}_${difficulty}`;
   }
 
@@ -339,11 +339,11 @@ export class ReinforcementLearningService {
    */
   private calculateEffectiveness(perf: MethodPerformance): number {
     if (perf.totalAttempts === 0) return 0;
-    
+
     const successRate = perf.successCount / perf.totalAttempts;
     const scoreFactor = perf.averageScore / 100;
     const recencyFactor = this.getRecencyFactor(perf.lastUsed);
-    
+
     return (successRate * 0.4 + scoreFactor * 0.4 + recencyFactor * 0.2);
   }
 
@@ -364,17 +364,17 @@ export class ReinforcementLearningService {
   ): MethodRecommendation {
     const profile = this.getUserProfile(userId);
     const state = this.getStateRepresentation(context);
-    
+
     // Get all available methods
     const allMethods: LearningMethod[] = [
       'quiz', 'feynman', 'memory_palace', 'zettelkasten',
       'spaced_repetition', 'dual_n_back', 'speed_reading',
       'interleaving', 'elaboration', 'teaching'
     ];
-    
+
     // Epsilon-greedy: explore with probability epsilon, exploit otherwise
     const shouldExplore = Math.random() < profile.explorationRate;
-    
+
     if (shouldExplore) {
       // Exploration: randomly select from methods
       const randomMethod = allMethods[Math.floor(Math.random() * allMethods.length)];
@@ -386,36 +386,36 @@ export class ReinforcementLearningService {
         alternatives: []
       };
     }
-    
+
     // Exploitation: select method with highest Q-value for this context
     // Also consider context-specific performance
     const methodScores = allMethods.map(method => {
       const baseQ = profile.methodWeights[method];
       const methodPerf = profile.preferredMethods.find(p => p.method === method);
-      
+
       let contextBonus = 0;
       if (methodPerf) {
         const contextKey = this.getContextKey(context);
         const contextSuccessRate = methodPerf.contexts[contextKey] || 0;
         contextBonus = contextSuccessRate * 0.2; // Up to 20% bonus
       }
-      
+
       return {
         method,
         score: baseQ + contextBonus,
         confidence: methodPerf ? methodPerf.effectiveness : 0.5
       };
     });
-    
+
     // Sort by score
     methodScores.sort((a, b) => b.score - a.score);
-    
+
     const best = methodScores[0];
     const alternatives = methodScores.slice(1, 4).map(m => ({
       method: m.method,
       confidence: m.confidence
     }));
-    
+
     return {
       method: best.method,
       confidence: best.confidence,
@@ -434,12 +434,12 @@ export class ReinforcementLearningService {
     context: LearningContext
   ): string {
     const methodPerf = profile.preferredMethods.find(p => p.method === method);
-    
+
     if (methodPerf && methodPerf.totalAttempts > 5) {
       const successRate = Math.round((methodPerf.successCount / methodPerf.totalAttempts) * 100);
       return `This method has a ${successRate}% success rate for you. Based on ${methodPerf.totalAttempts} previous uses, it's highly effective for your learning style.`;
     }
-    
+
     const methodNames: Record<LearningMethod, string> = {
       quiz: 'Adaptive quizzes',
       feynman: 'Feynman Technique',
@@ -452,7 +452,7 @@ export class ReinforcementLearningService {
       elaboration: 'Elaboration techniques',
       teaching: 'Teaching others'
     };
-    
+
     return `${methodNames[method]} is recommended based on your learning profile and current context.`;
   }
 
@@ -489,8 +489,8 @@ export class ReinforcementLearningService {
   /**
    * Get dimension for method (for comprehension tracking)
    */
-  private getDimensionForMethod(method: LearningMethod): string {
-    const mapping: Record<LearningMethod, string> = {
+  private getDimensionForMethod(method: LearningMethod): ComprehensionDimension {
+    const mapping: Record<LearningMethod, ComprehensionDimension> = {
       quiz: 'application',
       feynman: 'understanding',
       memory_palace: 'memory',

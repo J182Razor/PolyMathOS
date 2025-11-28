@@ -4,9 +4,10 @@ import { motion } from 'framer-motion';
 interface OnboardingCompleteProps {
   program: any;
   onStartLearning: (program: any) => void;
+  onBack?: () => void;
 }
 
-const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({ program, onStartLearning }) => {
+const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({ program, onStartLearning, onBack }) => {
   return (
     <motion.div 
       className="poly-card poly-card-elevated max-w-2xl mx-auto text-center px-6 py-8 md:p-8"
@@ -60,16 +61,28 @@ const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({ program, onStar
         </ul>
       </div>
       
-      <button
-        onClick={() => onStartLearning(program)}
-        className="poly-btn-primary w-full mb-4"
-      >
-        Begin Learning Journey
-      </button>
+      <div className="flex gap-3">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="poly-btn-secondary flex-1"
+          >
+            Back
+          </button>
+        )}
+        <button
+          onClick={() => onStartLearning(program)}
+          className={`poly-btn-primary ${onBack ? 'flex-1' : 'w-full'} mb-4`}
+        >
+          Begin Learning Journey
+        </button>
+      </div>
       
-      <button className="poly-btn-secondary w-full">
-        Explore More Paths
-      </button>
+      {!onBack && (
+        <button className="poly-btn-secondary w-full">
+          Explore More Paths
+        </button>
+      )}
     </motion.div>
   );
 };

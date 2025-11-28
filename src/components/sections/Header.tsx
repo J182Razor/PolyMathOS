@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
-import { Menu, X, Moon, Sun, Brain } from 'lucide-react';
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, Moon, Sun, Brain, ChevronRight } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { Icon } from '../ui/Icon';
+import { cn } from '../../lib/utils';
 
 interface User {
   email: string;
@@ -18,15 +21,35 @@ interface HeaderProps {
   onSignOut: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ 
-  darkMode, 
-  toggleDarkMode, 
-  onSignIn, 
-  onGetStarted, 
-  user, 
-  onSignOut 
+export const Header: React.FC<HeaderProps> = ({
+  darkMode,
+  toggleDarkMode,
+  onSignIn,
+  onGetStarted,
+  user,
+  onSignOut
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
 
   const navItems = [
     { name: 'Features', href: '#features' },
@@ -36,134 +59,204 @@ export const Header: React.FC<HeaderProps> = ({
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 glass-strong border-b border-silver-500/20">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="flex items-center justify-between h-20 py-4">
-          {/* Logo */}
-          <div className="flex items-center space-x-3 group cursor-pointer">
-            <div className="relative w-10 h-10 rounded-lg bg-gradient-to-br from-royal-600/20 to-purple-600/20 border border-royal-500/30 flex items-center justify-center overflow-hidden group-hover:border-royal-400/50 transition-all duration-300">
-              <div className="absolute inset-0 bg-brand-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-brain w-4 h-4 text-royal-400 relative z-10 group-hover:scale-110 transition-transform duration-300" aria-hidden="true">
-                <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"></path>
-                <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"></path>
-                <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"></path>
-                <path d="M17.599 6.5a3 3 0 0 0 .399-1.375"></path>
-                <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"></path>
-                <path d="M3.477 10.896a4 4 0 0 1 .585-.396"></path>
-                <path d="M19.938 10.5a4 4 0 0 1 .585.396"></path>
-                <path d="M6 18a4 4 0 0 1-1.967-.516"></path>
-                <path d="M19.967 17.484A4 4 0 0 1 18 18"></path>
-              </svg>
+    <>
+      <header
+        className={cn(
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+          scrolled
+            ? "bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/50 py-3"
+            : "bg-transparent py-4"
+        )}
+      >
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <div className="flex items-center space-x-3">
+              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 flex items-center justify-center flex-shrink-0">
+                <Brain className="w-5 h-5 text-blue-400" />
+              </div>
+              <span className="text-lg font-display font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent leading-none">
+                PolyMathOS
+              </span>
             </div>
-            <span className="text-xl font-display font-bold bg-brand-gradient bg-clip-text text-transparent">
-              PolyMathOS
-            </span>
-          </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="text-text-secondary hover:text-text-primary transition-all duration-200 relative group font-medium"
-              >
-                {item.name}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-royal-500 group-hover:w-full transition-all duration-300"></span>
-              </a>
-            ))}
-          </nav>
-
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-4">
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 text-text-secondary hover:text-text-primary hover:bg-dark-surface/30 rounded-lg transition-all duration-200 focus-silver"
-              aria-label="Toggle dark mode"
-            >
-              <Icon icon={darkMode ? Sun : Moon} size="sm" />
-            </button>
-            
-            {user ? (
-              <>
-                <span className="text-sm text-text-secondary">
-                  Welcome, <span className="text-text-primary font-medium">{user.firstName}</span>!
-                </span>
-                <Button variant="ghost" size="sm" onClick={onSignOut}>
-                  Sign Out
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button variant="ghost" size="sm" onClick={onSignIn}>
-                  Sign In
-                </Button>
-                <Button variant="primary" size="sm" onClick={onGetStarted}>
-                  Get Started
-                </Button>
-              </>
-            )}
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center space-x-2">
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 text-text-secondary hover:text-text-primary rounded-lg transition-colors duration-200"
-              aria-label="Toggle dark mode"
-            >
-              <Icon icon={darkMode ? Sun : Moon} size="sm" />
-            </button>
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-text-secondary hover:text-text-primary rounded-lg transition-colors duration-200"
-              aria-label="Toggle menu"
-            >
-              <Icon icon={mobileMenuOpen ? X : Menu} size="sm" />
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden py-6 border-t border-silver-500/20">
-            <nav className="flex flex-col space-y-4">
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-1">
               {navItems.map((item) => (
                 <a
                   key={item.name}
                   href={item.href}
-                  className="text-text-secondary hover:text-text-primary transition-colors duration-200 py-2 font-medium"
-                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    "px-4 py-2 text-sm font-medium rounded-lg",
+                    "text-slate-300 hover:text-white",
+                    "hover:bg-slate-800/50 transition-all duration-200",
+                    "relative group"
+                  )}
                 >
                   {item.name}
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-blue-500 group-hover:w-1/2 transition-all duration-300" />
                 </a>
               ))}
-              <div className="flex flex-col space-y-2 pt-4">
+            </nav>
+
+            {/* Desktop Actions */}
+            <div className="hidden md:flex items-center space-x-3">
+              <button
+                onClick={toggleDarkMode}
+                className={cn(
+                  "p-2.5 rounded-lg transition-all duration-200",
+                  "text-slate-400 hover:text-white",
+                  "hover:bg-slate-800/50"
+                )}
+                aria-label="Toggle theme"
+              >
+                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
+
+              {user ? (
+                <div className="flex items-center space-x-3">
+                  <span className="text-sm text-slate-400">
+                    Hi, <span className="text-white font-medium">{user.firstName}</span>
+                  </span>
+                  <Button variant="ghost" size="sm" onClick={onSignOut} className="text-slate-300">
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Button variant="ghost" size="sm" onClick={onSignIn} className="text-slate-300">
+                    Sign In
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={onGetStarted}
+                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-0"
+                  >
+                    Get Started
+                  </Button>
+                </>
+              )}
+            </div>
+
+            {/* Mobile Menu Button */}
+            <div className="flex md:hidden items-center space-x-2">
+              <button
+                onClick={toggleDarkMode}
+                className="p-2.5 rounded-lg text-slate-400 hover:text-white transition-colors"
+                aria-label="Toggle theme"
+              >
+                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2.5 rounded-lg text-slate-400 hover:text-white transition-colors"
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 md:hidden"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className={cn(
+                "fixed top-0 right-0 bottom-0 w-[85%] max-w-sm z-50 md:hidden",
+                "bg-slate-950 border-l border-slate-800",
+                "flex flex-col"
+              )}
+            >
+              <div className="flex items-center justify-between p-4 border-b border-slate-800">
+                <div className="flex items-center space-x-2">
+                  <Brain className="w-6 h-6 text-blue-500" />
+                  <span className="font-display font-bold text-white">Menu</span>
+                </div>
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-2 rounded-lg text-slate-400 hover:text-white transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <nav className="flex-1 overflow-y-auto py-4">
+                <div className="space-y-1 px-3">
+                  {navItems.map((item, index) => (
+                    <motion.a
+                      key={item.name}
+                      href={item.href}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={cn(
+                        "flex items-center justify-between py-3 px-4 rounded-xl",
+                        "text-slate-300 hover:text-white",
+                        "hover:bg-slate-800/50 transition-all duration-200"
+                      )}
+                    >
+                      <span className="font-medium">{item.name}</span>
+                      <ChevronRight className="w-5 h-5 text-slate-500" />
+                    </motion.a>
+                  ))}
+                </div>
+              </nav>
+
+              <div className="p-4 border-t border-slate-800 space-y-3">
                 {user ? (
                   <>
-                    <span className="text-sm text-text-secondary mb-2">
-                      Welcome, <span className="text-text-primary font-medium">{user.firstName}</span>!
-                    </span>
-                    <Button variant="ghost" size="sm" onClick={onSignOut}>
+                    <div className="text-center mb-4">
+                      <p className="text-sm text-slate-400">
+                        Signed in as <span className="text-white font-medium">{user.firstName}</span>
+                      </p>
+                    </div>
+                    <Button
+                      variant="secondary"
+                      className="w-full bg-slate-800 hover:bg-slate-700 text-white border-slate-700"
+                      onClick={() => { onSignOut(); setMobileMenuOpen(false); }}
+                    >
                       Sign Out
                     </Button>
                   </>
                 ) : (
                   <>
-                    <Button variant="ghost" size="sm" onClick={onSignIn}>
+                    <Button
+                      variant="secondary"
+                      className="w-full bg-slate-800 hover:bg-slate-700 text-white border-slate-700"
+                      onClick={() => { onSignIn(); setMobileMenuOpen(false); }}
+                    >
                       Sign In
                     </Button>
-                    <Button variant="primary" size="sm" onClick={onGetStarted}>
-                      Get Started
+                    <Button
+                      className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                      onClick={() => { onGetStarted(); setMobileMenuOpen(false); }}
+                    >
+                      Get Started Free
                     </Button>
                   </>
                 )}
               </div>
-            </nav>
-          </div>
+            </motion.div>
+          </>
         )}
-      </div>
-    </header>
+      </AnimatePresence>
+    </>
   );
 };
-

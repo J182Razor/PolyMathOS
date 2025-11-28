@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../../lib/utils';
 
 interface CardProps {
   children: React.ReactNode;
@@ -6,6 +7,7 @@ interface CardProps {
   hover?: boolean;
   gradient?: boolean;
   glass?: boolean;
+  padding?: 'none' | 'sm' | 'md' | 'lg';
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -13,34 +15,80 @@ export const Card: React.FC<CardProps> = ({
   className = '',
   hover = false,
   gradient = false,
-  glass = true
+  glass = false,
+  padding = 'md',
 }) => {
-  const baseClasses = 'rounded-xl transition-all duration-300 transform-gpu relative overflow-hidden';
-  
-  const backgroundClasses = glass
-    ? 'glass'
-    : gradient
-    ? 'bg-gradient-to-br from-dark-surface to-dark-elevated'
-    : 'bg-dark-surface';
-  
-  const borderClasses = glass
-    ? ''
-    : 'border border-silver-dark/20';
-  
-  const hoverClasses = hover 
-    ? `
-      hover:shadow-silver-lg hover:scale-[1.02]
-      hover:border-silver-base/40
-      before:absolute before:inset-0 before:bg-shimmer before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:pointer-events-none
-    `
-    : '';
-  
-  const shadowClasses = glass ? '' : 'shadow-glass';
-  
+  const paddingClasses = {
+    none: '',
+    sm: 'p-4',
+    md: 'p-6',
+    lg: 'p-8',
+  };
+
   return (
-    <div className={`${baseClasses} ${backgroundClasses} ${borderClasses} ${shadowClasses} ${hoverClasses} ${className}`}>
-      <div className="relative z-10">{children}</div>
+    <div
+      className={cn(
+        'rounded-2xl transition-all duration-300',
+        // Background
+        glass
+          ? 'bg-slate-900/80 backdrop-blur-xl border border-slate-800'
+          : gradient
+            ? 'bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700'
+            : 'bg-slate-900/50 backdrop-blur-xl border border-slate-800',
+        // Hover effects
+        hover && [
+          'hover:shadow-lg hover:-translate-y-1',
+          'hover:border-blue-500/50',
+        ],
+        // Padding
+        paddingClasses[padding],
+        className
+      )}
+    >
+      {children}
     </div>
   );
 };
 
+// Card subcomponents
+export const CardHeader: React.FC<{ children: React.ReactNode; className?: string }> = ({ 
+  children, 
+  className 
+}) => (
+  <div className={cn('mb-4', className)}>{children}</div>
+);
+
+export const CardTitle: React.FC<{ 
+  children: React.ReactNode; 
+  className?: string;
+  as?: 'h1' | 'h2' | 'h3' | 'h4';
+}> = ({ 
+  children, 
+  className,
+  as: Component = 'h3'
+}) => (
+  <Component className={cn('font-display font-semibold text-white', className)}>
+    {children}
+  </Component>
+);
+
+export const CardDescription: React.FC<{ children: React.ReactNode; className?: string }> = ({ 
+  children, 
+  className 
+}) => (
+  <p className={cn('text-sm text-slate-400 mt-1', className)}>{children}</p>
+);
+
+export const CardContent: React.FC<{ children: React.ReactNode; className?: string }> = ({ 
+  children, 
+  className 
+}) => (
+  <div className={cn('', className)}>{children}</div>
+);
+
+export const CardFooter: React.FC<{ children: React.ReactNode; className?: string }> = ({ 
+  children, 
+  className 
+}) => (
+  <div className={cn('mt-4 pt-4 border-t border-slate-800', className)}>{children}</div>
+);

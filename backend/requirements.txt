@@ -49,3 +49,21 @@ supabase
 PyPDF2
 python-docx
 # Lemon AI (optional - can be installed separately)
+
+# Swarms Tools - Extended agent capabilities
+# Install from: https://github.com/The-Swarm-Corporation/swarms-tools.git
+swarms-tools>=1.0.0
+
+# SwarmDB - Enhanced database functionality
+# Install from: https://github.com/The-Swarm-Corporation/SwarmDB.git
+# Note: May need to install from source
+# git+https://github.com/The-Swarm-Corporation/SwarmDB.git
+
+# Additional dependencies for swarms-tools
+httpx>=0.24.0
+orjson>=3.9.0
+
+# Note: To install SwarmDB, clone and install from source:
+# git clone https://github.com/The-Swarm-Corporation/SwarmDB.git
+# cd SwarmDB
+# pip install -e .

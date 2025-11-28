@@ -1,82 +1,129 @@
+"use client";
+
 import React from 'react';
-import { UserPlus, Brain, Rocket } from 'lucide-react';
-import { Icon } from '../ui/Icon';
-import { Card } from '../ui/Card';
+import { motion } from 'framer-motion';
+import { UserPlus, Compass, Rocket, Trophy } from 'lucide-react';
+import { cn } from '../../lib/utils';
+
+interface StepProps {
+  number: number;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  isLast?: boolean;
+}
+
+const Step: React.FC<StepProps> = ({ number, icon, title, description, isLast }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: "-50px" }}
+    transition={{ duration: 0.6, delay: number * 0.15 }}
+    className="relative flex flex-col items-center text-center"
+  >
+    {/* Connection Line - Desktop */}
+    {!isLast && (
+      <div className="hidden md:block absolute top-12 left-[calc(50%+40px)] w-[calc(100%-80px)] h-0.5 bg-gradient-to-r from-blue-500/50 to-purple-500/50" />
+    )}
+    
+    {/* Step Number */}
+    <div className={cn(
+      "relative w-20 h-20 md:w-24 md:h-24 rounded-2xl mb-6",
+      "bg-slate-900/80 backdrop-blur-xl",
+      "border border-slate-700 flex items-center justify-center",
+      "group hover:border-blue-500/50 transition-all duration-300"
+    )}>
+      <div className="absolute -top-2 -right-2 w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-sm font-bold text-white">
+        {number}
+      </div>
+      <div className="text-blue-400 group-hover:scale-110 transition-transform duration-300">
+        {icon}
+      </div>
+    </div>
+
+    {/* Content */}
+    <h3 className="text-lg md:text-xl font-display font-semibold text-white mb-2">
+      {title}
+    </h3>
+    <p className="text-sm md:text-base text-slate-400 max-w-xs">
+      {description}
+    </p>
+  </motion.div>
+);
+
+const steps = [
+  {
+    icon: <UserPlus className="w-8 h-8 md:w-10 md:h-10" />,
+    title: "Create Your Profile",
+    description: "Take our cognitive assessment to understand your learning style and current knowledge level.",
+  },
+  {
+    icon: <Compass className="w-8 h-8 md:w-10 md:h-10" />,
+    title: "Choose Your Path",
+    description: "Select your domains of interest and let AI create a personalized learning curriculum.",
+  },
+  {
+    icon: <Rocket className="w-8 h-8 md:w-10 md:h-10" />,
+    title: "Learn & Practice",
+    description: "Engage with interactive lessons, flashcards, and deep work sessions optimized for retention.",
+  },
+  {
+    icon: <Trophy className="w-8 h-8 md:w-10 md:h-10" />,
+    title: "Track & Achieve",
+    description: "Monitor your progress, earn achievements, and watch your expertise grow exponentially.",
+  },
+];
 
 export const HowItWorks: React.FC = () => {
-  const steps = [
-    {
-      icon: UserPlus,
-      title: 'Sign Up & Assess',
-      description: 'Complete our 5-minute cognitive assessment to understand your unique learning profile and preferences.',
-    },
-    {
-      icon: Brain,
-      title: 'AI Creates Your Path',
-      description: 'Our neural engine analyzes your data and creates a personalized learning journey optimized for your brain.',
-    },
-    {
-      icon: Rocket,
-      title: 'Learn & Accelerate',
-      description: 'Experience exponential growth as you progress through adaptive content that evolves with your abilities.',
-    }
-  ];
-
   return (
-    <section id="how-it-works" className="py-24 bg-light-surface dark:bg-dark-base">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+    <section id="how-it-works" className="relative py-20 md:py-32 bg-slate-900 overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
+      </div>
+
+      <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-20">
-          <h2 className="text-4xl sm:text-5xl font-display font-bold text-text-primary mb-6">
-            How It Works
-          </h2>
-          <p className="text-xl sm:text-2xl text-text-secondary max-w-3xl mx-auto leading-relaxed">
-            Get started in minutes and begin your transformation journey with our simple three-step process.
-          </p>
-        </div>
-
-        {/* Timeline */}
-        <div className="relative">
-          {/* Desktop Timeline Line */}
-          <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-royal-600 via-purple-600 to-royal-600 transform -translate-y-1/2 opacity-30"></div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-            {steps.map((step, index) => (
-              <div key={index} className="relative">
-                {/* Mobile Timeline Line */}
-                {index < steps.length - 1 && (
-                  <div className="lg:hidden absolute left-8 top-20 bottom-0 w-1 bg-gradient-to-b from-royal-600 to-purple-600 opacity-30"></div>
-                )}
-
-                <Card hover className="relative p-8 rounded-xl border-2 border-silver-500/20 hover:border-royal-500/40 transition-all duration-300">
-                  {/* Step Number */}
-                  <div className="absolute -top-5 left-8 lg:left-1/2 lg:transform lg:-translate-x-1/2 w-10 h-10 bg-dark-base rounded-full border-4 border-royal-500 flex items-center justify-center shadow-lg shadow-royal-500/30">
-                    <span className="text-sm font-bold text-royal-400">
-                      {index + 1}
-                    </span>
-                  </div>
-
-                  {/* Icon */}
-                  <div className="w-18 h-18 bg-gradient-to-br from-royal-600/20 to-purple-600/20 border-2 border-royal-500/30 rounded-xl flex items-center justify-center mb-6 mx-auto lg:mx-0 shadow-lg shadow-royal-500/10">
-                    <Icon icon={step.icon} size="xl" className="text-royal-400" />
-                  </div>
-
-                  {/* Content */}
-                  <div className="text-center lg:text-left">
-                    <h3 className="text-2xl font-display font-semibold text-text-primary mb-4">
-                      {step.title}
-                    </h3>
-                    <p className="text-base text-text-secondary leading-relaxed">
-                      {step.description}
-                    </p>
-                  </div>
-                </Card>
-              </div>
-            ))}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16 md:mb-20"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 backdrop-blur-sm mb-6">
+            <Compass className="w-4 h-4 text-purple-400" />
+            <span className="text-sm text-purple-300 font-medium">
+              Simple Process
+            </span>
           </div>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white mb-4">
+            How{' '}
+            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              PolyMathOS
+            </span>{' '}
+            Works
+          </h2>
+          <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto">
+            Get started in minutes and transform your learning journey forever.
+          </p>
+        </motion.div>
+
+        {/* Steps */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-4">
+          {steps.map((step, index) => (
+            <Step
+              key={step.title}
+              number={index + 1}
+              icon={step.icon}
+              title={step.title}
+              description={step.description}
+              isLast={index === steps.length - 1}
+            />
+          ))}
         </div>
       </div>
     </section>
   );
 };
-

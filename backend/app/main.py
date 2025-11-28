@@ -6,14 +6,25 @@ import json
 from app.core.enhanced_system import genius_system
 from app.core.config_manager import config_manager
 
+# Import integration manager
+try:
+    from app.core.integration_manager import get_integration_manager
+    INTEGRATION_MANAGER_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: Integration manager not available: {e}")
+    INTEGRATION_MANAGER_AVAILABLE = False
+
 # Import Learning AI router for the Genius Professor system
 try:
-    from app.api.learning_ai import router as learning_ai_router
+    from app.api import learning_ai, auth
     LEARNING_AI_AVAILABLE = True
+    AUTH_AVAILABLE = True
 except ImportError as e:
-    print(f"Warning: Learning AI router not available: {e}")
+    print(f"Warning: Learning AI or Auth router not available: {e}")
     LEARNING_AI_AVAILABLE = False
-    learning_ai_router = None
+    AUTH_AVAILABLE = False
+    learning_ai = None
+    auth = None
 
 app = FastAPI(
     title="PolyMathOS Genius Engine",
@@ -31,9 +42,14 @@ app.add_middleware(
 )
 
 # Include Learning AI routes (Genius Professor system)
-if LEARNING_AI_AVAILABLE and learning_ai_router:
-    app.include_router(learning_ai_router)
+if LEARNING_AI_AVAILABLE and learning_ai:
+    app.include_router(learning_ai.router)
     print("[OK] Learning AI (Genius Professor) routes registered")
+
+# Include Auth routes
+if AUTH_AVAILABLE and auth:
+    app.include_router(auth.router)
+    print("[OK] Auth routes registered")
 
 class UserEnrollment(BaseModel):
     user_id: str
@@ -225,7 +241,7 @@ def quantum_pattern_recognition(request: PatternRecognitionRequest):
 @app.get("/system/status")
 def system_status():
     """Get system status and capabilities"""
-    return {
+    status = {
         "status": "active",
         "version": "2.0.0",
         "quantum_available": genius_system.quantum_optimizer is not None,
@@ -261,6 +277,43 @@ def system_status():
             "visualization": "Memory Palace (Method of Loci)"
         }
     }
+    
+    # Add integration status if available
+    if INTEGRATION_MANAGER_AVAILABLE:
+        try:
+            manager = get_integration_manager()
+            health = manager.health_check()
+            status["integrations"] = health
+        except Exception as e:
+            status["integrations"] = {"status": "error", "message": str(e)}
+    
+    return status
+
+@app.get("/integrations/status")
+def integrations_status():
+    """Get detailed integration status"""
+    if not INTEGRATION_MANAGER_AVAILABLE:
+        return {"status": "unavailable", "message": "Integration manager not available"}
+    
+    try:
+        manager = get_integration_manager()
+        health = manager.health_check()
+        return health
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@app.post("/integrations/initialize")
+def initialize_integrations():
+    """Initialize all integrations"""
+    if not INTEGRATION_MANAGER_AVAILABLE:
+        return {"status": "error", "message": "Integration manager not available"}
+    
+    try:
+        manager = get_integration_manager()
+        results = manager.initialize_all()
+        return {"status": "success", "results": results}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
 @app.post("/llm/select")
 def select_optimal_llm(request: LLMSelectionRequest):

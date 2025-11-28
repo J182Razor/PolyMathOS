@@ -1,183 +1,162 @@
+"use client";
+
 import React from 'react';
-import { Brain, Twitter, Facebook, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
-import { Icon } from '../ui/Icon';
-import { Button } from '../ui/Button';
+import { Brain, Twitter, Github, Linkedin, Youtube } from 'lucide-react';
+import { cn } from '../../lib/utils';
+
+const footerLinks = {
+  product: [
+    { name: 'Features', href: '#features' },
+    { name: 'Pricing', href: '#pricing' },
+    { name: 'How It Works', href: '#how-it-works' },
+    { name: 'Testimonials', href: '#testimonials' },
+  ],
+  resources: [
+    { name: 'Documentation', href: '#' },
+    { name: 'Blog', href: '#' },
+    { name: 'Learning Science', href: '#' },
+    { name: 'API Reference', href: '#' },
+  ],
+  company: [
+    { name: 'About Us', href: '#' },
+    { name: 'Careers', href: '#' },
+    { name: 'Contact', href: '#' },
+    { name: 'Press Kit', href: '#' },
+  ],
+  legal: [
+    { name: 'Privacy Policy', href: '#' },
+    { name: 'Terms of Service', href: '#' },
+    { name: 'Cookie Policy', href: '#' },
+  ],
+};
+
+const socialLinks = [
+  { name: 'Twitter', icon: Twitter, href: '#' },
+  { name: 'GitHub', icon: Github, href: '#' },
+  { name: 'LinkedIn', icon: Linkedin, href: '#' },
+  { name: 'YouTube', icon: Youtube, href: '#' },
+];
 
 export const Footer: React.FC = () => {
-  const footerLinks = {
-    product: [
-      { name: 'Features', href: '#features' },
-      { name: 'How It Works', href: '#how-it-works' },
-      { name: 'Pricing', href: '#pricing' },
-      { name: 'API', href: '#' },
-      { name: 'Integrations', href: '#' }
-    ],
-    company: [
-      { name: 'About Us', href: '#' },
-      { name: 'Careers', href: '#' },
-      { name: 'Press', href: '#' },
-      { name: 'Blog', href: '#' },
-      { name: 'Contact', href: '#' }
-    ],
-    resources: [
-      { name: 'Documentation', href: '#' },
-      { name: 'Help Center', href: '#' },
-      { name: 'Community', href: '#' },
-      { name: 'Webinars', href: '#' },
-      { name: 'Research', href: '#' }
-    ],
-    legal: [
-      { name: 'Privacy Policy', href: '#' },
-      { name: 'Terms of Service', href: '#' },
-      { name: 'Cookie Policy', href: '#' },
-      { name: 'GDPR', href: '#' },
-      { name: 'Security', href: '#' }
-    ]
-  };
-
   return (
-    <footer className="bg-dark-base text-text-primary">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
-          {/* Brand Section */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-silver-base/20 to-silver-dark/20 border border-silver-base/30 rounded-lg flex items-center justify-center">
-                <Icon icon={Brain} size="sm" className="text-silver-light" />
+    <footer className="relative bg-slate-900 border-t border-slate-800">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Main Footer */}
+        <div className="py-12 md:py-16">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-8">
+            {/* Brand */}
+            <div className="col-span-2">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 flex items-center justify-center">
+                  <Brain className="w-5 h-5 text-blue-400" />
+                </div>
+                <span className="text-xl font-display font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                  PolyMathOS
+                </span>
               </div>
-              <span className="text-xl font-display font-bold text-shimmer">PolyMathOS</span>
-            </div>
-            <p className="text-text-secondary mb-6 max-w-md">
-              Transforming education through AI-powered personalized learning. 
-              Unlock your cognitive potential and accelerate your growth.
-            </p>
-            
-            {/* Newsletter Signup */}
-            <div className="mb-6">
-              <h4 className="font-display font-semibold text-text-primary mb-3">Stay Updated</h4>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="flex-1 px-4 py-2 bg-dark-surface border border-silver-dark/30 rounded-lg text-text-primary placeholder-text-tertiary focus-silver"
-                />
-                <Button variant="primary" size="sm">
-                  Subscribe
-                </Button>
+              <p className="text-slate-400 text-sm mb-6 max-w-xs">
+                Transform your learning with AI-powered tools and neuroscience-backed methods.
+              </p>
+              {/* Social Links */}
+              <div className="flex gap-4">
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.name}
+                    href={social.href}
+                    className={cn(
+                      "w-10 h-10 rounded-lg flex items-center justify-center",
+                      "bg-slate-800 text-slate-400",
+                      "hover:bg-blue-500/10 hover:text-blue-400",
+                      "transition-all duration-200"
+                    )}
+                    aria-label={social.name}
+                  >
+                    <social.icon className="w-5 h-5" />
+                  </a>
+                ))}
               </div>
             </div>
 
-            {/* Social Links */}
-            <div className="flex space-x-4">
-              <a href="#" className="text-text-tertiary hover:text-silver-light transition-colors">
-                <Icon icon={Twitter} size="sm" />
-              </a>
-              <a href="#" className="text-text-tertiary hover:text-silver-light transition-colors">
-                <Icon icon={Facebook} size="sm" />
-              </a>
-              <a href="#" className="text-text-tertiary hover:text-silver-light transition-colors">
-                <Icon icon={Linkedin} size="sm" />
-              </a>
+            {/* Product Links */}
+            <div>
+              <h4 className="text-white font-semibold mb-4">Product</h4>
+              <ul className="space-y-3">
+                {footerLinks.product.map((link) => (
+                  <li key={link.name}>
+                    <a
+                      href={link.href}
+                      className="text-slate-400 hover:text-blue-400 text-sm transition-colors"
+                    >
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
 
-          {/* Product Links */}
-          <div>
-            <h4 className="font-display font-semibold text-text-primary mb-4">Product</h4>
-            <ul className="space-y-2">
-              {footerLinks.product.map((link) => (
-                <li key={link.name}>
-                  <a href={link.href} className="text-text-secondary hover:text-silver-light transition-colors">
-                    {link.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+            {/* Resources Links */}
+            <div>
+              <h4 className="text-white font-semibold mb-4">Resources</h4>
+              <ul className="space-y-3">
+                {footerLinks.resources.map((link) => (
+                  <li key={link.name}>
+                    <a
+                      href={link.href}
+                      className="text-slate-400 hover:text-blue-400 text-sm transition-colors"
+                    >
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          {/* Company Links */}
-          <div>
-            <h4 className="font-display font-semibold text-text-primary mb-4">Company</h4>
-            <ul className="space-y-2">
-              {footerLinks.company.map((link) => (
-                <li key={link.name}>
-                  <a href={link.href} className="text-text-secondary hover:text-silver-light transition-colors">
-                    {link.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+            {/* Company Links */}
+            <div>
+              <h4 className="text-white font-semibold mb-4">Company</h4>
+              <ul className="space-y-3">
+                {footerLinks.company.map((link) => (
+                  <li key={link.name}>
+                    <a
+                      href={link.href}
+                      className="text-slate-400 hover:text-blue-400 text-sm transition-colors"
+                    >
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          {/* Resources Links */}
-          <div>
-            <h4 className="font-display font-semibold text-text-primary mb-4">Resources</h4>
-            <ul className="space-y-2">
-              {footerLinks.resources.map((link) => (
-                <li key={link.name}>
-                  <a href={link.href} className="text-text-secondary hover:text-silver-light transition-colors">
-                    {link.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Legal Links */}
-          <div>
-            <h4 className="font-display font-semibold text-text-primary mb-4">Legal</h4>
-            <ul className="space-y-2">
-              {footerLinks.legal.map((link) => (
-                <li key={link.name}>
-                  <a href={link.href} className="text-text-secondary hover:text-silver-light transition-colors">
-                    {link.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            {/* Legal Links */}
+            <div>
+              <h4 className="text-white font-semibold mb-4">Legal</h4>
+              <ul className="space-y-3">
+                {footerLinks.legal.map((link) => (
+                  <li key={link.name}>
+                    <a
+                      href={link.href}
+                      className="text-slate-400 hover:text-blue-400 text-sm transition-colors"
+                    >
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
 
-        {/* Contact Info */}
-        <div className="border-t border-silver-dark/20 mt-12 pt-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="flex items-center space-x-3">
-              <Icon icon={Mail} size="sm" className="text-silver-base" />
-              <span className="text-text-secondary">hello@polymathos.com</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Icon icon={Phone} size="sm" className="text-silver-base" />
-              <span className="text-text-secondary">+1 (555) 123-4567</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Icon icon={MapPin} size="sm" className="text-silver-base" />
-              <span className="text-text-secondary">San Francisco, CA</span>
-            </div>
-          </div>
-
-          {/* Trust Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-6 mb-8">
-            <div className="flex items-center space-x-2 text-sm text-text-tertiary">
-              <div className="w-4 h-4 bg-green-400 rounded-full"></div>
-              <span>SOC 2 Type II Certified</span>
-            </div>
-            <div className="flex items-center space-x-2 text-sm text-text-tertiary">
-              <div className="w-4 h-4 bg-blue-400 rounded-full"></div>
-              <span>GDPR Compliant</span>
-            </div>
-            <div className="flex items-center space-x-2 text-sm text-text-tertiary">
-              <div className="w-4 h-4 bg-silver-base rounded-full"></div>
-              <span>ISO 27001 Certified</span>
-            </div>
-          </div>
-
-          {/* Copyright */}
-          <div className="text-center text-text-tertiary text-sm">
-            <p>&copy; 2025 PolyMathOS. All rights reserved.</p>
-          </div>
+        {/* Bottom Bar */}
+        <div className="py-6 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-slate-400 text-sm">
+            © {new Date().getFullYear()} PolyMathOS. All rights reserved.
+          </p>
+          <p className="text-slate-500 text-sm">
+            Built with 💜 for lifelong learners
+          </p>
         </div>
       </div>
     </footer>
   );
 };
-

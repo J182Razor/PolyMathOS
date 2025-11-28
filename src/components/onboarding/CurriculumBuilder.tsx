@@ -22,9 +22,10 @@ interface LearningPath {
 interface CurriculumBuilderProps {
   userData: any;
   onComplete: (program: any) => void;
+  onBack?: () => void;
 }
 
-const CurriculumBuilder: React.FC<CurriculumBuilderProps> = ({ userData, onComplete }) => {
+const CurriculumBuilder: React.FC<CurriculumBuilderProps> = ({ userData, onComplete, onBack }) => {
   // Generate sample learning paths based on user domains
   const generateLearningPaths = (): LearningPath[] => {
     const domains = userData.domains && userData.domains.length > 0 ? userData.domains : ['General'];
@@ -195,12 +196,22 @@ const CurriculumBuilder: React.FC<CurriculumBuilderProps> = ({ userData, onCompl
         </motion.div>
       )}
 
-      <button
-        onClick={handleCreateProgram}
-        className="poly-btn-primary w-full"
-      >
-        Start My Learning Journey
-      </button>
+      <div className="flex gap-3">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="poly-btn-secondary flex-1"
+          >
+            Back
+          </button>
+        )}
+        <button
+          onClick={handleCreateProgram}
+          className={`poly-btn-primary ${onBack ? 'flex-1' : 'w-full'}`}
+        >
+          Start My Learning Journey
+        </button>
+      </div>
     </motion.div>
   );
 };
