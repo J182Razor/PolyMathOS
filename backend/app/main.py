@@ -26,6 +26,36 @@ except ImportError as e:
     learning_ai = None
     auth = None
 
+# Import new Swarm Corporation routers
+try:
+    from app.api import hdam, swarms, documents, research, rag, security, workflows, database
+    HDAM_AVAILABLE = True
+    SWARMS_AVAILABLE = True
+    DOCUMENTS_AVAILABLE = True
+    RESEARCH_AVAILABLE = True
+    RAG_AVAILABLE = True
+    SECURITY_AVAILABLE = True
+    WORKFLOWS_AVAILABLE = True
+    DATABASE_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: Some Swarm Corporation routers not available: {e}")
+    HDAM_AVAILABLE = False
+    SWARMS_AVAILABLE = False
+    DOCUMENTS_AVAILABLE = False
+    RESEARCH_AVAILABLE = False
+    RAG_AVAILABLE = False
+    SECURITY_AVAILABLE = False
+    WORKFLOWS_AVAILABLE = False
+    DATABASE_AVAILABLE = False
+    hdam = None
+    swarms = None
+    documents = None
+    research = None
+    rag = None
+    security = None
+    workflows = None
+    database = None
+
 app = FastAPI(
     title="PolyMathOS Genius Engine",
     description="A comprehensive cognitive enhancement and learning system implementing the Polymath Stack",
@@ -50,6 +80,54 @@ if LEARNING_AI_AVAILABLE and learning_ai:
 if AUTH_AVAILABLE and auth:
     app.include_router(auth.router)
     print("[OK] Auth routes registered")
+
+# Include HDAM routes
+if HDAM_AVAILABLE and hdam:
+    app.include_router(hdam.router)
+    print("[OK] HDAM routes registered")
+
+# Include Swarms routes
+if SWARMS_AVAILABLE and swarms:
+    app.include_router(swarms.router)
+    print("[OK] Swarms routes registered")
+
+# Include Documents routes
+if DOCUMENTS_AVAILABLE and documents:
+    app.include_router(documents.router)
+    print("[OK] Documents routes registered")
+
+# Include Research routes
+if RESEARCH_AVAILABLE and research:
+    app.include_router(research.router)
+    print("[OK] Research routes registered")
+
+# Include RAG routes
+if RAG_AVAILABLE and rag:
+    app.include_router(rag.router)
+    print("[OK] RAG routes registered")
+
+# Include Security routes
+if SECURITY_AVAILABLE and security:
+    app.include_router(security.router)
+    print("[OK] Security routes registered")
+
+# Include Workflows routes
+if WORKFLOWS_AVAILABLE and workflows:
+    app.include_router(workflows.router)
+    print("[OK] Workflows routes registered")
+
+# Include Database routes
+if DATABASE_AVAILABLE and database:
+    app.include_router(database.router)
+    print("[OK] Database routes registered")
+
+# Include Health check routes
+try:
+    from app.api import health
+    app.include_router(health.router)
+    print("[OK] Health check routes registered")
+except ImportError as e:
+    print(f"Warning: Health check router not available: {e}")
 
 class UserEnrollment(BaseModel):
     user_id: str

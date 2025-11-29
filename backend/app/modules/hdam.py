@@ -32,8 +32,9 @@ except ImportError:
 # Global numeric configuration (15+ decimal precision)
 # ---------------------------------------------------------------------
 TORCH_FLOAT = torch.float64          # ~15 decimal digits
-TORCH_COMPLEX = torch.complex128     # complex counterpart
+TORCH_COMPLEX = torch.complex128     # PyTorch complex type
 NP_FLOAT = np.float64                # ~15 decimal digits
+NP_COMPLEX = np.complex128           # NumPy complex type (for numpy operations)
 SIMILARITY_DECIMALS = 15             # for display / formatting
 PRECISION_THRESHOLD = 1e-15          # Minimum distinguishable difference
 
@@ -80,10 +81,10 @@ class QuantumHolographicProcessor:
         """
         High-precision inverse Fourier transform with 15-decimal accuracy.
         """
-        freq_array = np.array(freq_vector, dtype=TORCH_COMPLEX)
+        freq_array = np.array(freq_vector, dtype=NP_COMPLEX)
         # Zero-pad to next power of 2 for efficiency
         padded_length = 2**math.ceil(math.log2(len(freq_array)))
-        padded_freq = np.zeros(padded_length, dtype=TORCH_COMPLEX)
+        padded_freq = np.zeros(padded_length, dtype=np.complex128)
         padded_freq[:len(freq_array)] = freq_array
         
         # Compute IFFT with high precision
@@ -123,7 +124,7 @@ class QuantumHolographicProcessor:
         retrieved_freq = memory_trace * query_freq
         
         # Convert back to time domain
-        retrieved = self.inverse_fourier_transform(tuple(retrieved_freq.tolist()))
+        retrieved = self.inverse_fourier_transform(tuple(retrieved_freq))
         return retrieved
     
     def quantum_optimized_selection(self, similarities: np.ndarray, k: int) -> List[int]:
@@ -313,7 +314,7 @@ class AdvancedHolographicMemory:
         
         # Add to appropriate memory trace
         if context not in self.memory_traces:
-            self.memory_traces[context] = np.zeros(self.dimensions, dtype=TORCH_COMPLEX)
+            self.memory_traces[context] = np.zeros(self.dimensions, dtype=np.complex128)
         
         self.memory_traces[context] += bound_freq
         
@@ -543,9 +544,11 @@ class SupabaseHDAMStorage:
         metadata: List[Dict[str, Any]],
         table: str = "holographic_embeddings",
         quantum_enhanced: bool = False,
+        context: str = "general",
     ) -> Dict[str, Any]:
         """
         Store high-precision embeddings with metadata.
+        Now includes vector column for pgvector similarity search.
         """
         try:
             rows = []
@@ -559,13 +562,18 @@ class SupabaseHDAMStorage:
                     emb_real = emb.astype(NP_FLOAT).tolist()
                     emb_imag = None
                 
+                # Extract context from metadata if available
+                item_context = meta.get("context", context) if meta else context
+                
                 record = {
                     "id": hashlib.md5(
                         (str(emb_real) + str(sorted(meta.items()))).encode()
                     ).hexdigest(),
-                    "embedding": {"real": emb_real, "imag": emb_imag},
+                    "embedding": {"real": emb_real, "imag": emb_imag if emb_imag is not None else [0.0]*len(emb_real)},
+                    "embedding_vector": emb_real,  # Real part as vector for pgvector
                     "metadata": meta,
                     "quantum_enhanced": quantum_enhanced,
+                    "context": item_context,
                     "created_at": datetime.utcnow().isoformat(),
                 }
                 rows.append(record)
@@ -620,12 +628,36 @@ class EnhancedQuantumHolographicHDAM:
         )
         
         # Supabase integration for persistence
+        # Try to get credentials from credential manager if not provided
+        if not supabase_url or not supabase_key:
+            try:
+                from credential_manager import get_credential_manager
+                cred_manager = get_credential_manager(interactive=False)
+                supabase_url = supabase_url or cred_manager.get_credential("SUPABASE_URL")
+                supabase_key = supabase_key or cred_manager.get_credential("SUPABASE_KEY")
+            except ImportError:
+                pass
+        
         if supabase_url and supabase_key:
-            self.storage: Optional[SupabaseHDAMStorage] = SupabaseHDAMStorage(
-                supabase_url, supabase_key
-            )
+            # Skip if placeholder/invalid values
+            if ("your-" in supabase_url.lower() or "your-" in supabase_key.lower() or 
+                "placeholder" in supabase_url.lower() or "placeholder" in supabase_key.lower()):
+                print("⚠️ [HDAM] Skipping Supabase: placeholder credentials detected")
+                print("   Using ChromaDB-only mode. Configure SUPABASE_URL and SUPABASE_KEY for persistent storage.")
+                self.storage = None
+            else:
+                try:
+                    self.storage: Optional[SupabaseHDAMStorage] = SupabaseHDAMStorage(
+                        supabase_url, supabase_key
+                    )
+                    print("✓ [HDAM] Supabase storage initialized")
+                except Exception as e:
+                    print(f"⚠️ [HDAM] Failed to initialize Supabase storage: {e}")
+                    print("   Using ChromaDB-only mode.")
+                    self.storage = None
         else:
             self.storage = None
+            print("ℹ️ [HDAM] Supabase not configured - using ChromaDB-only mode")
         
         # Local in-memory store for fast access
         self.local_memory: Dict[str, Dict[str, Any]] = {}
@@ -709,7 +741,8 @@ class EnhancedQuantumHolographicHDAM:
                 list(embeddings),
                 storage_metadata,
                 table="holographic_embeddings",
-                quantum_enhanced=quantum_enhanced or self.enable_quantum
+                quantum_enhanced=quantum_enhanced or self.enable_quantum,
+                context=context
             )
             
             if verbose:
@@ -940,11 +973,11 @@ class EnhancedQuantumHolographicHDAM:
             return {
                 "trajectory": [],
                 "base_concept": base_concept,
-                "direction": f"{direction_from} -> {direction_to}"
+                "direction": f"{direction_from} → {direction_to}"
             }
         
         # Format results
-        result_lines = [f"Conceptual extrapolation from '{base_concept}' in direction '{direction_from} -> {direction_to}':"]
+        result_lines = [f"Conceptual extrapolation from '{base_concept}' in direction '{direction_from} → {direction_to}':"]
         for step_info in trajectory:
             result_lines.append(f"Step {step_info['step']}:")
             if step_info["closest_match"]:

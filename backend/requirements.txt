@@ -67,3 +67,34 @@ orjson>=3.9.0
 # git clone https://github.com/The-Swarm-Corporation/SwarmDB.git
 # cd SwarmDB
 # pip install -e .
+
+# Swarm Corporation Components
+# Security
+swarm-shield>=0.0.1
+
+# Document Processing
+doc-master>=1.0.0
+omniparse>=1.0.0
+agentparse>=1.0.0
+
+# Research
+research-paper-hive>=1.0.0
+advanced-research>=1.0.0
+
+# RAG
+agent-rag-protocol>=1.0.0
+multi-agent-rag-template>=1.0.0
+
+# Workflow
+zero>=1.0.0
+
+# Utilities
+swarms-utils>=1.0.0
+
+# Note: Many components may need to be installed from source:
+# git clone https://github.com/The-Swarm-Corporation/<component>.git
+# cd <component>
+# pip install -e .
+
+# Additional dependencies
+pyyaml>=6.0

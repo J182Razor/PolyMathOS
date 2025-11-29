@@ -1,62 +1,72 @@
-import { MCPService, ResearchResult } from './MCPService';
+/**
+ * RAG Service
+ * Service for RAG operations (AgentRAGProtocol, Multi-Agent-RAG)
+ */
 
-export class RAGService {
-    private static instance: RAGService;
-    private mcpService: MCPService;
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-    private constructor() {
-        this.mcpService = MCPService.getInstance();
-    }
-
-    public static getInstance(): RAGService {
-        if (!RAGService.instance) {
-            RAGService.instance = new RAGService();
-        }
-        return RAGService.instance;
-    }
-
-    /**
-     * Ingest a document into the knowledge base
-     * @param content The text content to ingest
-     * @param metadata Metadata about the document (source, author, etc.)
-     * @param collection The ChromaDB collection to use (default: 'polymath_knowledge')
-     */
-    public async ingestDocument(content: string, metadata: any, collection: string = 'polymath_knowledge'): Promise<boolean> {
-        try {
-            console.log(`[RAG] Ingesting document into ${collection}`);
-            return await this.mcpService.ingestDocument(collection, content, metadata);
-        } catch (error) {
-            console.error('[RAG] Ingestion failed:', error);
-            return false;
-        }
-    }
-
-    /**
-     * Retrieve relevant context for a query
-     * @param query The search query
-     * @param nResults Number of results to return
-     * @param collection The ChromaDB collection to search
-     */
-    public async retrieveContext(query: string, nResults: number = 3, collection: string = 'polymath_knowledge'): Promise<ResearchResult[]> {
-        try {
-            console.log(`[RAG] Retrieving context for: "${query}"`);
-            return await this.mcpService.queryCollection(collection, query, nResults);
-        } catch (error) {
-            console.error('[RAG] Retrieval failed:', error);
-            return [];
-        }
-    }
-
-    /**
-     * Enhance a prompt with retrieved context
-     */
-    public async enhancePrompt(prompt: string, collection: string = 'polymath_knowledge'): Promise<string> {
-        const context = await this.retrieveContext(prompt, 3, collection);
-
-        if (context.length === 0) return prompt;
-
-        const contextString = context.map(c => `[Source: ${c.title}]\n${c.summary}`).join('\n\n');
-
-        return `Context information is below.\n---------------------\n${contextString}\n---------------------\nGiven the context information and not prior knowledge, answer the query.\nQuery: ${prompt}`;
-    }
+export interface IndexDocumentsRequest {
+  documents: string[];
+  metadata?: Array<Record<string, any>>;
 }
+
+export interface RAGQueryRequest {
+  query: string;
+  top_k?: number;
+  filters?: Record<string, any>;
+}
+
+export interface ProcessDocumentsRequest {
+  documents: string[];
+  analysis_type?: 'comprehensive' | 'summary' | 'insights';
+}
+
+class RAGService {
+  private baseUrl: string;
+
+  constructor() {
+    this.baseUrl = `${API_BASE_URL}/api/rag`;
+  }
+
+  async indexDocuments(request: IndexDocumentsRequest) {
+    const response = await fetch(`${this.baseUrl}/agent/index`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+    });
+    if (!response.ok) throw new Error(`RAG indexing failed: ${response.statusText}`);
+    return response.json();
+  }
+
+  async query(request: RAGQueryRequest) {
+    const response = await fetch(`${this.baseUrl}/agent/query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+    });
+    if (!response.ok) throw new Error(`RAG query failed: ${response.statusText}`);
+    return response.json();
+  }
+
+  async getContext(agentQuery: string, contextLength: number = 2000) {
+    const response = await fetch(`${this.baseUrl}/agent/context`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ agent_query: agentQuery, context_length: contextLength }),
+    });
+    if (!response.ok) throw new Error(`Get context failed: ${response.statusText}`);
+    return response.json();
+  }
+
+  async processDocuments(request: ProcessDocumentsRequest) {
+    const response = await fetch(`${this.baseUrl}/multi-agent/process`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+    });
+    if (!response.ok) throw new Error(`Multi-agent RAG processing failed: ${response.statusText}`);
+    return response.json();
+  }
+}
+
+export const ragService = new RAGService();

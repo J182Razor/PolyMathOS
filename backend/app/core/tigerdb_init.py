@@ -472,6 +472,96 @@ SELECT
 FROM learning_progress
 GROUP BY user_id, week
 WITH NO DATA;
+
+-- ============ Swarm Corporation Integration Tables ============
+
+-- SwarmShield encrypted conversations
+CREATE TABLE IF NOT EXISTS swarm_conversations (
+    conversation_id VARCHAR(255) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    user_id VARCHAR(255),
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    metadata JSONB
+);
+CREATE INDEX IF NOT EXISTS idx_swarm_conv_user ON swarm_conversations(user_id);
+
+-- Document metadata (doc-master, OmniParse)
+CREATE TABLE IF NOT EXISTS document_metadata (
+    document_id VARCHAR(255) PRIMARY KEY,
+    user_id VARCHAR(255),
+    filename VARCHAR(500),
+    file_type VARCHAR(50),
+    file_size BIGINT,
+    content_hash VARCHAR(64),
+    parsed_data JSONB,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    metadata JSONB
+);
+CREATE INDEX IF NOT EXISTS idx_doc_meta_user ON document_metadata(user_id);
+CREATE INDEX IF NOT EXISTS idx_doc_meta_type ON document_metadata(file_type);
+
+-- Research papers (Research-Paper-Hive)
+CREATE TABLE IF NOT EXISTS research_papers (
+    paper_id VARCHAR(255) PRIMARY KEY,
+    user_id VARCHAR(255),
+    title TEXT,
+    authors TEXT[],
+    abstract TEXT,
+    year INTEGER,
+    venue VARCHAR(255),
+    doi VARCHAR(255),
+    arxiv_id VARCHAR(255),
+    url TEXT,
+    engagement_data JSONB,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_research_papers_user ON research_papers(user_id);
+CREATE INDEX IF NOT EXISTS idx_research_papers_year ON research_papers(year);
+
+-- RAG vectors (AgentRAGProtocol, Multi-Agent-RAG)
+CREATE TABLE IF NOT EXISTS rag_vectors (
+    vector_id VARCHAR(255) PRIMARY KEY,
+    user_id VARCHAR(255),
+    document_id VARCHAR(255),
+    content TEXT,
+    embedding vector(384),  -- Adjust dimension as needed
+    metadata JSONB,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_rag_vectors_user ON rag_vectors(user_id);
+CREATE INDEX IF NOT EXISTS idx_rag_vectors_doc ON rag_vectors(document_id);
+CREATE INDEX IF NOT EXISTS idx_rag_vectors_embedding ON rag_vectors USING ivfflat (embedding vector_cosine_ops);
+
+-- Workflow definitions (Zero)
+CREATE TABLE IF NOT EXISTS workflow_definitions (
+    workflow_id VARCHAR(255) PRIMARY KEY,
+    user_id VARCHAR(255),
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    workflow_def JSONB NOT NULL,
+    status VARCHAR(50) DEFAULT 'active',
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_workflows_user ON workflow_definitions(user_id);
+CREATE INDEX IF NOT EXISTS idx_workflows_status ON workflow_definitions(status);
+
+-- Custom swarm specifications
+CREATE TABLE IF NOT EXISTS custom_swarm_specs (
+    spec_id VARCHAR(255) PRIMARY KEY,
+    user_id VARCHAR(255),
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    spec JSONB NOT NULL,
+    validation_status VARCHAR(50) DEFAULT 'pending',
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_custom_swarms_user ON custom_swarm_specs(user_id);
+CREATE INDEX IF NOT EXISTS idx_custom_swarms_status ON custom_swarm_specs(validation_status);
 """
 
 
@@ -529,7 +619,10 @@ class TigerDBInitializer:
             'memory_palaces', 'palace_reviews',
             'feynman_sessions', 'feynman_iterations',
             'learning_plans', 'learning_progress',
-            'comprehension_metrics'
+            'comprehension_metrics',
+            # Swarm Corporation integration tables
+            'swarm_conversations', 'document_metadata', 'research_papers',
+            'rag_vectors', 'workflow_definitions', 'custom_swarm_specs'
         ]
         
         try:
