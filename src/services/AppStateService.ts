@@ -26,6 +26,26 @@ export interface AppSettings {
     BACKEND_API_URL: string;
   };
   customModels: CustomModel[];
+  swarmShield?: {
+    enabled: boolean;
+    encryptionStrength: 'STANDARD' | 'ENHANCED' | 'MAXIMUM';
+  };
+  zero?: {
+    enabled: boolean;
+    serviceUrl: string;
+  };
+  documentProcessing?: {
+    enabled: boolean;
+    preferredParser: 'doc-master' | 'omniparse';
+  };
+  rag?: {
+    enabled: boolean;
+    vectorStore: 'tigerdb' | 'supabase';
+    topK: number;
+  };
+  customSwarms?: {
+    enabled: boolean;
+  };
 }
 
 type SettingsChangeListener = (settings: AppSettings) => void;
@@ -67,10 +87,14 @@ class AppStateService {
     const savedModels = localStorage.getItem('polymathos_custom_models');
     const customModels = savedModels ? JSON.parse(savedModels) : [];
 
+    const savedSwarmSettings = localStorage.getItem('polymathos_swarm_settings');
+    const swarmSettings = savedSwarmSettings ? JSON.parse(savedSwarmSettings) : {};
+
     this.currentSettings = {
       n8nUrl,
       envVars,
       customModels,
+      ...swarmSettings,
     };
 
     return this.currentSettings;
@@ -99,6 +123,16 @@ class AppStateService {
     if (updated.customModels) {
       localStorage.setItem('polymathos_custom_models', JSON.stringify(updated.customModels));
     }
+    
+    // Save Swarm Corporation settings
+    const swarmSettings = {
+      swarmShield: updated.swarmShield,
+      zero: updated.zero,
+      documentProcessing: updated.documentProcessing,
+      rag: updated.rag,
+      customSwarms: updated.customSwarms,
+    };
+    localStorage.setItem('polymathos_swarm_settings', JSON.stringify(swarmSettings));
 
     this.currentSettings = updated;
     this.notifySettingsListeners(updated);

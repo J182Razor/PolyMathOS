@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Settings, Database, Cpu, Key, Check, AlertCircle, Save, Plus, Trash2, User } from 'lucide-react';
+import { X, Settings, Database, Cpu, Key, Check, AlertCircle, Save, Plus, Trash2, User, Shield, Workflow, FileText, Search, Zap } from 'lucide-react';
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
 import { Icon } from './ui/Icon';
@@ -30,6 +30,26 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     });
 
     const [customModels, setCustomModels] = useState<CustomModel[]>([]);
+    
+    // SwarmShield settings
+    const [swarmShieldEnabled, setSwarmShieldEnabled] = useState(true);
+    const [encryptionStrength, setEncryptionStrength] = useState<'STANDARD' | 'ENHANCED' | 'MAXIMUM'>('MAXIMUM');
+    
+    // Zero workflow settings
+    const [zeroEnabled, setZeroEnabled] = useState(false);
+    const [zeroServiceUrl, setZeroServiceUrl] = useState('');
+    
+    // Document processing settings
+    const [documentProcessingEnabled, setDocumentProcessingEnabled] = useState(true);
+    const [preferredParser, setPreferredParser] = useState<'doc-master' | 'omniparse'>('omniparse');
+    
+    // RAG settings
+    const [ragEnabled, setRagEnabled] = useState(true);
+    const [ragVectorStore, setRagVectorStore] = useState<'tigerdb' | 'supabase'>('tigerdb');
+    const [ragTopK, setRagTopK] = useState(5);
+    
+    // Custom swarms
+    const [customSwarmsEnabled, setCustomSwarmsEnabled] = useState(true);
 
     useEffect(() => {
         if (isOpen) {
@@ -41,6 +61,28 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             setN8nUrl(settings.n8nUrl);
             setEnvVars(settings.envVars);
             setCustomModels(settings.customModels);
+            
+            // Load Swarm Corporation settings
+            if (settings.swarmShield) {
+                setSwarmShieldEnabled(settings.swarmShield.enabled ?? true);
+                setEncryptionStrength(settings.swarmShield.encryptionStrength || 'MAXIMUM');
+            }
+            if (settings.zero) {
+                setZeroEnabled(settings.zero.enabled ?? false);
+                setZeroServiceUrl(settings.zero.serviceUrl || '');
+            }
+            if (settings.documentProcessing) {
+                setDocumentProcessingEnabled(settings.documentProcessing.enabled ?? true);
+                setPreferredParser(settings.documentProcessing.preferredParser || 'omniparse');
+            }
+            if (settings.rag) {
+                setRagEnabled(settings.rag.enabled ?? true);
+                setRagVectorStore(settings.rag.vectorStore || 'tigerdb');
+                setRagTopK(settings.rag.topK || 5);
+            }
+            if (settings.customSwarms) {
+                setCustomSwarmsEnabled(settings.customSwarms.enabled ?? true);
+            }
 
             if (settings.n8nUrl) {
                 checkN8nConnection(settings.n8nUrl);
@@ -74,6 +116,26 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             n8nUrl,
             envVars,
             customModels,
+            swarmShield: {
+                enabled: swarmShieldEnabled,
+                encryptionStrength,
+            },
+            zero: {
+                enabled: zeroEnabled,
+                serviceUrl: zeroServiceUrl,
+            },
+            documentProcessing: {
+                enabled: documentProcessingEnabled,
+                preferredParser,
+            },
+            rag: {
+                enabled: ragEnabled,
+                vectorStore: ragVectorStore,
+                topK: ragTopK,
+            },
+            customSwarms: {
+                enabled: customSwarmsEnabled,
+            },
         });
 
         // Update user name if changed (will notify all listeners)
@@ -325,6 +387,221 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                                                     <Icon icon={Plus} size="sm" className="mr-2" />
                                                     Add Your First Model
                                                 </Button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </section>
+
+                                {/* SwarmShield Security Section */}
+                                <section className="space-y-4">
+                                    <h3 className="text-lg font-semibold text-white dark:text-white flex items-center">
+                                        <Icon icon={Shield} size="sm" className="mr-2 text-green-500" />
+                                        SwarmShield Security
+                                    </h3>
+                                    <div className="p-6 rounded-xl border border-slate-700 dark:border-slate-700 bg-slate-800 dark:bg-slate-800 shadow-sm space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-300 mb-1">Enable SwarmShield</label>
+                                                <p className="text-xs text-slate-400">Encrypt all agent communications with AES-256-GCM</p>
+                                            </div>
+                                            <button
+                                                onClick={() => setSwarmShieldEnabled(!swarmShieldEnabled)}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                                    swarmShieldEnabled ? 'bg-green-500' : 'bg-slate-600'
+                                                }`}
+                                            >
+                                                <span
+                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                                        swarmShieldEnabled ? 'translate-x-6' : 'translate-x-1'
+                                                    }`}
+                                                />
+                                            </button>
+                                        </div>
+                                        {swarmShieldEnabled && (
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-300 mb-1.5">Encryption Strength</label>
+                                                <select
+                                                    value={encryptionStrength}
+                                                    onChange={(e) => setEncryptionStrength(e.target.value as any)}
+                                                    className="w-full px-4 py-2 rounded-lg border border-slate-600 bg-slate-900 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                                >
+                                                    <option value="STANDARD">Standard</option>
+                                                    <option value="ENHANCED">Enhanced</option>
+                                                    <option value="MAXIMUM">Maximum (Recommended)</option>
+                                                </select>
+                                            </div>
+                                        )}
+                                    </div>
+                                </section>
+
+                                {/* Zero Workflow Automation Section */}
+                                <section className="space-y-4">
+                                    <h3 className="text-lg font-semibold text-white dark:text-white flex items-center">
+                                        <Icon icon={Workflow} size="sm" className="mr-2 text-purple-500" />
+                                        Zero Workflow Automation
+                                    </h3>
+                                    <div className="p-6 rounded-xl border border-slate-700 dark:border-slate-700 bg-slate-800 dark:bg-slate-800 shadow-sm space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-300 mb-1">Enable Zero</label>
+                                                <p className="text-xs text-slate-400">Production-grade workflow automation (Zapier alternative)</p>
+                                            </div>
+                                            <button
+                                                onClick={() => setZeroEnabled(!zeroEnabled)}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                                    zeroEnabled ? 'bg-purple-500' : 'bg-slate-600'
+                                                }`}
+                                            >
+                                                <span
+                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                                        zeroEnabled ? 'translate-x-6' : 'translate-x-1'
+                                                    }`}
+                                                />
+                                            </button>
+                                        </div>
+                                        {zeroEnabled && (
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-300 mb-1.5">Zero Service URL (Optional)</label>
+                                                <input
+                                                    type="text"
+                                                    value={zeroServiceUrl}
+                                                    onChange={(e) => setZeroServiceUrl(e.target.value)}
+                                                    placeholder="http://localhost:8080"
+                                                    className="w-full px-4 py-2 rounded-lg border border-slate-600 bg-slate-900 text-white focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm"
+                                                />
+                                                <p className="mt-1 text-xs text-slate-400">Leave empty to use default Zero configuration</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </section>
+
+                                {/* Document Processing Section */}
+                                <section className="space-y-4">
+                                    <h3 className="text-lg font-semibold text-white dark:text-white flex items-center">
+                                        <Icon icon={FileText} size="sm" className="mr-2 text-blue-500" />
+                                        Document Processing
+                                    </h3>
+                                    <div className="p-6 rounded-xl border border-slate-700 dark:border-slate-700 bg-slate-800 dark:bg-slate-800 shadow-sm space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-300 mb-1">Enable Document Processing</label>
+                                                <p className="text-xs text-slate-400">Use doc-master and OmniParse for document extraction</p>
+                                            </div>
+                                            <button
+                                                onClick={() => setDocumentProcessingEnabled(!documentProcessingEnabled)}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                                    documentProcessingEnabled ? 'bg-blue-500' : 'bg-slate-600'
+                                                }`}
+                                            >
+                                                <span
+                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                                        documentProcessingEnabled ? 'translate-x-6' : 'translate-x-1'
+                                                    }`}
+                                                />
+                                            </button>
+                                        </div>
+                                        {documentProcessingEnabled && (
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-300 mb-1.5">Preferred Parser</label>
+                                                <select
+                                                    value={preferredParser}
+                                                    onChange={(e) => setPreferredParser(e.target.value as any)}
+                                                    className="w-full px-4 py-2 rounded-lg border border-slate-600 bg-slate-900 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                                >
+                                                    <option value="doc-master">doc-master (Lightweight)</option>
+                                                    <option value="omniparse">OmniParse (Enterprise-grade)</option>
+                                                </select>
+                                            </div>
+                                        )}
+                                    </div>
+                                </section>
+
+                                {/* RAG Settings Section */}
+                                <section className="space-y-4">
+                                    <h3 className="text-lg font-semibold text-white dark:text-white flex items-center">
+                                        <Icon icon={Search} size="sm" className="mr-2 text-cyan-500" />
+                                        RAG (Retrieval-Augmented Generation)
+                                    </h3>
+                                    <div className="p-6 rounded-xl border border-slate-700 dark:border-slate-700 bg-slate-800 dark:bg-slate-800 shadow-sm space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-300 mb-1">Enable RAG</label>
+                                                <p className="text-xs text-slate-400">Vector-based knowledge retrieval for agents</p>
+                                            </div>
+                                            <button
+                                                onClick={() => setRagEnabled(!ragEnabled)}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                                    ragEnabled ? 'bg-cyan-500' : 'bg-slate-600'
+                                                }`}
+                                            >
+                                                <span
+                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                                        ragEnabled ? 'translate-x-6' : 'translate-x-1'
+                                                    }`}
+                                                />
+                                            </button>
+                                        </div>
+                                        {ragEnabled && (
+                                            <>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-slate-300 mb-1.5">Vector Store</label>
+                                                    <select
+                                                        value={ragVectorStore}
+                                                        onChange={(e) => setRagVectorStore(e.target.value as any)}
+                                                        className="w-full px-4 py-2 rounded-lg border border-slate-600 bg-slate-900 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                                    >
+                                                        <option value="tigerdb">TigerDB (pgvector)</option>
+                                                        <option value="supabase">Supabase</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-slate-300 mb-1.5">Default Top-K Results</label>
+                                                    <input
+                                                        type="number"
+                                                        value={ragTopK}
+                                                        onChange={(e) => setRagTopK(parseInt(e.target.value) || 5)}
+                                                        min="1"
+                                                        max="20"
+                                                        className="w-full px-4 py-2 rounded-lg border border-slate-600 bg-slate-900 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                                    />
+                                                    <p className="mt-1 text-xs text-slate-400">Number of results to return for RAG queries</p>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                </section>
+
+                                {/* Custom Swarms Section */}
+                                <section className="space-y-4">
+                                    <h3 className="text-lg font-semibold text-white dark:text-white flex items-center">
+                                        <Icon icon={Zap} size="sm" className="mr-2 text-yellow-500" />
+                                        Custom Swarms
+                                    </h3>
+                                    <div className="p-6 rounded-xl border border-slate-700 dark:border-slate-700 bg-slate-800 dark:bg-slate-800 shadow-sm space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-300 mb-1">Enable Custom Swarms</label>
+                                                <p className="text-xs text-slate-400">Create and manage custom swarm configurations</p>
+                                            </div>
+                                            <button
+                                                onClick={() => setCustomSwarmsEnabled(!customSwarmsEnabled)}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                                    customSwarmsEnabled ? 'bg-yellow-500' : 'bg-slate-600'
+                                                }`}
+                                            >
+                                                <span
+                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                                        customSwarmsEnabled ? 'translate-x-6' : 'translate-x-1'
+                                                    }`}
+                                                />
+                                            </button>
+                                        </div>
+                                        {customSwarmsEnabled && (
+                                            <div className="p-4 rounded-lg bg-slate-900/50 border border-slate-700">
+                                                <p className="text-sm text-slate-400">
+                                                    Custom swarms allow you to define your own agent configurations and workflows.
+                                                    Use the Custom Swarm Builder in the main interface to create new swarms.
+                                                </p>
                                             </div>
                                         )}
                                     </div>

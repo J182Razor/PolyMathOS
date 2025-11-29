@@ -1,294 +1,283 @@
-# PolyMathOS Integration Guide
-
-This guide covers the integration of TigerDB, SwarmDB, Swarms Tools, and OpenAlphaEvolve into PolyMathOS.
+# Swarm Corporation Components Integration Guide
 
 ## Overview
 
-The integration includes:
-- **TigerDB**: TimescaleDB cloud database with comprehensive table initialization
-- **SwarmDB**: Enhanced database functionality with message queues and load balancing
-- **Swarms Tools**: Extended agent capabilities (financial data, web scraping, social media, etc.)
-- **OpenAlphaEvolve**: Advanced neural architecture evolution system
+This guide documents the integration of all Swarm Corporation components into PolyMathOS. Each component has been integrated with graceful degradation, health checks, and comprehensive API endpoints.
 
-## Quick Start
+## Components
 
-### 1. Install Dependencies
+### 1. HDAM (Holographic Associative Memory)
+**Location**: `backend/app/modules/hdam.py`  
+**API**: `/api/hdam/*`  
+**Features**:
+- Quantum-enhanced holographic memory
+- Multidimensional associative learning
+- Analogy reasoning and extrapolation
+- Learning path optimization
 
+**Usage**:
+```python
+from app.modules.hdam import initialize_hdam
+
+hdam = initialize_hdam(
+    supabase_url="your_url",
+    supabase_key="your_key",
+    enable_quantum=False
+)
+
+# Learn facts
+await hdam.learn(["Fact 1", "Fact 2"], context="general")
+
+# Reason
+result = await hdam.reason("What is machine learning?", top_k=5)
+```
+
+### 2. MonteCarloSwarm
+**Location**: `backend/app/modules/monte_carlo_swarm.py`  
+**API**: `/api/swarms/monte-carlo/run`  
+**Features**:
+- Sequential and parallel agent execution
+- Multiple result aggregators
+- Dynamic agent selection
+
+**Usage**:
+```python
+from app.modules.monte_carlo_swarm import MonteCarloSwarm
+from swarms import Agent
+
+agents = [Agent(...) for _ in range(3)]
+swarm = MonteCarloSwarm(agents, parallel=True)
+result = swarm.run("Your task")
+```
+
+### 3. Education Swarm
+**Location**: `backend/app/modules/education_swarm.py`  
+**API**: `/api/swarms/education/generate`  
+**Features**:
+- Personalized curriculum generation
+- Interactive learning workflows
+- Sample test generation
+
+### 4. SwarmShield
+**Location**: `backend/app/modules/swarm_shield_integration.py`  
+**API**: `/api/security/shield/*`  
+**Features**:
+- AES-256-GCM encryption
+- Secure conversation management
+- Audit logging
+
+### 5. Zero
+**Location**: `backend/app/modules/zero_integration.py`  
+**API**: `/api/workflows/zero/*`  
+**Features**:
+- Production-grade workflow automation
+- Trigger-action workflows
+- Zapier alternative
+
+### 6. Document Processing
+**Components**: doc-master, OmniParse, AgentParse  
+**Location**: `backend/app/modules/doc_master_integration.py`, etc.  
+**API**: `/api/documents/*`  
+**Features**:
+- File reading and extraction
+- Unstructured to structured parsing
+- Agent-ready data blocks
+
+### 7. Research Systems
+**Components**: Research-Paper-Hive, AdvancedResearch  
+**Location**: `backend/app/modules/research_paper_hive_integration.py`, etc.  
+**API**: `/api/research/*`  
+**Features**:
+- Paper discovery and engagement
+- Orchestrator-worker research patterns
+
+### 8. RAG Systems
+**Components**: AgentRAGProtocol, Multi-Agent-RAG  
+**Location**: `backend/app/modules/agent_rag_protocol_integration.py`, etc.  
+**API**: `/api/rag/*`  
+**Features**:
+- Vector-based retrieval
+- Multi-agent document processing
+- Context generation for agents
+
+### 9. OmniDB
+**Location**: `backend/app/modules/omnidb_integration.py`  
+**API**: `/api/database/omnidb/*`  
+**Features**:
+- Hybrid database (SQL + NoSQL + file storage)
+- Service-based integration (Rust backend)
+
+### 10. Utilities
+**Components**: swarms-utils, Custom-Swarms-Spec  
+**Location**: `backend/app/modules/swarms_utils_integration.py`, etc.  
+**Features**:
+- JSON formatting
+- Swarm matching
+- Custom swarm specifications
+
+## Installation
+
+### Automatic Installation
 ```bash
-# Install Python dependencies
-pip install -r requirements.txt
+cd backend
+python scripts/install_swarm_components.py
+```
 
-# Install Swarms Tools
-pip install swarms-tools
+### Manual Installation
+```bash
+# Install from pip (if available)
+pip install swarm-shield doc-master omniparse agentparse
 
-# Install SwarmDB (from source)
-git clone https://github.com/The-Swarm-Corporation/SwarmDB.git
-cd SwarmDB
+# Or install from source
+git clone https://github.com/The-Swarm-Corporation/<component>.git
+cd <component>
 pip install -e .
 ```
 
-### 2. Set Environment Variables
+## Configuration
 
+### Environment Variables
 ```bash
-# TigerDB connection (required)
-export DATABASE_URL="postgresql://user:password@host:port/database"
+# HDAM
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_key
+ENABLE_QUANTUM=false
 
-# Or use TIGERDB_URL
-export TIGERDB_URL="postgresql://user:password@host:port/database"
+# Zero
+OMNIDB_SERVICE_URL=http://localhost:8080
 
-# SwarmDB connection (optional)
-export SWARMDB_URL="your_swarmdb_connection_string"
-
-# Twitter API credentials (optional, for swarms-tools)
-export TWITTER_API_KEY="your_key"
-export TWITTER_API_SECRET_KEY="your_secret"
-export TWITTER_ACCESS_TOKEN="your_token"
-export TWITTER_ACCESS_TOKEN_SECRET="your_token_secret"
+# SwarmShield
+SWARM_SHIELD_ENCRYPTION_STRENGTH=MAXIMUM
 ```
 
-### 3. Initialize TigerDB
+### Settings Modal
+Configure all components through the Settings Modal:
+- SwarmShield: Encryption strength settings
+- Zero: Workflow automation configuration
+- Document Processing: Parser preferences
+- RAG: Vector store and top-K settings
+- Custom Swarms: Enable/disable custom swarm creation
 
+## Health Checks
+
+### Check All Components
 ```bash
-# Initialize all tables in TigerDB
-python backend/scripts/init_tigerdb.py
+curl http://localhost:8000/api/health/
 ```
 
-This will:
-- Create all required tables
-- Set up TimescaleDB hypertables for time-series optimization
-- Create indexes for optimal performance
-- Verify table creation
-
-### 4. Initialize All Integrations
-
+### Check Specific Component
 ```bash
-# Initialize all components
-python backend/scripts/init_all_integrations.py
+curl http://localhost:8000/api/health/component/hdam
 ```
 
-## Component Details
+## API Endpoints
 
-### TigerDB Integration
+### HDAM
+- `POST /api/hdam/learn` - Learn facts
+- `POST /api/hdam/reason` - Perform reasoning
+- `POST /api/hdam/analogy` - Analogical reasoning
+- `POST /api/hdam/extrapolate` - Conceptual extrapolation
+- `POST /api/hdam/optimize-path` - Optimize learning path
+- `GET /api/hdam/metrics` - Get memory metrics
 
-**Location**: `backend/app/core/tigerdb_init.py`
+### Swarms
+- `POST /api/swarms/monte-carlo/run` - Run MonteCarloSwarm
+- `POST /api/swarms/education/generate` - Generate education workflow
+- `POST /api/swarms/custom/create` - Create custom swarm
+- `GET /api/swarms/custom/list` - List custom swarms
 
-**Features**:
-- Comprehensive table initialization
-- TimescaleDB hypertable configuration
-- Table verification
-- Health checks
+### Documents
+- `POST /api/documents/read` - Read file
+- `POST /api/documents/parse` - Parse document
+- `POST /api/documents/parse/agent` - Parse for agent
+- `GET /api/documents/formats` - Get supported formats
 
-**Usage**:
-```python
-from app.core.tigerdb_init import TigerDBInitializer
+### Research
+- `POST /api/research/papers/discover` - Discover papers
+- `POST /api/research/papers/engage` - Engage with paper
+- `POST /api/research/advanced/orchestrate` - Orchestrate research
 
-# Initialize
-initializer = TigerDBInitializer(connection_string)
-initializer.initialize_all_tables()
+### RAG
+- `POST /api/rag/agent/index` - Index documents
+- `POST /api/rag/agent/query` - Query RAG system
+- `POST /api/rag/multi-agent/process` - Process with multi-agent RAG
 
-# Verify
-verification = initializer.verify_tables()
-print(f"Tables: {verification['existing']}/{verification['total_required']}")
-```
+### Security
+- `POST /api/security/shield/protect-message` - Protect message
+- `POST /api/security/shield/conversations` - Create conversation
+- `GET /api/security/shield/status` - Get security status
 
-**Tables Created**:
-- Core: users, tasks, learning_sessions, rpe_events, executions
-- Quiz System: quizzes, quiz_sessions, quiz_questions
-- FSRS: fsrs_cards, fsrs_reviews
-- Zettelkasten: zettel_notes, note_embeddings, elaboration_sessions
-- Memory Palaces: memory_palaces, palace_reviews
-- Feynman: feynman_sessions, feynman_iterations
-- Learning Plans: learning_plans, learning_progress
-- Analytics: comprehension_metrics, user_analytics
+### Workflows
+- `POST /api/workflows/zero/create` - Create workflow
+- `POST /api/workflows/zero/execute` - Execute workflow
+- `GET /api/workflows/zero/list` - List workflows
 
-### SwarmDB Integration
+## Database Schema
 
-**Location**: `backend/app/modules/swarmdb_integration.py`
+New tables added to TigerDB:
+- `swarm_conversations` - SwarmShield encrypted conversations
+- `document_metadata` - Document processing metadata
+- `research_papers` - Research paper storage
+- `rag_vectors` - RAG vector embeddings (pgvector)
+- `workflow_definitions` - Zero workflow specs
+- `custom_swarm_specs` - Custom swarm configurations
 
-**Features**:
-- Message queue system for agent communication
-- LLM backend load balancing
-- Production-grade multi-agent support
+## Frontend Services
 
-**Usage**:
-```python
-from app.modules.swarmdb_integration import get_swarmdb_integration
+TypeScript services available in `src/services/`:
+- `HDAMService.ts`
+- `MonteCarloSwarmService.ts`
+- `EducationSwarmService.ts`
+- `SwarmShieldService.ts`
+- `DocumentService.ts`
+- `ResearchService.ts`
+- `RAGService.ts`
+- `ZeroService.ts`
+- `CustomSwarmService.ts`
 
-swarmdb = get_swarmdb_integration()
+## Error Handling
 
-# Send message
-swarmdb.send_message("agent_queue", {"task": "process_data"})
+All components implement graceful degradation:
+- Components check availability on initialization
+- Fallback behavior when dependencies unavailable
+- Clear error messages with component status
+- Health check endpoints for monitoring
 
-# Receive message
-message = swarmdb.receive_message("agent_queue")
+## Testing
 
-# Balance LLM requests
-balanced_requests = swarmdb.balance_llm_requests(requests)
-```
-
-### Swarms Tools Integration
-
-**Location**: `backend/app/modules/swarms_tools_integration.py`
-
-**Features**:
-- Financial data: HTX, Yahoo Finance, CoinGecko, DeFi
-- Web scraping
-- Social media: Twitter, Telegram
-- Development: GitHub, Code Executor
-- Tool orchestration
-
-**Usage**:
-```python
-from app.modules.swarms_tools_integration import get_swarms_tools_integration
-
-tools = get_swarms_tools_integration()
-
-# Financial data
-stock_data = tools.get_yahoo_finance_data("AAPL")
-crypto_data = tools.get_crypto_data("bitcoin")
-
-# Web scraping
-content = tools.scrape_url("https://example.com")
-
-# Social media
-tools.post_tweet("Hello from PolyMathOS!")
-
-# Development
-repo_info = tools.get_github_repo("user/repo")
-result = tools.execute_code("print('Hello')")
-```
-
-### OpenAlphaEvolve Integration
-
-**Location**: `backend/app/modules/alpha_evolve.py`
-
-**Features**:
-- Neural architecture evolution
-- Novelty search for behavioral diversity
-- Population Based Training (PBT)
-- Multi-objective optimization
-
-**Usage**:
-```python
-from app.modules.alpha_evolve import AdvancedAlphaEvolve
-from torch.utils.data import DataLoader
-
-# Initialize
-alpha_evolve = AdvancedAlphaEvolve(
-    population_size=20,
-    use_novelty_search=True,
-    use_pbt=True,
-    multi_objective=True
-)
-
-# Run evolution
-best_agent = alpha_evolve.run_evolution(
-    train_dataloader=train_loader,
-    val_dataloader=val_loader,
-    generations=50,
-    device='cuda' if torch.cuda.is_available() else 'cpu'
-)
-```
-
-## Integration Manager
-
-**Location**: `backend/app/core/integration_manager.py`
-
-The IntegrationManager coordinates all components:
-
-```python
-from app.core.integration_manager import get_integration_manager
-
-# Initialize all
-manager = get_integration_manager(config)
-results = manager.initialize_all()
-
-# Access components
-tigerdb = manager.get_tigerdb()
-swarmdb = manager.get_swarmdb()
-swarms_tools = manager.get_swarms_tools()
-alpha_evolve = manager.get_alpha_evolve()
-
-# Health check
-health = manager.health_check()
-```
-
-## Verification
-
-### Check TigerDB Tables
-
+### Unit Tests
 ```bash
-python backend/scripts/init_tigerdb.py
+pytest backend/tests/unit/test_*_integration.py
 ```
 
-### Check All Integrations
-
+### Integration Tests
 ```bash
-python backend/scripts/init_all_integrations.py
+pytest backend/tests/integration/test_*_api.py
 ```
 
-### Programmatic Health Check
-
-```python
-from app.core.integration_manager import get_integration_manager
-
-manager = get_integration_manager()
-health = manager.health_check()
-print(health)
+### Health Check Tests
+```bash
+pytest backend/tests/integration/test_health_checks.py
 ```
 
 ## Troubleshooting
 
-### TigerDB Connection Issues
+### Component Not Available
+1. Check health endpoint: `/api/health/component/<component>`
+2. Verify installation: `python scripts/install_swarm_components.py`
+3. Check logs for import errors
+4. Verify environment variables
 
-1. Verify connection string format:
-   ```
-   postgresql://user:password@host:port/database
-   ```
-
-2. Check network connectivity
-3. Verify credentials
-4. Ensure TimescaleDB extension is enabled
-
-### SwarmDB Not Available
-
-SwarmDB is optional. If not installed:
-- Clone from: https://github.com/The-Swarm-Corporation/SwarmDB.git
-- Install from source
-- Set SWARMDB_URL environment variable
-
-### Swarms Tools Import Errors
-
-Install swarms-tools:
-```bash
-pip install swarms-tools
-```
-
-Or install from source:
-```bash
-git clone https://github.com/The-Swarm-Corporation/swarms-tools.git
-cd swarms-tools
-pip install -e .
-```
-
-### Missing Tables
-
-Re-run initialization:
-```bash
-python backend/scripts/init_tigerdb.py
-```
-
-## Next Steps
-
-1. **Configure TigerDB**: Set up your TigerDB connection string
-2. **Initialize Tables**: Run the initialization script
-3. **Test Integrations**: Use the health check to verify
-4. **Start Using**: Integrate components into your application
+### API Errors
+1. Check component health status
+2. Verify API endpoint exists
+3. Check request/response format
+4. Review error logs
 
 ## Support
 
-For issues:
-- TigerDB: Check TimescaleDB documentation
-- SwarmDB: See https://github.com/The-Swarm-Corporation/SwarmDB.git
-- Swarms Tools: See https://github.com/The-Swarm-Corporation/swarms-tools.git
-
+For issues or questions:
+1. Check component-specific documentation
+2. Review health check endpoints
+3. Check integration logs
+4. Verify component availability
