@@ -1,0 +1,43 @@
+{
+  "name": "Hierarchical Planning Workflow",
+  "description": "Use director-agent pattern for strategic planning",
+  "triggers": [
+    {
+      "type": "manual",
+      "name": "create_plan",
+      "parameters": [
+        "objective",
+        "user_id"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "strategic_planning",
+      "type": "agent_pattern",
+      "pattern": "hierarchical_swarm",
+      "action": "hierarchical_swarm_step",
+      "config": {
+        "director_prompt": "As the Director, coordinate strategic planning tasks",
+        "agents": [
+          {
+            "name": "Strategy-Analyst",
+            "system_prompt": "Analyze objectives and create strategic plans"
+          },
+          {
+            "name": "Resource-Planner",
+            "system_prompt": "Plan resource allocation and timelines"
+          },
+          {
+            "name": "Risk-Assessor",
+            "system_prompt": "Assess risks and mitigation strategies"
+          }
+        ],
+        "max_loops": 2
+      },
+      "inputs": [
+        "objective"
+      ]
+    }
+  ]
+}

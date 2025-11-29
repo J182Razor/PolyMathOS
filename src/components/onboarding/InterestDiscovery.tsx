@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 
 interface InterestDiscoveryProps {
   userData: any;
@@ -7,20 +6,20 @@ interface InterestDiscoveryProps {
   onBack?: () => void;
 }
 
+const domains = [
+  { id: 'machine-learning', name: 'Machine Learning', description: 'AI and statistical models', icon: 'psychology' },
+  { id: 'quantum-physics', name: 'Quantum Physics', description: 'Study of matter and energy', icon: 'atm' },
+  { id: 'abstract-algebra', name: 'Abstract Algebra', description: 'Study of algebraic structures', icon: 'function' },
+  { id: 'neuroscience', name: 'Neuroscience', description: 'Study of the nervous system', icon: 'neurology' },
+  { id: 'comp-biology', name: 'Comp. Biology', description: 'Models for biology', icon: 'biotech' },
+  { id: 'cryptography', name: 'Cryptography', description: 'Secure communication', icon: 'lock' },
+  { id: 'string-theory', name: 'String Theory', description: 'Framework in physics', icon: 'view_in_ar' },
+  { id: 'bioinformatics', name: 'Bioinformatics', description: 'Analyzing biological data', icon: 'genetics' },
+];
+
 const InterestDiscovery: React.FC<InterestDiscoveryProps> = ({ userData, onNext, onBack }) => {
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
-  const [customDomains, setCustomDomains] = useState<string[]>([]);
-
-  const predefinedDomains = [
-    { id: 'mathematics', name: 'Mathematics', icon: '∑', color: 'from-poly-primary-500 to-poly-primary-600' },
-    { id: 'physics', name: 'Physics', icon: '⚛', color: 'from-poly-secondary-500 to-poly-secondary-600' },
-    { id: 'computer-science', name: 'Computer Science', icon: '</>', color: 'from-poly-accent-500 to-poly-accent-600' },
-    { id: 'biology', name: 'Biology', icon: '🧬', color: 'from-yellow-400 to-yellow-500' },
-    { id: 'chemistry', name: 'Chemistry', icon: '🧪', color: 'from-purple-400 to-purple-500' },
-    { id: 'engineering', name: 'Engineering', icon: '⚙', color: 'from-poly-neutral-500 to-poly-neutral-600' },
-    { id: 'data-science', name: 'Data Science', icon: '📊', color: 'from-blue-400 to-blue-500' },
-    { id: 'philosophy', name: 'Philosophy', icon: '💭', color: 'from-green-400 to-green-500' }
-  ];
+  const [searchQuery, setSearchQuery] = useState('');
 
   const toggleDomain = (domainId: string) => {
     setSelectedDomains(prev => 
@@ -30,122 +29,95 @@ const InterestDiscovery: React.FC<InterestDiscoveryProps> = ({ userData, onNext,
     );
   };
 
-  const addCustomDomain = (domainName: string) => {
-    if (domainName.trim() && !customDomains.includes(domainName.trim())) {
-      setCustomDomains([...customDomains, domainName.trim()]);
-    }
-  };
+  const filteredDomains = domains.filter(domain =>
+    domain.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    domain.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <motion.div 
-      className="poly-card poly-card-elevated max-w-4xl mx-auto"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="text-center mb-8">
-        <h2 className="text-display-3 mb-3">What fascinates you?</h2>
-        <p className="text-body-large text-poly-neutral-600">
-          Select domains that interest you. We'll discover learning resources and create a personalized path.
-        </p>
-      </div>
-
-      {/* Predefined Domains Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {predefinedDomains.map((domain) => (
-          <motion.button
-            key={domain.id}
-            onClick={() => toggleDomain(domain.id)}
-            className={`p-4 rounded-xl border-2 transition-all duration-200 ${
-              selectedDomains.includes(domain.id)
-                ? 'border-poly-primary-500 bg-poly-primary-50'
-                : 'border-poly-neutral-200 hover:border-poly-neutral-300'
-            }`}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${domain.color} mx-auto mb-3 flex items-center justify-center text-white text-xl`}>
-              {domain.icon}
-            </div>
-            <h3 className="text-body-medium font-semibold text-poly-neutral-900">
-              {domain.name}
-            </h3>
-          </motion.button>
-        ))}
-      </div>
-
-      {/* Custom Domains Input */}
-      <div className="mb-8">
-        <label className="block text-body-medium text-poly-neutral-700 mb-3">
-          Add your own interests
-        </label>
-        <div className="flex flex-col sm:flex-row gap-2">
-          <input
-            type="text"
-            placeholder="e.g., Quantum Computing, Neuroscience, Economics..."
-            className="poly-input flex-1"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                addCustomDomain(e.currentTarget.value);
-                e.currentTarget.value = '';
-              }
-            }}
-          />
-          <button 
-            className="poly-btn-secondary"
-            onClick={(e) => {
-              const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-              if (input) {
-                addCustomDomain(input.value);
-                input.value = '';
-              }
-            }}
-          >
-            Add
-          </button>
+    <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden text-[#EAEAEA] bg-background-dark font-display">
+      {/* Header */}
+      <div className="flex items-center p-4 pb-2">
+        <div className="flex size-12 shrink-0 items-center justify-start text-[#EAEAEA]">
+          <button onClick={onBack} className="material-symbols-outlined text-2xl">arrow_back</button>
         </div>
-        
-        {/* Display custom domains */}
-        {customDomains.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {customDomains.map((domain, index) => (
-              <span 
-                key={index}
-                className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-poly-secondary-100 text-poly-secondary-800"
-              >
-                {domain}
-                <button 
-                  onClick={() => setCustomDomains(customDomains.filter(d => d !== domain))}
-                  className="ml-2 text-poly-secondary-500 hover:text-poly-secondary-700"
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
+        <h1 className="flex-1 text-center text-lg font-bold leading-tight tracking-[-0.015em] text-[#EAEAEA] mr-12">
+          Craft Your Knowledge Core
+        </h1>
       </div>
 
-      <div className="flex gap-3">
-        {onBack && (
-          <button
-            onClick={onBack}
-            className="poly-btn-secondary flex-1"
-          >
-            Back
-          </button>
-        )}
+      {/* Subheader Text */}
+      <p className="px-4 pb-3 pt-1 text-base font-normal leading-normal text-[#EAEAEA]/70">
+        Choose one or more fields to begin your journey.
+      </p>
+
+      {/* Search Bar */}
+      <div className="px-4 py-3">
+        <label className="flex h-12 w-full min-w-40 flex-col">
+          <div className="flex h-full w-full flex-1 items-stretch rounded-lg">
+            <div className="flex items-center justify-center rounded-l-lg border-r-0 border-none bg-[#1F1F2A] pl-4 text-[#EAEAEA]/70">
+              <span className="material-symbols-outlined text-2xl">search</span>
+            </div>
+            <input
+              className="form-input h-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg rounded-l-none border-l-0 border-none bg-[#1F1F2A] px-4 pl-2 text-base font-normal leading-normal text-[#EAEAEA] placeholder:text-[#EAEAEA]/50 focus:outline-0 focus:ring-0"
+              placeholder="Search for a domain"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </label>
+      </div>
+
+      {/* Domain Selection Grid */}
+      <div className="grid flex-1 grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3 p-4">
+        {filteredDomains.map((domain) => {
+          const isSelected = selectedDomains.includes(domain.id);
+          return (
+            <div
+              key={domain.id}
+              onClick={() => toggleDomain(domain.id)}
+              className={`group flex cursor-pointer flex-1 flex-col gap-3 rounded-lg border ${
+                isSelected ? 'border-2 border-primary bg-[#1F1F2A] ring-2 ring-primary/30' : 'border-[#3B3B4F] bg-[#1F1F2A] ring-2 ring-transparent'
+              } p-4 transition-all hover:border-primary/50 hover:bg-[#1F1F2A]/80 focus-within:border-primary focus-within:ring-primary/30`}
+            >
+              <div className="flex items-center justify-between">
+                <span className={`material-symbols-outlined text-2xl ${isSelected ? 'text-primary' : 'text-primary'}`}>
+                  {domain.icon}
+                </span>
+                <div className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
+                  isSelected 
+                    ? 'border-primary bg-primary' 
+                    : 'border-[#3B3B4F] bg-transparent group-focus-within:border-primary group-focus-within:bg-primary'
+                }`}>
+                  <span className={`material-symbols-outlined text-sm text-background-dark ${
+                    isSelected ? 'opacity-100' : 'opacity-0 group-focus-within:opacity-100'
+                  }`}>
+                    check
+                  </span>
+                </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                <h2 className="text-base font-bold leading-tight text-[#EAEAEA]">{domain.name}</h2>
+                <p className="text-sm font-normal leading-normal text-[#EAEAEA]/70">{domain.description}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Floating Action Button */}
+      <div className="sticky bottom-0 mt-auto w-full bg-gradient-to-t from-background-dark to-transparent p-4 pt-12">
         <button
-          onClick={() => onNext({ ...userData, domains: [...selectedDomains, ...customDomains] })}
-          disabled={selectedDomains.length === 0 && customDomains.length === 0}
-          className={`poly-btn-primary ${onBack ? 'flex-1' : 'w-full'}`}
+          onClick={() => onNext({ ...userData, domains: selectedDomains })}
+          disabled={selectedDomains.length === 0}
+          className="flex h-14 w-full cursor-pointer items-center justify-center gap-3 overflow-hidden rounded-full bg-primary pl-6 pr-5 text-base font-bold leading-normal tracking-[0.015em] text-background-dark shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Discover Learning Resources
+          <span className="truncate">Continue</span>
+          <span className="material-symbols-outlined text-2xl">arrow_forward</span>
         </button>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
 export default InterestDiscovery;
-

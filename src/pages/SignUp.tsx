@@ -1,11 +1,6 @@
 "use client";
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Brain, Mail, Lock, User, ArrowLeft, Eye, EyeOff, Check } from 'lucide-react';
-import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
-import { cn } from '../lib/utils';
 
 interface SignUpProps {
   onSignUp: (userData: { email: string; password: string; firstName: string; lastName: string }) => void;
@@ -23,233 +18,125 @@ export const SignUp: React.FC<SignUpProps> = ({ onSignUp, onBack }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    // TODO: Integrate with backend user registration API
     await new Promise(resolve => setTimeout(resolve, 1000));
     onSignUp({ email, password, firstName, lastName });
     setIsLoading(false);
   };
 
-  const passwordStrength = () => {
-    let strength = 0;
-    if (password.length >= 8) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/[0-9]/.test(password)) strength++;
-    if (/[^A-Za-z0-9]/.test(password)) strength++;
-    return strength;
-  };
-
-  const strengthColors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-green-500'];
-  const strengthLabels = ['Weak', 'Fair', 'Good', 'Strong'];
-
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
-      </div>
+    <div className="relative flex min-h-screen w-full flex-col items-center justify-center bg-background-light dark:bg-background-dark text-white p-4">
+      {/* Grid background */}
+      <div className="absolute inset-0 bg-grid-white/[0.05] [mask-image:linear-gradient(to_bottom,white_10%,transparent_90%)]"></div>
+      
+      <div className="w-full max-w-sm relative z-10">
+        <header className="flex flex-col items-center justify-center text-center pb-8">
+          {/* Star icon */}
+          <svg className="mb-4" fill="none" height="40" viewBox="0 0 40 40" width="40" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 0L24.4721 15.5279L40 20L24.4721 24.4721L20 40L15.5279 24.4721L0 20L15.5279 15.5279L20 0Z" fill="white" fillOpacity="0.8" />
+          </svg>
+          <h1 className="text-white tracking-tight text-[32px] font-bold leading-tight">Begin Your Ascent</h1>
+        </header>
 
-      {/* Back Button */}
-      <motion.button
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        onClick={onBack}
-        className="absolute top-6 left-6 flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
-      >
-        <ArrowLeft className="w-5 h-5" />
-        <span className="hidden sm:inline">Back</span>
-      </motion.button>
+        <main className="flex flex-col gap-3">
+          {/* Full Name */}
+          <div className="flex max-w-[480px] flex-wrap items-end gap-4">
+            <label className="flex flex-col min-w-40 flex-1">
+              <p className="text-white/80 text-base font-medium leading-normal pb-2">Full Name</p>
+              <input 
+                className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border-none bg-white/5 h-14 placeholder:text-[#888888] p-4 text-base font-normal leading-normal" 
+                placeholder="Enter your full name" 
+                value={`${firstName} ${lastName}`.trim()}
+                onChange={(e) => {
+                  const parts = e.target.value.split(' ');
+                  setFirstName(parts[0] || '');
+                  setLastName(parts.slice(1).join(' ') || '');
+                }}
+                required
+              />
+            </label>
+          </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md relative z-10"
-      >
-        <Card className="bg-slate-900/80 backdrop-blur-xl border-slate-800" padding="none">
-          <div className="p-8">
-            {/* Logo */}
-            <div className="flex items-center justify-center mb-8">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 flex items-center justify-center">
-                <Brain className="w-7 h-7 text-blue-400" />
-              </div>
-            </div>
+          {/* Email Address */}
+          <div className="flex max-w-[480px] flex-wrap items-end gap-4">
+            <label className="flex flex-col min-w-40 flex-1">
+              <p className="text-white/80 text-base font-medium leading-normal pb-2">Email Address</p>
+              <input 
+                className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border-none bg-white/5 h-14 placeholder:text-[#888888] p-4 text-base font-normal leading-normal" 
+                placeholder="Enter your email address" 
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </label>
+          </div>
 
-            {/* Header */}
-            <div className="text-center mb-8">
-              <h1 className="text-2xl font-display font-bold text-white mb-2">
-                Create Your Account
-              </h1>
-              <p className="text-slate-400">
-                Start your AI-powered learning journey
-              </p>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    First Name
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                    <input
-                      type="text"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      placeholder="John"
-                      required
-                      className={cn(
-                        "w-full pl-12 pr-4 py-3 rounded-xl",
-                        "bg-slate-800 border border-slate-700",
-                        "text-white placeholder-slate-500",
-                        "focus:border-blue-500 focus:ring-1 focus:ring-blue-500",
-                        "outline-none transition-all"
-                      )}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Doe"
-                    required
-                    className={cn(
-                      "w-full px-4 py-3 rounded-xl",
-                      "bg-slate-800 border border-slate-700",
-                      "text-white placeholder-slate-500",
-                      "focus:border-blue-500 focus:ring-1 focus:ring-blue-500",
-                      "outline-none transition-all"
-                    )}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Email
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    required
-                    className={cn(
-                      "w-full pl-12 pr-4 py-3 rounded-xl",
-                      "bg-slate-800 border border-slate-700",
-                      "text-white placeholder-slate-500",
-                      "focus:border-blue-500 focus:ring-1 focus:ring-blue-500",
-                      "outline-none transition-all"
-                    )}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Create a strong password"
-                    required
-                    minLength={8}
-                    className={cn(
-                      "w-full pl-12 pr-12 py-3 rounded-xl",
-                      "bg-slate-800 border border-slate-700",
-                      "text-white placeholder-slate-500",
-                      "focus:border-blue-500 focus:ring-1 focus:ring-blue-500",
-                      "outline-none transition-all"
-                    )}
-                  />
+          {/* Password */}
+          <div className="flex max-w-[480px] flex-wrap items-end gap-4">
+            <label className="flex flex-col min-w-40 flex-1">
+              <p className="text-white/80 text-base font-medium leading-normal pb-2">Password</p>
+              <div className="flex w-full flex-1 items-stretch rounded-lg">
+                <input 
+                  className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-l-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border-none bg-white/5 h-14 placeholder:text-[#888888] p-4 pr-2 text-base font-normal leading-normal" 
+                  placeholder="Enter your password" 
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <div className="flex items-center justify-center bg-white/5 pr-4 rounded-r-lg">
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                    className="material-symbols-outlined text-[#888888] cursor-pointer"
+                    style={{ fontSize: '24px' }}
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? 'visibility_off' : 'visibility'}
                   </button>
                 </div>
-                
-                {/* Password Strength */}
-                {password && (
-                  <div className="mt-3">
-                    <div className="flex gap-1 mb-2">
-                      {[0, 1, 2, 3].map((i) => (
-                        <div
-                          key={i}
-                          className={cn(
-                            "h-1 flex-1 rounded-full transition-colors",
-                            i < passwordStrength() ? strengthColors[passwordStrength() - 1] : "bg-slate-700"
-                          )}
-                        />
-                      ))}
-                    </div>
-                    <p className="text-xs text-slate-400">
-                      Password strength: {strengthLabels[passwordStrength() - 1] || 'Too weak'}
-                    </p>
-                  </div>
-                )}
               </div>
-
-              <div className="flex items-start gap-3">
-                <input 
-                  type="checkbox" 
-                  required
-                  className="w-4 h-4 mt-0.5 rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-blue-500"
-                />
-                <span className="text-sm text-slate-400">
-                  I agree to the{' '}
-                  <a href="#" className="text-blue-400 hover:text-blue-300">Terms of Service</a>
-                  {' '}and{' '}
-                  <a href="#" className="text-blue-400 hover:text-blue-300">Privacy Policy</a>
-                </span>
-              </div>
-
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-6"
-              >
-                {isLoading ? 'Creating account...' : 'Create Account'}
-              </Button>
-            </form>
-
-            {/* Features */}
-            <div className="mt-6 space-y-2">
-              {['AI-personalized learning paths', 'Spaced repetition system', 'Progress tracking & analytics'].map((feature) => (
-                <div key={feature} className="flex items-center gap-2 text-sm text-slate-400">
-                  <Check className="w-4 h-4 text-green-400" />
-                  {feature}
-                </div>
-              ))}
-            </div>
-
-            {/* Sign In Link */}
-            <p className="text-center text-slate-400 mt-6">
-              Already have an account?{' '}
-              <button 
-                onClick={onBack}
-                className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
-              >
-                Sign in
-              </button>
-            </p>
+            </label>
           </div>
-        </Card>
-      </motion.div>
+
+          {/* Create Account Button */}
+          <div className="pt-5 pb-3">
+            <button
+              type="submit"
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className="flex w-full items-center justify-center rounded-lg bg-primary h-14 text-white text-base font-bold leading-normal transition-all hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark disabled:opacity-50"
+            >
+              {isLoading ? 'Creating Account...' : 'Create Account'}
+            </button>
+          </div>
+
+          {/* Terms & Privacy */}
+          <p className="text-[#888888] text-center text-sm font-normal leading-normal">
+            By creating an account, you agree to our{' '}
+            <a className="font-medium text-white/90 hover:underline" href="#">
+              Terms & Privacy
+            </a>.
+          </p>
+        </main>
+
+        {/* Footer */}
+        <footer className="mt-8 text-center">
+          <p className="text-[#888888] text-sm">
+            Already a member?{' '}
+            <a 
+              onClick={(e) => {
+                e.preventDefault();
+                onBack();
+              }}
+              className="font-medium text-white/90 hover:underline cursor-pointer" 
+              href="#"
+            >
+              Sign In
+            </a>
+          </p>
+        </footer>
+      </div>
     </div>
   );
 };

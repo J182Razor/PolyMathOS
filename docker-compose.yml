@@ -10,6 +10,12 @@ services:
     environment:
       - NODE_ENV=production
       - VITE_API_URL=http://polymathos-backend:8000
+      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL:-}
+      - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY:-}
+      - VITE_N8N_WEBHOOK_URL=${VITE_N8N_WEBHOOK_URL:-}
+      - VITE_USE_N8N=${VITE_USE_N8N:-false}
+      - VITE_ENABLE_QUANTUM=${VITE_ENABLE_QUANTUM:-false}
+      - VITE_ENABLE_HDAM=${VITE_ENABLE_HDAM:-true}
     depends_on:
       - backend
     healthcheck:
@@ -32,14 +38,53 @@ services:
     volumes:
       - ./backend/app:/app/app
       - ./backend/data:/app/data
+      - ./backend/workspace:/app/workspace
+      - ./backend/agent_workspace:/app/agent_workspace
     environment:
       - ENV=production
+      - DEBUG=false
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      # Database Configuration
+      - DATABASE_URL=${DATABASE_URL:-postgresql://user:password@localhost:5432/polymathos}
+      - TIGERDB_URL=${TIGERDB_URL:-}
+      # Supabase Configuration (Optional)
+      - SUPABASE_URL=${SUPABASE_URL:-}
+      - SUPABASE_KEY=${SUPABASE_KEY:-}
+      # LLM API Keys
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      - COHERE_API_KEY=${COHERE_API_KEY:-}
+      - EXA_API_KEY=${EXA_API_KEY:-}
+      # Quantum Computing (Optional)
+      - DWAVE_API_TOKEN=${DWAVE_API_TOKEN:-}
+      - IBM_QUANTUM_TOKEN=${IBM_QUANTUM_TOKEN:-}
+      - ENABLE_QUANTUM=${ENABLE_QUANTUM:-false}
+      # SwarmDB Configuration
+      - SWARMDB_URL=${SWARMDB_URL:-}
+      # Zero Workflow Configuration
+      - ZERO_API_URL=${ZERO_API_URL:-}
+      - ZERO_API_KEY=${ZERO_API_KEY:-}
+      # OmniDB Configuration
+      - OMNIDB_SERVICE_URL=${OMNIDB_SERVICE_URL:-}
+      # Lemon AI Configuration
+      - LEMON_AI_PATH=${LEMON_AI_PATH:-/app/lemon-ai}
+      # n8n Configuration
+      - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL:-}
+      - USE_N8N=${USE_N8N:-false}
+      # CORS Configuration
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+      # LlamaIndex Configuration
+      - LLAMA_INDEX_DATA_DIR=${LLAMA_INDEX_DATA_DIR:-/app/data/llama_index}
+      # ChromaDB Configuration
+      - CHROMADB_PATH=${CHROMADB_PATH:-/app/data/chromadb}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 20s
+      start_period: 40s
     networks:
       - polymathos-network
 

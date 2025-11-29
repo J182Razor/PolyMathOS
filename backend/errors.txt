@@ -1,0 +1,11 @@
+swarms library not available: No module named 'langchain.callbacks', using fallback Agent class
+swarms library not available, using fallback mode
+SwarmDB not available. Install from: https://github.com/The-Swarm-Corporation/SwarmDB.git
+swarms-tools not available. Install with: pip install swarms-tools
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Users\Administrator\PolyMathOS\backend\app\main.py", line 19, in <module>
+    from app.api import learning_ai, auth
+  File "C:\Users\Administrator\PolyMathOS\backend\app\api\learning_ai.py", line 467
+    result = await agentic_system.process_agentically(
+IndentationError: unexpected indent

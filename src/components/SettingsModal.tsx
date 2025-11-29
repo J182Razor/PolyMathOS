@@ -6,6 +6,7 @@ import { Icon } from './ui/Icon';
 import { N8NService } from '../services/N8NService';
 import AppStateService, { CustomModel } from '../services/AppStateService';
 import { PolymathUserService } from '../services/PolymathUserService';
+import { ConnectionStatus } from './ConnectionStatus';
 
 interface SettingsModalProps {
     isOpen: boolean;
@@ -610,6 +611,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                         )}
 
                         {activeTab === 'data' && (
+                            <div className="space-y-6">
+                                {/* Connection Status */}
+                                <section className="space-y-4">
+                                    <h3 className="text-lg font-semibold text-white dark:text-white flex items-center">
+                                        <Icon icon={Database} size="sm" className="mr-2 text-blue-500" />
+                                        API Connection Status
+                                    </h3>
+                                    <ConnectionStatus />
+                                </section>
                             <div className="space-y-6">
                                 <h3 className="text-lg font-semibold text-text-primary dark:text-white">Data Sets</h3>
                                 <p className="text-text-secondary">Manage your local and remote datasets here.</p>

@@ -1,0 +1,42 @@
+{
+  "name": "Sequential Document Processing",
+  "description": "Process documents through sequential agent stages",
+  "triggers": [
+    {
+      "type": "manual",
+      "name": "process_document",
+      "parameters": [
+        "document",
+        "user_id"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "sequential_processing",
+      "type": "agent_pattern",
+      "pattern": "agent_rearrange",
+      "action": "agent_rearrange_step",
+      "config": {
+        "agents": [
+          {
+            "name": "Document-Extractor",
+            "system_prompt": "Extract key information from documents"
+          },
+          {
+            "name": "Content-Analyzer",
+            "system_prompt": "Analyze extracted content for insights"
+          },
+          {
+            "name": "Summary-Generator",
+            "system_prompt": "Generate comprehensive summaries"
+          }
+        ],
+        "flow": "Document-Extractor -> Content-Analyzer -> Summary-Generator"
+      },
+      "inputs": [
+        "document"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "name": "Research Workflow with AdvancedResearch",
+  "description": "Comprehensive research workflow using orchestrator-worker pattern",
+  "triggers": [
+    {
+      "type": "manual",
+      "name": "start_research",
+      "parameters": [
+        "query",
+        "user_id"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "research_orchestration",
+      "type": "agent_pattern",
+      "pattern": "advanced_research",
+      "action": "advanced_research_step",
+      "config": {
+        "max_workers": 5,
+        "strategy": "comprehensive",
+        "export": true
+      },
+      "inputs": [
+        "query"
+      ]
+    },
+    {
+      "id": "store_results",
+      "type": "agent_pattern",
+      "pattern": "chromadb_memory",
+      "action": "chromadb_memory_step",
+      "config": {
+        "operation": "store"
+      },
+      "inputs": [
+        "research_results"
+      ]
+    }
+  ]
+}

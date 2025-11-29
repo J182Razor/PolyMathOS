@@ -1,4 +1,5 @@
 import { PolymathUser } from '../types/polymath';
+import { dynamicWorkflowService } from './DynamicWorkflowService';
 
 export interface LearningSource {
     title: string;
@@ -80,8 +81,9 @@ export class LearningPlanService {
 
             const planData = await response.json();
 
-            // Map backend response to frontend LearningPlan interface
-            return {
+            // If workflow IDs are present, workflows are already created
+            // The plan now includes dynamic workflows for adaptation
+            const plan: LearningPlan = {
                 id: planData.id,
                 topic: planData.goals.topic,
                 mode: mode,
@@ -89,6 +91,19 @@ export class LearningPlanService {
                 sources: [], // Backend might not return sources in the same format yet, or we need to extract them
                 createdAt: new Date(planData.created_at)
             };
+
+            // Store workflow IDs for future adaptations
+            if (planData.workflow_id) {
+                (plan as any).workflowId = planData.workflow_id;
+            }
+            if (planData.multi_phase_workflow_id) {
+                (plan as any).multiPhaseWorkflowId = planData.multi_phase_workflow_id;
+            }
+            if (planData.assessment_workflow_id) {
+                (plan as any).assessmentWorkflowId = planData.assessment_workflow_id;
+            }
+
+            return plan;
 
         } catch (error) {
             console.error('Error creating learning plan:', error);

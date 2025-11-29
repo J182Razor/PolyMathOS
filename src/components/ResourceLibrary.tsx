@@ -1,139 +1,175 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ACADEMIC_RESOURCES } from '../data/academicResources';
+import { ResearchService } from '../services/ResearchService';
+import { DocumentService } from '../services/DocumentService';
 
 const ResourceLibrary: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'datasets' | 'courses' | 'papers' | 'government'>('datasets');
   const [searchTerm, setSearchTerm] = useState('');
+  const researchService = new ResearchService();
+  const documentService = new DocumentService();
 
   const tabs = [
     { id: 'datasets', label: 'Datasets' },
     { id: 'courses', label: 'Courses' },
     { id: 'papers', label: 'Papers' },
-    { id: 'government', label: 'Government Data' }
+    { id: 'government', label: 'Gov Data' },
   ];
 
-  const getResources = () => {
-    let resources: any[] = [];
-    switch (activeTab) {
-      case 'datasets':
-        resources = ACADEMIC_RESOURCES.datasets;
-        break;
-      case 'courses':
-        resources = ACADEMIC_RESOURCES.courses;
-        break;
-      case 'papers':
-        resources = ACADEMIC_RESOURCES.papers;
-        break;
-      case 'government':
-        resources = ACADEMIC_RESOURCES.government;
-        break;
-      default:
-        resources = [];
-    }
+  const resources = [
+    {
+      id: 1,
+      name: 'Quantum Entanglement Simulation',
+      description: 'Dataset from MIT Media Lab',
+      tags: ['#Quantum', '#Physics'],
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCe71YDghcCRMN6-Z2JhRJYcifN0S6qkXPSGKf14Q6WjfjQUsnc5aQAzAVPDkgYHNXLQ_eIStUJ_8dWrrS7tVW0Y40o0VMwG2Mn-Q8eWTyodh4gycQzSJKV1CCMDWEayaYaKZ4pgS0Otko8bLTOWwgBCqvrWTiS_Mw6wHEaKpAvSlaTVtO2XxKKe8x4qrvz5NSwqen51WZYVyk4CyFrR_UFyeTcTGYVJc-9shg2ksvUvsQdKzgWjGwCkS1oXMoDBwCGb3dt_4RD8Jed',
+    },
+    {
+      id: 2,
+      name: 'Advanced AI Ethics Course',
+      description: '12 Modules, Stanford University',
+      tags: ['#Ethics', '#AI'],
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCW8gbj8wMZY7NTVAQBX3uqh_XAgcF9zCADGAxyq8GVshUEbWO2K6DVGjVOLswfvtYqM-_R2SPxp1f7xZwBlavuFML3nt0jN6PYYUOFhusve6RKxk89VYZLtTRbTQPTLjbqdXq3216R8Uo59hroNKuFBKciPetn3Du12sE_OVuMz67VGPf_qhOCzetWhGqLrUTAjJpsfhYOiYE7bqS3rxI9UTQrpfcBarEqrjxY-Tdt__vCiqEzVcMmaXF7Wn353v2_-oOmZALp_wCQ',
+    },
+    {
+      id: 3,
+      name: 'Superposition & Its Applications',
+      description: 'Research paper by A. Turing',
+      tags: ['#Quantum', '#Theory'],
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAA2I6tUoe8gVF-W12UnSVCSPMNjyIQIOCTe2vEJBkT_AIAmb6a8FbnpiD6R0fIImDbglKL5mbqk7N-02fBOW2W1g5Enjtz7q2-nQTChz0oAFDGOQ74DlHXFrmJbx8BUcqxicD9mQfD-bJK68m3YDL3lNugxcOvvQPb1Y961PvJfFGiWYX3OBZ7_psKuzDeajWcBCpXTEbbPqwKmbRLUflWVPoe5uMILICYc2jiQclb5xmRCJ-kK8va-n1Tgy9SAnkJ-dCmQ40NfIfz',
+    },
+    {
+      id: 4,
+      name: 'US Gov AI Research Archive',
+      description: '1.2M Entries, Updated Q2 2024',
+      tags: ['#GovData', '#AI'],
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDladE6rEKNFnnTJt2xanszuIqzi_QM7bp6MnwYSGYsAwVphIpGCZf6x8O4y1ejiTuSlqyXkrMRDjFmPBhFPG3GHr9eC0OLvkylPhEN1Dk7XgPOZUR7JCuuaopLtMHTavJmiVhKUJhU5_buT5kjfQiO0rColNGh-bXBLEQZJUT__8tQgpcOzgXv4PC-yfZzCU5vpKENswRhvWdsShZ94z9r530u6Nb5G2H3l4rvWbgN-GupMvWa7QZ4SDqKB6Q_DDcIp4jLXtoUdkSL',
+    },
+    {
+      id: 5,
+      name: 'Machine Learning Foundations',
+      description: 'Deeplearning.ai Course',
+      tags: ['#ML', '#Course'],
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBOMygje8UHja2ZGFbOCx1wVmtxGf9eIaTr6L8txXxCHvSBp_d7QjsBNuhHP0OAYs0PEEEXNT_mY4C0Pu4DHCkZC9xXTlIq5gRIKWurAD1iN_0wYVG9kbGYj9wZ8aOVIN91gPAWVHklRi_2kH7gm44ojN3CDZKHssf4jAa2yr10CtVJA8gLsJ_9_9JKbmG4035mzRyKMxPI_SatxMKR71lXIv8axkRfkCmX7XHZHuhXLn3IoMZEvcow0PxvGi2k3jPX3rBI112zscmz',
+    },
+    {
+      id: 6,
+      name: 'Modern Cryptography Protocols',
+      description: 'Paper from ACM Conference',
+      tags: ['#Cryptography', '#Security'],
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD2b2SqyEyskn3uxCGyNz8fTnDkPLAzG97WAe3qTs-ilhl6uWxG_lFfgxQnxbGTlWCpf229dJxCBFkB_FDb8P88qXKSjCoWbj1NwOoAF6f8O1Pgxq0uE6CiLu6ST9aF7qeKHCfsFrrLJnAZen5ahAhHLGQwWNc0C_azZYh6UkS2bh2ivyDjGl7TcoyhCp2gjTSSUYCj5rn1C3yUNiPBzjlJKqFPrW9Qu5_ol8vwkcwfXHF7BpalfH8NoqV2boQwo83AMCDohNdj2KtM',
+    },
+  ];
 
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      return resources.filter(r => 
-        r.name.toLowerCase().includes(term) || 
-        r.description.toLowerCase().includes(term) ||
-        r.category.toLowerCase().includes(term)
-      );
-    }
-
-    return resources;
-  };
+  const filteredResources = resources.filter(resource =>
+    resource.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    resource.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    resource.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
   return (
-    <div className="p-4 sm:p-6 max-w-7xl mx-auto">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-display-2 mb-3 sm:mb-4 text-poly-text-primary">Academic Resource Library</h1>
-        <p className="text-sm sm:text-body-large text-poly-text-secondary">
-          Access a comprehensive collection of free academic resources, datasets, and learning materials.
-        </p>
+    <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden bg-background-light dark:bg-background-dark font-display">
+      {/* Top App Bar */}
+      <div className="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
+        <div className="flex size-12 shrink-0 items-center justify-start">
+          <span className="material-symbols-outlined text-text-primary-dark" style={{ fontSize: '28px' }}>
+            widgets
+          </span>
+        </div>
+        <h1 className="text-text-primary-dark text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
+          Resource Library
+        </h1>
+        <div className="flex w-12 items-center justify-end">
+          <button className="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 bg-transparent text-text-primary-dark gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0">
+            <span className="material-symbols-outlined text-text-primary-dark" style={{ fontSize: '28px' }}>
+              account_circle
+            </span>
+          </button>
+        </div>
       </div>
 
-      {/* Search and Tabs */}
-      <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center mb-6 sm:mb-8 gap-4">
-        <div className="flex space-x-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-hide">
-          {tabs.map(tab => (
-            <button
+      {/* Search Bar */}
+      <div className="px-4 py-3">
+        <label className="flex flex-col min-w-40 h-12 w-full">
+          <div className="flex w-full flex-1 items-stretch rounded-lg h-full">
+            <div className="text-text-secondary-dark flex border-none bg-card-dark items-center justify-center pl-4 rounded-l-lg border-r-0">
+              <span className="material-symbols-outlined">search</span>
+            </div>
+            <input
+              className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-primary-dark focus:outline-0 focus:ring-0 border-none bg-card-dark focus:border-none h-full placeholder:text-text-secondary-dark px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+              placeholder="Search Quantum Datasets..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </label>
+      </div>
+
+      {/* Tabs */}
+      <div>
+        <div className="flex border-b border-[#242424] px-4 justify-between">
+          {tabs.map((tab) => (
+            <a
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap text-sm sm:text-base ${
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveTab(tab.id as any);
+              }}
+              className={`flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 flex-1 cursor-pointer ${
                 activeTab === tab.id
-                  ? 'bg-poly-primary-500 text-white shadow-poly-sm'
-                  : 'bg-poly-neutral-100 dark:bg-poly-neutral-800 text-poly-neutral-600 dark:text-poly-neutral-300 hover:bg-poly-neutral-200 dark:hover:bg-poly-neutral-700'
+                  ? 'border-b-accent-dark text-accent-dark'
+                  : 'border-b-transparent text-text-secondary-dark'
               }`}
+              href="#"
             >
-              {tab.label}
-            </button>
+              <p className="text-sm font-bold leading-normal tracking-[0.015em]">{tab.label}</p>
+            </a>
           ))}
         </div>
-
-        <div className="relative w-full md:w-64">
-          <input
-            type="text"
-            placeholder="Search resources..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="poly-input pl-10 w-full"
-          />
-          <svg
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-poly-neutral-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </div>
       </div>
 
-      {/* Resource Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {getResources().map((resource, index) => (
-          <motion.a
-            key={index}
-            href={resource.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="poly-card hover:shadow-poly-lg transition-all duration-300 flex flex-col h-full group no-underline"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
-          >
-            <div className="flex justify-between items-start mb-3">
-              <span className="px-2 py-1 rounded text-xs font-medium bg-poly-primary-50 text-poly-primary-700">
-                {resource.category}
-              </span>
-              <svg
-                className="w-5 h-5 text-poly-neutral-400 group-hover:text-poly-primary-500 transition-colors"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
+      {/* Chips / Filters */}
+      <div className="flex gap-3 px-4 py-3 overflow-x-auto [scrollbar-width:none]">
+        <button className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-accent-dark/20 px-3">
+          <span className="material-symbols-outlined text-accent-dark" style={{ fontSize: '20px' }}>
+            tune
+          </span>
+          <p className="text-accent-dark text-sm font-medium leading-normal">Filter</p>
+        </button>
+        <button className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-card-dark px-3">
+          <p className="text-text-primary-dark text-sm font-medium leading-normal">Quantum Mechanics</p>
+        </button>
+        <button className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-card-dark px-3">
+          <p className="text-text-primary-dark text-sm font-medium leading-normal">AI Ethics</p>
+        </button>
+        <button className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-card-dark px-3">
+          <p className="text-text-primary-dark text-sm font-medium leading-normal">Cryptography</p>
+        </button>
+        <button className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-card-dark px-3">
+          <p className="text-text-primary-dark text-sm font-medium leading-normal">AI Policy</p>
+        </button>
+      </div>
+
+      {/* Image Grid */}
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-4 p-4">
+        {filteredResources.map((resource) => (
+          <div key={resource.id} className="flex flex-col gap-3 rounded-xl bg-card-dark p-3">
+            <div className="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg relative" style={{ backgroundImage: `url("${resource.image}")` }}>
+              <div className="absolute top-2 right-2 flex size-6 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm">
+                <span className="material-symbols-outlined text-text-primary-dark" style={{ fontSize: '16px' }}>
+                  open_in_new
+                </span>
+              </div>
             </div>
-            <h3 className="text-base sm:text-heading-3 text-poly-text-primary mb-2 group-hover:text-poly-primary-600 transition-colors line-clamp-2">
-              {resource.name}
-            </h3>
-            <p className="text-sm sm:text-body-small text-poly-text-secondary flex-grow line-clamp-3">
-              {resource.description}
-            </p>
-          </motion.a>
+            <div>
+              <p className="text-text-primary-dark text-base font-medium leading-normal">{resource.name}</p>
+              <p className="text-text-secondary-dark text-sm font-normal leading-tight mt-1">{resource.description}</p>
+              <p className="text-text-secondary-dark text-xs font-normal leading-normal mt-1.5">{resource.tags.join(', ')}</p>
+            </div>
+          </div>
         ))}
       </div>
-      
-      {getResources().length === 0 && (
-        <div className="text-center py-12 text-poly-neutral-500">
-          No resources found matching your search.
-        </div>
-      )}
     </div>
   );
 };
 
 export default ResourceLibrary;
-

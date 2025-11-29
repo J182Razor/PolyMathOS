@@ -174,11 +174,24 @@ comprehension_metrics_db: Dict[str, List[Dict]] = {}
 
 @router.post("/plan", response_model=LearningPlanResponse)
 async def create_learning_plan(request: CreateLearningPlanRequest):
-    """Create a personalized learning plan for a topic"""
+    """Create a personalized learning plan for a topic using dynamic workflows"""
     try:
         from ..modules.swarms_agentic_system import agentic_system
+        from ..modules.dynamic_workflow_generator import get_dynamic_workflow_generator
         
-        # Use curriculum architect agent to design the plan
+        # Generate dynamic workflow for lesson plan
+        workflow_generator = get_dynamic_workflow_generator()
+        
+        # Create workflow definition
+        goals_dict = request.goals.dict()
+        workflow_def = workflow_generator.generate_lesson_plan_workflow(
+            topic=request.goals.topic,
+            user_id=request.user_id,
+            goals=goals_dict,
+            user_profile={"archetype": request.archetype}
+        )
+        
+        # Use curriculum architect agent to design the plan (enhanced with workflow)
         result = await agentic_system.process_agentically(
             task_type="curriculum_design",
             prompt=f"""Design a comprehensive learning plan for:
@@ -195,8 +208,13 @@ async def create_learning_plan(request: CreateLearningPlanRequest):
             
             User's learning archetype: {request.archetype}
             
-            Create a structured learning plan with phases, activities, and assessments.""",
-            context={"user_id": request.user_id, "archetype": request.archetype}
+            Create a structured learning plan with phases, activities, and assessments.
+            This plan will be executed via a dynamic workflow that adapts based on progress.""",
+            context={
+                "user_id": request.user_id,
+                "archetype": request.archetype,
+                "workflow_id": workflow_def.get("workflow_id")
+            }
         )
         
         plan_id = str(uuid.uuid4())
@@ -239,10 +257,17 @@ async def create_learning_plan(request: CreateLearningPlanRequest):
             }
         ]
         
+        # Generate multi-phase workflow for the plan
+        multi_phase_workflow = workflow_generator.generate_multi_phase_workflow(
+            phases=phases,
+            user_id=request.user_id,
+            topic=request.goals.topic
+        )
+        
         plan = {
             "id": plan_id,
             "user_id": request.user_id,
-            "goals": request.goals.dict(),
+            "goals": goals_dict,
             "phases": phases,
             "current_phase_index": 0,
             "start_date": now,
@@ -252,8 +277,18 @@ async def create_learning_plan(request: CreateLearningPlanRequest):
                 "activities_completed": 0,
                 "total_activities": 0
             },
+            "workflow_id": workflow_def.get("workflow_id"),
+            "multi_phase_workflow_id": multi_phase_workflow.get("workflow_id"),
             "created_at": now
         }
+        
+        # Generate assessment workflow
+        assessment_workflow = workflow_generator.generate_assessment_workflow(
+            user_id=request.user_id,
+            learning_plan_id=plan_id,
+            frequency="weekly"
+        )
+        plan["assessment_workflow_id"] = assessment_workflow.get("workflow_id")
         
         # Save to database
         saved = genius_system.database.save_learning_plan(plan)

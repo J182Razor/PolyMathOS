@@ -1,10 +1,12 @@
 fastapi
 uvicorn
-torch
-torchvision
-torchaudio
-transformers
-sentence-transformers
+# PyTorch - compatible versions to avoid pytree conflicts
+torch>=2.1.0,<2.4.0
+torchvision>=0.16.0,<0.19.0
+torchaudio>=2.1.0,<2.4.0
+# Transformers - compatible with torch 2.1+
+transformers>=4.35.0,<5.0.0
+sentence-transformers>=2.2.2,<3.0.0
 numpy
 scipy
 scikit-learn
@@ -52,7 +54,7 @@ python-docx
 
 # Swarms Tools - Extended agent capabilities
 # Install from: https://github.com/The-Swarm-Corporation/swarms-tools.git
-swarms-tools>=1.0.0
+swarms-tools>=0.3.0
 
 # SwarmDB - Enhanced database functionality
 # Install from: https://github.com/The-Swarm-Corporation/SwarmDB.git
@@ -80,10 +82,15 @@ agentparse>=1.0.0
 # Research
 research-paper-hive>=1.0.0
 advanced-research>=1.0.0
+exa-py>=1.0.0  # For AdvancedResearch web search
 
-# RAG
+# RAG & Memory
 agent-rag-protocol>=1.0.0
 multi-agent-rag-template>=1.0.0
+llama-index>=0.10.0
+llama-index-core>=0.10.0
+chromadb>=0.4.0
+swarms-memory>=1.0.0  # For ChromaDB integration
 
 # Workflow
 zero>=1.0.0

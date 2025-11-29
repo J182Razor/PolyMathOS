@@ -1,23 +1,8 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-
-interface Milestone {
-  week: number;
-  topic: string;
-  completed: boolean;
-}
-
-interface LearningPath {
-  id: number;
-  title: string;
-  description: string;
-  duration: number;
-  difficulty: string;
-  resources: number;
-  milestones: Milestone[];
-  domain: string;
-  estimatedHours: number;
-}
+import React, { useState, useEffect } from 'react';
+import { DynamicWorkflowService } from '../../services/DynamicWorkflowService';
+import { ApiErrorHandler, ApiError } from '../../utils/apiErrorHandler';
+import { LoadingSpinner } from '../ui/LoadingSpinner';
+import { ErrorMessage } from '../ui/ErrorMessage';
 
 interface CurriculumBuilderProps {
   userData: any;
@@ -25,196 +10,196 @@ interface CurriculumBuilderProps {
   onBack?: () => void;
 }
 
+interface Module {
+  id: number;
+  title: string;
+  description: string;
+  expanded: boolean;
+}
+
 const CurriculumBuilder: React.FC<CurriculumBuilderProps> = ({ userData, onComplete, onBack }) => {
-  // Generate sample learning paths based on user domains
-  const generateLearningPaths = (): LearningPath[] => {
-    const domains = userData.domains && userData.domains.length > 0 ? userData.domains : ['General'];
-    return domains.map((domain: string, index: number) => ({
-      id: index + 1,
-      title: `${domain} Mastery Path`,
-      description: `A comprehensive journey through ${domain} fundamentals to advanced concepts`,
-      duration: Math.floor(Math.random() * 12) + 6, // weeks
-      difficulty: ['Beginner', 'Intermediate', 'Advanced'][Math.floor(Math.random() * 3)],
-      resources: Math.floor(Math.random() * 50) + 20,
-      milestones: [
-        { week: 1, topic: 'Foundations', completed: false },
-        { week: 3, topic: 'Core Concepts', completed: false },
-        { week: 6, topic: 'Practical Applications', completed: false },
-        { week: 9, topic: 'Advanced Topics', completed: false }
-      ],
-      domain: domain,
-      estimatedHours: Math.floor(Math.random() * 40) + 20
-    }));
+  const [timeline, setTimeline] = useState('1 Month');
+  const [modules, setModules] = useState<Module[]>([
+    {
+      id: 1,
+      title: 'Introduction to Quantum States',
+      description: 'Grasp the fundamental concepts of qubits, superposition, and the principles that govern quantum systems.',
+      expanded: false,
+    },
+    {
+      id: 2,
+      title: 'The EPR Paradox',
+      description: 'Explore the famous thought experiment by Einstein, Podolsky, and Rosen that questioned quantum mechanics.',
+      expanded: false,
+    },
+    {
+      id: 3,
+      title: "Bell's Theorem & Non-Locality",
+      description: "Understand the mathematical proof that demonstrates the inconsistencies of local hidden-variable theories.",
+      expanded: false,
+    },
+  ]);
+  const [topic, setTopic] = useState('Quantum Entanglement');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<ApiError | null>(null);
+  const workflowService = new DynamicWorkflowService();
+
+  useEffect(() => {
+    // Generate curriculum based on user data
+    if (userData.domains && userData.domains.length > 0) {
+      const primaryDomain = userData.domains[0];
+      setTopic(primaryDomain.charAt(0).toUpperCase() + primaryDomain.slice(1).replace(/-/g, ' '));
+    }
+  }, [userData]);
+
+  const toggleModule = (id: number) => {
+    setModules(prev => prev.map(m => m.id === id ? { ...m, expanded: !m.expanded } : m));
   };
 
-  const [selectedPath, setSelectedPath] = useState<LearningPath | null>(null);
-  const [programName, setProgramName] = useState(`${userData.userName || 'User'}'s Learning Journey`);
-  const [learningPaths] = useState<LearningPath[]>(generateLearningPaths());
+  const handleStartLearningPath = async () => {
+    setIsGenerating(true);
+    setError(null);
+    try {
+      // Integrate with DynamicWorkflowService to create learning plan workflow
+      const workflow = await workflowService.generateWorkflow({
+        type: 'learning_plan',
+        topic,
+        timeline,
+        modules: modules.length,
+        user_id: userData.userId || 'guest',
+      });
 
-  const handleCreateProgram = () => {
-    const program = {
-      name: programName,
-      userId: userData.userId || 'guest',
-      startDate: new Date(),
-      paths: selectedPath ? [selectedPath] : learningPaths,
-      progress: 0,
-      createdAt: new Date()
-    };
-    
-    onComplete(program);
+      const program = {
+        name: `${topic} Learning Path`,
+        topic,
+        timeline,
+        modules,
+        workflow_id: workflow.workflow_id,
+        userId: userData.userId || 'guest',
+        createdAt: new Date(),
+      };
+
+      setIsGenerating(false);
+      onComplete(program);
+    } catch (err) {
+      const apiError = ApiErrorHandler.handleError(err);
+      setError(apiError);
+      setIsGenerating(false);
+    }
   };
 
   return (
-    <motion.div 
-      className="poly-card poly-card-elevated max-w-4xl mx-auto"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="text-center mb-8">
-        <div className="w-20 h-20 bg-gradient-to-r from-poly-accent-500 to-poly-primary-500 rounded-2xl mx-auto mb-6 flex items-center justify-center">
-          <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
-        </div>
-        <h2 className="text-display-3 mb-3">Your Personalized Learning Program</h2>
-        <p className="text-body-large text-poly-neutral-600">
-          We've created customized learning paths based on your interests. Choose one to get started!
-        </p>
-      </div>
+    <div className="relative flex h-auto min-h-screen w-full flex-col bg-background-dark antialiased font-display">
+      {/* Top App Bar */}
+      <header className="flex items-center bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
+        <button onClick={onBack} className="text-text-main flex size-10 shrink-0 items-center justify-center">
+          <span className="material-symbols-outlined text-2xl">arrow_back</span>
+        </button>
+        <h2 className="text-text-title text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
+          Curriculum Builder
+        </h2>
+        <div className="size-10 shrink-0"></div>
+      </header>
 
-      {/* Program Name */}
-      <div className="mb-8">
-        <label className="block text-body-medium text-poly-neutral-700 mb-2">
-          Program Name
-        </label>
-        <input
-          type="text"
-          value={programName}
-          onChange={(e) => setProgramName(e.target.value)}
-          className="poly-input w-full"
-        />
-      </div>
+      <main className="flex-1 flex flex-col px-4 pt-4 pb-28">
+        {/* Headline Text */}
+        <h1 className="text-text-title tracking-tight text-[32px] font-bold leading-tight text-left pb-4">
+          {topic}
+        </h1>
 
-      {/* Learning Paths */}
-      <div className="mb-8">
-        <h3 className="text-heading-3 mb-4">Recommended Learning Paths</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {learningPaths.map((path) => (
-            <motion.div
-              key={path.id}
-              onClick={() => setSelectedPath(path)}
-              className={`p-5 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
-                selectedPath?.id === path.id
-                  ? 'border-poly-primary-500 bg-poly-primary-50'
-                  : 'border-poly-neutral-200 hover:border-poly-neutral-300'
+        {/* Section Header for Timeline */}
+        <h3 className="text-text-title text-lg font-bold leading-tight tracking-[-0.015em] pt-4 pb-3">
+          Select Your Timeline
+        </h3>
+
+        {/* Chips for Timeline Selection */}
+        <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4">
+          {['1 Week', '1 Month', '6 Months', '1 Year'].map((option) => (
+            <div
+              key={option}
+              onClick={() => setTimeline(option)}
+              className={`flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full px-5 cursor-pointer transition-all ${
+                timeline === option
+                  ? 'bg-accent ring-2 ring-accent/50'
+                  : 'bg-surface-dark'
               }`}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
             >
-              <div className="flex justify-between items-start mb-3">
-                <h4 className="text-heading-3 text-poly-neutral-900">{path.title}</h4>
-                {selectedPath?.id === path.id && (
-                  <div className="w-6 h-6 rounded-full bg-poly-primary-500 text-white flex items-center justify-center">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                )}
-              </div>
-              
-              <p className="text-body-small text-poly-neutral-600 mb-4">
-                {path.description}
+              <p className={`text-sm font-medium leading-normal ${
+                timeline === option ? 'text-background-dark font-bold' : 'text-text-main'
+              }`}>
+                {option}
               </p>
-              
-              <div className="grid grid-cols-3 gap-2 mb-4 text-center">
-                <div className="poly-panel p-2 flex flex-col justify-center">
-                  <div className="text-body-medium font-semibold text-poly-neutral-900">
-                    {path.duration}w
-                  </div>
-                  <div className="text-xs text-poly-neutral-600">Duration</div>
-                </div>
-                <div className="poly-panel p-2 flex flex-col justify-center">
-                  <div className="text-body-medium font-semibold text-poly-neutral-900">
-                    {path.resources}
-                  </div>
-                  <div className="text-xs text-poly-neutral-600">Resources</div>
-                </div>
-                <div className="poly-panel p-2 flex flex-col justify-center">
-                  <div className="text-body-medium font-semibold text-poly-neutral-900">
-                    {path.estimatedHours}h
-                  </div>
-                  <div className="text-xs text-poly-neutral-600">Est. Hours</div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <span className={`px-2 py-1 rounded text-xs font-medium ${
-                  path.difficulty === 'Beginner' 
-                    ? 'bg-poly-accent-100 text-poly-accent-800' 
-                    : path.difficulty === 'Intermediate' 
-                      ? 'bg-poly-primary-100 text-poly-primary-800' 
-                      : 'bg-poly-secondary-100 text-poly-secondary-800'
-                }`}>
-                  {path.difficulty}
-                </span>
-                <span className="poly-caption text-poly-neutral-500">
-                  {path.domain}
-                </span>
-              </div>
-            </motion.div>
+            </div>
           ))}
         </div>
-      </div>
 
-      {/* Milestones Preview */}
-      {selectedPath && (
-        <motion.div 
-          className="mb-8"
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          transition={{ duration: 0.3 }}
-        >
-          <h3 className="text-heading-3 mb-4">Learning Milestones</h3>
-          <div className="space-y-3">
-            {selectedPath.milestones.map((milestone, index) => (
-              <div key={index} className="flex items-center p-3 bg-poly-neutral-50 rounded-lg">
-                <div className="w-8 h-8 rounded-full bg-poly-neutral-200 flex items-center justify-center mr-3">
-                  <span className="text-body-medium font-semibold text-poly-neutral-700">
-                    W{milestone.week}
+        {/* Body Text (Dynamic Summary) */}
+        <p className="text-text-main text-base font-normal leading-normal pt-4 pb-6">
+          AI recommends {modules.length} modules, approximately 2 hours/week.
+        </p>
+
+        {/* Section Header for Modules */}
+        <h3 className="text-text-title text-lg font-bold leading-tight tracking-[-0.015em] pb-3">
+          Generated Modules
+        </h3>
+
+        {/* AI-Generated Curriculum List */}
+        <div className="flex flex-col gap-3">
+          {modules.map((module) => (
+            <div key={module.id} className="flex flex-col rounded-xl bg-surface-dark p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-accent">Module {module.id}</span>
+                  <h4 className="text-text-title font-bold text-base leading-tight">{module.title}</h4>
+                </div>
+                <button
+                  onClick={() => toggleModule(module.id)}
+                  className="text-text-main"
+                >
+                  <span className="material-symbols-outlined">
+                    {module.expanded ? 'expand_less' : 'expand_more'}
                   </span>
-                </div>
-                <div className="flex-1">
-                  <div className="text-body-medium text-poly-neutral-900">
-                    {milestone.topic}
-                  </div>
-                </div>
-                <div className="w-6 h-6 rounded-full border-2 border-poly-neutral-300"></div>
+                </button>
               </div>
-            ))}
-          </div>
-        </motion.div>
+              {module.expanded && (
+                <p className="text-text-main text-sm mt-2">{module.description}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </main>
+
+      {/* Error Message */}
+      {error && (
+        <div className="px-4 mt-4">
+          <ErrorMessage 
+            error={error} 
+            onDismiss={() => setError(null)}
+            retryable={ApiErrorHandler.isRetryable(error)}
+            onRetry={handleStartLearningPath}
+          />
+        </div>
       )}
 
-      <div className="flex gap-3">
-        {onBack && (
-          <button
-            onClick={onBack}
-            className="poly-btn-secondary flex-1"
-          >
-            Back
-          </button>
-        )}
+      {/* Bottom CTA Bar */}
+      <footer className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background-dark via-background-dark/90 to-transparent">
         <button
-          onClick={handleCreateProgram}
-          className={`poly-btn-primary ${onBack ? 'flex-1' : 'w-full'}`}
+          onClick={handleStartLearningPath}
+          disabled={isGenerating}
+          className="w-full h-14 bg-accent text-background-dark font-bold text-base rounded-xl flex items-center justify-center gap-2 shadow-[0_0_20px_theme(colors.accent/0.5)] disabled:opacity-50"
         >
-          Start My Learning Journey
+          {isGenerating ? (
+            <>
+              <LoadingSpinner size="sm" />
+              <span>Creating Learning Path...</span>
+            </>
+          ) : (
+            'Start Learning Path'
+          )}
         </button>
-      </div>
-    </motion.div>
+      </footer>
+    </div>
   );
 };
 
 export default CurriculumBuilder;
-

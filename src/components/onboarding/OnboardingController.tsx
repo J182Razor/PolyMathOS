@@ -25,13 +25,6 @@ const OnboardingController: React.FC<OnboardingControllerProps> = ({ onComplete 
     }
   };
 
-  const handleStepClick = (stepNumber: number) => {
-    // Allow clicking on progress indicators to go back to previous steps
-    if (stepNumber < step) {
-      setStep(stepNumber);
-    }
-  };
-
   const handleComplete = (createdProgram: any) => {
     setProgram(createdProgram);
     setStep(5);
@@ -40,7 +33,7 @@ const OnboardingController: React.FC<OnboardingControllerProps> = ({ onComplete 
   const renderStep = () => {
     switch (step) {
       case 1:
-        return <WelcomeScreen onNext={handleNext} onBack={undefined} />;
+        return <WelcomeScreen onNext={handleNext} />;
       case 2:
         return <InterestDiscovery userData={userData} onNext={handleNext} onBack={handleBack} />;
       case 3:
@@ -50,54 +43,15 @@ const OnboardingController: React.FC<OnboardingControllerProps> = ({ onComplete 
       case 5:
         return <OnboardingComplete program={program} onStartLearning={onComplete} onBack={handleBack} />;
       default:
-        return <WelcomeScreen onNext={handleNext} onBack={undefined} />;
+        return <WelcomeScreen onNext={handleNext} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-poly-neutral-50 to-poly-neutral-100 py-12 px-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Progress Indicator */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center max-w-md mx-auto mb-4">
-            {[1, 2, 3, 4].map((num) => (
-              <div 
-                key={num} 
-                className="flex flex-col items-center cursor-pointer"
-                onClick={() => handleStepClick(num)}
-              >
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                  step >= num 
-                    ? 'bg-poly-primary-500 text-white' 
-                    : 'bg-poly-neutral-200 text-poly-neutral-500'
-                } ${num < step ? 'hover:bg-poly-primary-400 hover:scale-110' : ''}`}>
-                  {num}
-                </div>
-                {num < 4 && (
-                  <div className={`w-8 sm:w-16 h-1 mt-2 ${
-                    step > num ? 'bg-poly-primary-500' : 'bg-poly-neutral-200'
-                  }`} />
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="text-center">
-            <span className="text-body-medium text-poly-neutral-600">
-              {step === 1 && 'Welcome'}
-              {step === 2 && 'Interests'}
-              {step === 3 && 'Discovery'}
-              {step === 4 && 'Program'}
-              {step === 5 && 'Complete'}
-            </span>
-          </div>
-        </div>
-
-        {/* Step Content */}
-        {renderStep()}
-      </div>
+    <div className="min-h-screen bg-background-dark">
+      {renderStep()}
     </div>
   );
 };
 
 export default OnboardingController;
-

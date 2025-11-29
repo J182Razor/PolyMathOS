@@ -1080,15 +1080,15 @@ What is the single most impactful thing this learner should do next? Be specific
   }
 
   /**
-   * Update activity status
+   * Update activity status with dynamic workflow adaptation
    */
-  public updateActivityStatus(
+  public async updateActivityStatus(
     planId: string,
     phaseId: string,
     activityId: string,
     status: LearningActivity['status'],
     performance?: LearningActivity['performance']
-  ): boolean {
+  ): Promise<boolean> {
     const plan = this.learningPlans.get(planId);
     if (!plan) return false;
 
@@ -1110,6 +1110,25 @@ What is the single most impactful thing this learner should do next? Be specific
 
     plan.updatedAt = new Date();
     this.saveData();
+
+    // Trigger workflow adaptation if activity completed with performance data
+    if (status === 'completed' && performance) {
+      try {
+        const { workflowOrchestratorService } = await import('./WorkflowOrchestratorService');
+        const score = performance.score || (performance.correct ? 100 : 0);
+        
+        await workflowOrchestratorService.updateProgress({
+          learning_plan_id: planId,
+          activity_id: activityId,
+          score: score,
+          activity_type: activity.type || 'assessment'
+        });
+      } catch (error) {
+        console.error('Workflow adaptation error:', error);
+        // Don't fail the activity update if workflow adaptation fails
+      }
+    }
+
     return true;
   }
 

@@ -1,0 +1,82 @@
+{
+  "name": "Dynamic Learning Workflow",
+  "description": "Multi-pattern learning workflow with RAG and agent collaboration",
+  "triggers": [
+    {
+      "type": "manual",
+      "name": "start_learning",
+      "parameters": [
+        "topic",
+        "user_id",
+        "goals"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "research_topic",
+      "type": "agent_pattern",
+      "pattern": "advanced_research",
+      "action": "advanced_research_step",
+      "config": {
+        "max_workers": 3,
+        "strategy": "focused"
+      },
+      "inputs": [
+        "topic"
+      ]
+    },
+    {
+      "id": "query_knowledge_base",
+      "type": "agent_pattern",
+      "pattern": "llamaindex_rag",
+      "action": "llamaindex_rag_step",
+      "config": {
+        "similarity_top_k": 10
+      },
+      "inputs": [
+        "topic",
+        "research_results"
+      ]
+    },
+    {
+      "id": "collaborative_analysis",
+      "type": "agent_pattern",
+      "pattern": "group_chat",
+      "action": "group_chat_step",
+      "config": {
+        "agents": [
+          {
+            "name": "Content-Analyzer",
+            "description": "Analyzes and structures learning content"
+          },
+          {
+            "name": "Pedagogy-Expert",
+            "description": "Ensures pedagogical soundness"
+          },
+          {
+            "name": "Assessment-Designer",
+            "description": "Creates assessment strategies"
+          }
+        ],
+        "max_loops": 2
+      },
+      "inputs": [
+        "research_results",
+        "rag_results"
+      ]
+    },
+    {
+      "id": "store_learning_materials",
+      "type": "agent_pattern",
+      "pattern": "chromadb_memory",
+      "action": "chromadb_memory_step",
+      "config": {
+        "operation": "store"
+      },
+      "inputs": [
+        "collaborative_results"
+      ]
+    }
+  ]
+}

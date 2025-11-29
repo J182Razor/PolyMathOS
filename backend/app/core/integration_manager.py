@@ -58,6 +58,13 @@ class IntegrationManager:
         self.swarms_utils = None
         self.custom_swarms_spec = None
         
+        # Dynamic workflow system
+        self.dynamic_workflow_generator = None
+        self.workflow_orchestrator = None
+        
+        # Unified agent orchestrator
+        self.unified_orchestrator = None
+        
         self.initialized = False
     
     def initialize_all(self) -> Dict[str, bool]:
@@ -184,6 +191,33 @@ class IntegrationManager:
                 logger.info("Zero initialized successfully")
         except Exception as e:
             logger.error(f"Failed to initialize Zero: {e}")
+        
+        # Initialize Dynamic Workflow Generator (depends on Zero)
+        logger.info("Initializing Dynamic Workflow Generator...")
+        try:
+            from app.modules.dynamic_workflow_generator import get_dynamic_workflow_generator
+            self.dynamic_workflow_generator = get_dynamic_workflow_generator()
+            logger.info("Dynamic Workflow Generator initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize Dynamic Workflow Generator: {e}")
+        
+        # Initialize Workflow Orchestrator
+        logger.info("Initializing Workflow Orchestrator...")
+        try:
+            from app.modules.workflow_orchestrator import get_workflow_orchestrator
+            self.workflow_orchestrator = get_workflow_orchestrator()
+            logger.info("Workflow Orchestrator initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize Workflow Orchestrator: {e}")
+        
+        # Initialize Unified Agent Orchestrator
+        logger.info("Initializing Unified Agent Orchestrator...")
+        try:
+            from app.modules.unified_agent_orchestrator import get_unified_orchestrator
+            self.unified_orchestrator = get_unified_orchestrator(self.config)
+            logger.info("Unified Agent Orchestrator initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize Unified Agent Orchestrator: {e}")
         
         # Initialize doc-master
         logger.info("Initializing doc-master...")
@@ -394,6 +428,18 @@ class IntegrationManager:
         """Get Custom-Swarms-Spec instance"""
         return self.custom_swarms_spec
     
+    def get_dynamic_workflow_generator(self):
+        """Get Dynamic Workflow Generator instance"""
+        return self.dynamic_workflow_generator
+    
+    def get_workflow_orchestrator(self):
+        """Get Workflow Orchestrator instance"""
+        return self.workflow_orchestrator
+    
+    def get_unified_orchestrator(self):
+        """Get Unified Agent Orchestrator instance"""
+        return self.unified_orchestrator
+    
     def health_check(self) -> Dict[str, Any]:
         """Perform health check on all components"""
         health = {
@@ -458,6 +504,34 @@ class IntegrationManager:
             health["components"]["zero"] = self.zero.health_check()
         else:
             health["components"]["zero"] = {"status": "unavailable"}
+        
+        # Check Dynamic Workflow Generator
+        if self.dynamic_workflow_generator:
+            health["components"]["dynamic_workflow_generator"] = {
+                "status": "healthy",
+                "available": True,
+                "templates": len(self.dynamic_workflow_generator.workflow_templates)
+            }
+        else:
+            health["components"]["dynamic_workflow_generator"] = {"status": "unavailable"}
+        
+        # Check Workflow Orchestrator
+        if self.workflow_orchestrator:
+            active_count = len(self.workflow_orchestrator.active_workflows)
+            health["components"]["workflow_orchestrator"] = {
+                "status": "healthy",
+                "available": True,
+                "active_workflows": active_count
+            }
+        else:
+            health["components"]["workflow_orchestrator"] = {"status": "unavailable"}
+        
+        # Check Unified Agent Orchestrator
+        if self.unified_orchestrator:
+            orchestrator_health = self.unified_orchestrator.health_check()
+            health["components"]["unified_orchestrator"] = orchestrator_health
+        else:
+            health["components"]["unified_orchestrator"] = {"status": "unavailable"}
         
         # Check doc-master
         if self.doc_master:

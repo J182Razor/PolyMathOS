@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 
 interface OnboardingCompleteProps {
   program: any;
@@ -8,84 +7,91 @@ interface OnboardingCompleteProps {
 }
 
 const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({ program, onStartLearning, onBack }) => {
+  const concepts = [
+    { name: 'Quantum Entanglement', type: 'Core Concept', icon: 'hub' },
+    { name: 'Neural Networks', type: 'Core Concept', icon: 'grain' },
+  ];
+
   return (
-    <motion.div 
-      className="poly-card poly-card-elevated max-w-2xl mx-auto text-center px-6 py-8 md:p-8"
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
-    >
-      <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-r from-poly-success to-poly-accent-500 rounded-2xl mx-auto mb-6 sm:mb-8 flex items-center justify-center">
-        <svg className="w-10 h-10 sm:w-12 sm:h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      </div>
-      
-      <h2 className="text-2xl sm:text-display-2 mb-3 sm:mb-4 text-poly-text-primary">Ready to Learn!</h2>
-      
-      <p className="text-sm sm:text-body-large text-poly-text-secondary mb-2">
-        Congratulations, {program.name ? program.name.split("'")[0] : 'Learner'}! Your personalized learning program is ready.
-      </p>
-      
-      <p className="text-sm sm:text-body-medium text-poly-text-secondary mb-6 sm:mb-8">
-        We've discovered {program.paths?.[0]?.resources || 0} resources and created a {program.paths?.[0]?.duration || 8}-week learning path in {program.paths?.[0]?.domain || 'your selected domains'}.
-      </p>
-      
-      <div className="bg-poly-primary-50 dark:bg-poly-primary-900/20 border border-poly-primary-200 dark:border-poly-primary-800 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
-        <h3 className="text-lg sm:text-heading-3 text-poly-primary-800 dark:text-poly-primary-200 mb-3">Your First Steps</h3>
-        <ul className="text-left space-y-2 text-sm sm:text-body-medium text-poly-primary-700 dark:text-poly-primary-300">
-          <li className="flex items-start">
-            <div className="w-5 h-5 rounded-full bg-poly-primary-500 text-white flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
+    <div className="relative flex h-auto min-h-screen w-full flex-col bg-brand-charcoal dark group/design-root overflow-x-hidden font-display">
+      <div className="flex flex-col grow justify-between p-6">
+        <div className="flex flex-col items-center">
+          {/* Animated Completion Icon Placeholder */}
+          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-accent/10 mb-6 mt-8">
+            <span className="material-symbols-outlined text-5xl text-accent">
+              verified
+            </span>
+          </div>
+
+          {/* HeadlineText */}
+          <h1 className="text-white tracking-tight text-[32px] font-bold leading-tight px-4 text-center pb-2 pt-0">
+            Your Path is Synthesized
+          </h1>
+
+          {/* BodyText */}
+          <p className="text-[#A0A0A0] text-base font-normal leading-normal pb-8 pt-1 px-4 text-center">
+            Your personalized AI-driven curriculum is ready.
+          </p>
+        </div>
+
+        <div className="flex flex-col w-full gap-4">
+          {/* Program Overview Card */}
+          <div className="flex flex-col w-full gap-4 rounded-xl border border-white/10 bg-white/5 p-5">
+            {/* TitleText */}
+            <h1 className="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-0 text-left pb-0 pt-0">
+              {program?.name || 'Quantum Cognition Path'}
+            </h1>
+
+            {/* TextGrid */}
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3">
+              {concepts.map((concept, index) => (
+                <div key={index} className="flex flex-1 gap-3 rounded-lg border border-white/10 bg-black/20 p-4 flex-col">
+                  <span className="material-symbols-outlined text-accent text-2xl">
+                    {concept.icon}
+                  </span>
+                  <div className="flex flex-col gap-1">
+                    <h2 className="text-white text-base font-bold leading-tight">{concept.name}</h2>
+                    <p className="text-[#A0A0A0] text-sm font-normal leading-normal">{concept.type}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-            Week 1: Foundations of {program.paths?.[0]?.domain || 'your subject'}
-          </li>
-          <li className="flex items-start">
-            <div className="w-5 h-5 rounded-full bg-poly-primary-500 text-white flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
+
+            {/* Milestone */}
+            <div className="mt-2 flex items-center gap-3 rounded-lg bg-black/20 px-4 py-3">
+              <span className="material-symbols-outlined text-accent text-2xl">
+                flag
+              </span>
+              <p className="text-white text-base font-medium leading-normal">First Milestone: 7 Days</p>
             </div>
-            Access curated resources and interactive exercises
-          </li>
-          <li className="flex items-start">
-            <div className="w-5 h-5 rounded-full bg-poly-primary-500 text-white flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            Track your progress with our AI-powered insights
-          </li>
-        </ul>
-      </div>
-      
-      <div className="flex gap-3">
-        {onBack && (
+          </div>
+        </div>
+
+        {/* CTA and Secondary Action */}
+        <div className="flex w-full flex-col items-center gap-4 pt-8 pb-4">
+          {/* Primary Call-to-Action (CTA) Button */}
           <button
-            onClick={onBack}
-            className="poly-btn-secondary flex-1"
+            onClick={() => onStartLearning(program)}
+            className="flex w-full items-center justify-center rounded-lg bg-accent px-6 py-4 text-center text-lg font-bold text-black shadow-[0_4px_14px_0_rgba(0,191,255,0.3)] hover:bg-opacity-90 transition-opacity"
           >
-            Back
+            Begin Your Journey
           </button>
-        )}
-        <button
-          onClick={() => onStartLearning(program)}
-          className={`poly-btn-primary ${onBack ? 'flex-1' : 'w-full'} mb-4`}
-        >
-          Begin Learning Journey
-        </button>
+
+          {/* Secondary Action Link */}
+          <a
+            onClick={(e) => {
+              e.preventDefault();
+              // Navigate to dashboard
+            }}
+            className="text-[#A0A0A0] text-sm font-medium hover:text-white transition-colors cursor-pointer"
+            href="#"
+          >
+            Or, Explore the Dashboard
+          </a>
+        </div>
       </div>
-      
-      {!onBack && (
-        <button className="poly-btn-secondary w-full">
-          Explore More Paths
-        </button>
-      )}
-    </motion.div>
+    </div>
   );
 };
 
 export default OnboardingComplete;
-

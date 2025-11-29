@@ -1,7 +1,6 @@
 "use client";
 
 import React from 'react';
-import { Brain, Twitter, Github, Linkedin, Youtube } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 const footerLinks = {
@@ -31,15 +30,15 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { name: 'Twitter', icon: Twitter, href: '#' },
-  { name: 'GitHub', icon: Github, href: '#' },
-  { name: 'LinkedIn', icon: Linkedin, href: '#' },
-  { name: 'YouTube', icon: Youtube, href: '#' },
+  { name: 'Twitter', icon: 'logo', href: '#' },
+  { name: 'GitHub', icon: 'code', href: '#' },
+  { name: 'LinkedIn', icon: 'work', href: '#' },
+  { name: 'YouTube', icon: 'play_circle', href: '#' },
 ];
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="relative bg-slate-900 border-t border-slate-800">
+    <footer className="relative bg-background-dark border-t border-white/10">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer */}
         <div className="py-12 md:py-16">
@@ -47,14 +46,14 @@ export const Footer: React.FC = () => {
             {/* Brand */}
             <div className="col-span-2">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 flex items-center justify-center">
-                  <Brain className="w-5 h-5 text-blue-400" />
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-purple-500/20 border border-primary/30 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-primary">neurology</span>
                 </div>
-                <span className="text-xl font-display font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                <span className="text-xl font-display font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
                   PolyMathOS
                 </span>
               </div>
-              <p className="text-slate-400 text-sm mb-6 max-w-xs">
+              <p className="text-text-secondary-dark text-sm mb-6 max-w-xs">
                 Transform your learning with AI-powered tools and neuroscience-backed methods.
               </p>
               {/* Social Links */}
@@ -65,13 +64,13 @@ export const Footer: React.FC = () => {
                     href={social.href}
                     className={cn(
                       "w-10 h-10 rounded-lg flex items-center justify-center",
-                      "bg-slate-800 text-slate-400",
-                      "hover:bg-blue-500/10 hover:text-blue-400",
+                      "bg-surface-dark text-text-secondary-dark",
+                      "hover:bg-primary/10 hover:text-primary",
                       "transition-all duration-200"
                     )}
                     aria-label={social.name}
                   >
-                    <social.icon className="w-5 h-5" />
+                    <span className="material-symbols-outlined text-xl">{social.icon}</span>
                   </a>
                 ))}
               </div>
@@ -85,7 +84,7 @@ export const Footer: React.FC = () => {
                   <li key={link.name}>
                     <a
                       href={link.href}
-                      className="text-slate-400 hover:text-blue-400 text-sm transition-colors"
+                      className="text-text-secondary-dark hover:text-primary text-sm transition-colors"
                     >
                       {link.name}
                     </a>
@@ -102,7 +101,7 @@ export const Footer: React.FC = () => {
                   <li key={link.name}>
                     <a
                       href={link.href}
-                      className="text-slate-400 hover:text-blue-400 text-sm transition-colors"
+                      className="text-text-secondary-dark hover:text-primary text-sm transition-colors"
                     >
                       {link.name}
                     </a>
@@ -119,7 +118,7 @@ export const Footer: React.FC = () => {
                   <li key={link.name}>
                     <a
                       href={link.href}
-                      className="text-slate-400 hover:text-blue-400 text-sm transition-colors"
+                      className="text-text-secondary-dark hover:text-primary text-sm transition-colors"
                     >
                       {link.name}
                     </a>
@@ -136,7 +135,7 @@ export const Footer: React.FC = () => {
                   <li key={link.name}>
                     <a
                       href={link.href}
-                      className="text-slate-400 hover:text-blue-400 text-sm transition-colors"
+                      className="text-text-secondary-dark hover:text-primary text-sm transition-colors"
                     >
                       {link.name}
                     </a>
@@ -148,11 +147,11 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="py-6 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-slate-400 text-sm">
+        <div className="py-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-text-secondary-dark text-sm">
             © {new Date().getFullYear()} PolyMathOS. All rights reserved.
           </p>
-          <p className="text-slate-500 text-sm">
+          <p className="text-text-secondary-dark text-sm">
             Built with 💜 for lifelong learners
           </p>
         </div>

@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Home, BookOpen, BarChart3, Brain, User } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 interface MobileNavigationProps {
@@ -14,7 +13,7 @@ interface MobileNavigationProps {
 interface NavItem {
   id: string;
   label: string;
-  icon: React.ElementType;
+  icon: string;
   pages: string[];
 }
 
@@ -22,32 +21,26 @@ const navItems: NavItem[] = [
   { 
     id: 'home', 
     label: 'Home', 
-    icon: Home,
-    pages: ['home', 'signin', 'signup']
-  },
-  { 
-    id: 'learn', 
-    label: 'Learn', 
-    icon: BookOpen,
-    pages: ['learning', 'flashcards', 'memory_palace', 'deep_work', 'mind_map']
+    icon: 'home',
+    pages: ['home', 'signin', 'signup', 'dashboard', 'polymath_dashboard']
   },
   { 
     id: 'progress', 
     label: 'Progress', 
-    icon: BarChart3,
-    pages: ['dashboard', 'polymath_dashboard', 'assessment']
+    icon: 'bar_chart',
+    pages: ['assessment']
   },
   { 
-    id: 'ai', 
-    label: 'AI', 
-    icon: Brain,
-    pages: ['polymath_ai']
+    id: 'search', 
+    label: 'Search', 
+    icon: 'search',
+    pages: ['resource_library']
   },
   { 
-    id: 'profile', 
-    label: 'Profile', 
-    icon: User,
-    pages: ['portfolio', 'reflection']
+    id: 'settings', 
+    label: 'Settings', 
+    icon: 'settings',
+    pages: []
   },
 ];
 
@@ -72,19 +65,16 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
   const handleNavigate = (item: NavItem) => {
     switch (item.id) {
       case 'home':
-        onNavigate('home');
-        break;
-      case 'learn':
-        onNavigate('learning');
+        onNavigate('dashboard');
         break;
       case 'progress':
         onNavigate('dashboard');
         break;
-      case 'ai':
-        onNavigate('polymath_ai');
+      case 'search':
+        onNavigate('resource_library');
         break;
-      case 'profile':
-        onNavigate('portfolio');
+      case 'settings':
+        // Open settings modal
         break;
     }
   };
@@ -106,7 +96,6 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
       <div className="flex items-stretch justify-around px-2 py-1">
         {navItems.map((item) => {
           const isActive = activeItem === item.id;
-          const Icon = item.icon;
           
           return (
             <button
@@ -118,7 +107,7 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
                 "transition-all duration-200",
                 "touch-manipulation active:scale-95",
                 isActive 
-                  ? "text-blue-400 bg-blue-500/10" 
+                  ? "text-primary bg-primary/10" 
                   : "text-slate-500 hover:text-slate-300"
               )}
             >
@@ -126,21 +115,23 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
                 animate={isActive ? { scale: [1, 1.1, 1] } : {}}
                 transition={{ duration: 0.2 }}
               >
-                <Icon className={cn(
-                  "w-5 h-5 mb-1",
+                <span className={cn(
+                  "material-symbols-outlined text-2xl mb-1",
                   isActive && "drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]"
-                )} />
+                )}>
+                  {item.icon}
+                </span>
               </motion.div>
               <span className={cn(
                 "text-[10px] font-medium",
-                isActive && "text-blue-400"
+                isActive && "text-primary"
               )}>
                 {item.label}
               </span>
               {isActive && (
                 <motion.div
                   layoutId="mobileActiveIndicator"
-                  className="absolute -top-0.5 w-8 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
+                  className="absolute -top-0.5 w-8 h-0.5 bg-gradient-to-r from-primary to-purple-500 rounded-full"
                   transition={{ type: 'spring', damping: 30, stiffness: 300 }}
                 />
               )}

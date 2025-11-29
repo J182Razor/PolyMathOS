@@ -1,0 +1,209 @@
+{
+  "timestamp": "2025-11-29T22:35:19.902393",
+  "summary": {
+    "total": 33,
+    "passed": 26,
+    "failed": 7,
+    "success_rate": 78.78787878787878
+  },
+  "results": [
+    {
+      "test": "Connection String Available",
+      "passed": true,
+      "message": "Found connection string",
+      "details": {}
+    },
+    {
+      "test": "Connection Established",
+      "passed": true,
+      "message": "Successfully connected to TigerDB",
+      "details": {}
+    },
+    {
+      "test": "Connection Health Check",
+      "passed": true,
+      "message": "PostgreSQL version: PostgreSQL 17.7 (Ubuntu 17.7-3.pgdg22.04+1) on aar...",
+      "details": {}
+    },
+    {
+      "test": "Vector Extension",
+      "passed": true,
+      "message": "pgvector extension installed",
+      "details": {}
+    },
+    {
+      "test": "TimescaleDB Extension",
+      "passed": true,
+      "message": "TimescaleDB extension installed",
+      "details": {}
+    },
+    {
+      "test": "Table: workflow_executions",
+      "passed": true,
+      "message": "Table exists",
+      "details": {}
+    },
+    {
+      "test": "Table: workflow_progress",
+      "passed": true,
+      "message": "Table exists",
+      "details": {}
+    },
+    {
+      "test": "Table: workflow_definitions",
+      "passed": true,
+      "message": "Table exists",
+      "details": {}
+    },
+    {
+      "test": "Table: workflow_adaptations",
+      "passed": true,
+      "message": "Table exists",
+      "details": {}
+    },
+    {
+      "test": "Table: swarm_conversations",
+      "passed": true,
+      "message": "Table exists",
+      "details": {}
+    },
+    {
+      "test": "Table: rag_vectors",
+      "passed": true,
+      "message": "Table exists",
+      "details": {}
+    },
+    {
+      "test": "Hypertable: workflow_executions",
+      "passed": true,
+      "message": "Table is hypertable",
+      "details": {}
+    },
+    {
+      "test": "Hypertable: workflow_progress",
+      "passed": true,
+      "message": "Table is hypertable",
+      "details": {}
+    },
+    {
+      "test": "Hypertable: workflow_adaptations",
+      "passed": true,
+      "message": "Table is hypertable",
+      "details": {}
+    },
+    {
+      "test": "Index: idx_workflow_exec_workflow",
+      "passed": true,
+      "message": "Index on workflow_executions exists",
+      "details": {}
+    },
+    {
+      "test": "Index: idx_workflow_exec_user",
+      "passed": true,
+      "message": "Index on workflow_executions exists",
+      "details": {}
+    },
+    {
+      "test": "Index: idx_workflow_exec_status",
+      "passed": true,
+      "message": "Index on workflow_executions exists",
+      "details": {}
+    },
+    {
+      "test": "Index: idx_workflow_prog_workflow",
+      "passed": true,
+      "message": "Index on workflow_progress exists",
+      "details": {}
+    },
+    {
+      "test": "Index: idx_workflow_prog_user",
+      "passed": true,
+      "message": "Index on workflow_progress exists",
+      "details": {}
+    },
+    {
+      "test": "INSERT workflow_executions (NULL workflow_id)",
+      "passed": true,
+      "message": "Inserted test execution: test_20251129_223515_373796",
+      "details": {}
+    },
+    {
+      "test": "Verify INSERT",
+      "passed": true,
+      "message": "Found 1 record(s) with test execution_id",
+      "details": {}
+    },
+    {
+      "test": "INSERT workflow_executions (with workflow_id)",
+      "passed": true,
+      "message": "Inserted test execution: test2_20251129_223515_506851",
+      "details": {}
+    },
+    {
+      "test": "Cleanup Test Data",
+      "passed": true,
+      "message": "Test data removed",
+      "details": {}
+    },
+    {
+      "test": "SELECT workflow_executions",
+      "passed": true,
+      "message": "Found 0 execution record(s)",
+      "details": {}
+    },
+    {
+      "test": "Time-Series Query",
+      "passed": true,
+      "message": "Found 0 execution(s) in last 24 hours",
+      "details": {}
+    },
+    {
+      "test": "JOIN Query",
+      "passed": true,
+      "message": "JOIN query executed successfully",
+      "details": {}
+    },
+    {
+      "test": "Orchestrator Initialization",
+      "passed": false,
+      "message": "Import failed due to dependency version conflict: module 'torch.utils._pytree' has no attribute 'register_pytree_node'...",
+      "details": {}
+    },
+    {
+      "test": "TigerDB Integration",
+      "passed": false,
+      "message": "Cannot test - orchestrator not available",
+      "details": {}
+    },
+    {
+      "test": "Connection Health Check",
+      "passed": false,
+      "message": "Cannot test - orchestrator not available",
+      "details": {}
+    },
+    {
+      "test": "Orchestrator Health Check",
+      "passed": false,
+      "message": "Cannot test - orchestrator not available",
+      "details": {}
+    },
+    {
+      "test": "Async Storage",
+      "passed": false,
+      "message": "Import failed due to dependency version conflict: module 'torch.utils._pytree' has no attribute 'register_pytree_node'...",
+      "details": {}
+    },
+    {
+      "test": "Async Storage Execution",
+      "passed": false,
+      "message": "Cannot test - orchestrator not available",
+      "details": {}
+    },
+    {
+      "test": "Async Storage Cleanup",
+      "passed": false,
+      "message": "Cannot test - orchestrator not available",
+      "details": {}
+    }
+  ]
+}

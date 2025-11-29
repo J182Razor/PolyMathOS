@@ -28,7 +28,7 @@ except ImportError as e:
 
 # Import new Swarm Corporation routers
 try:
-    from app.api import hdam, swarms, documents, research, rag, security, workflows, database
+    from app.api import hdam, swarms, documents, research, rag, security, workflows, database, unified_agents
     HDAM_AVAILABLE = True
     SWARMS_AVAILABLE = True
     DOCUMENTS_AVAILABLE = True
@@ -37,6 +37,7 @@ try:
     SECURITY_AVAILABLE = True
     WORKFLOWS_AVAILABLE = True
     DATABASE_AVAILABLE = True
+    UNIFIED_AGENTS_AVAILABLE = True
 except ImportError as e:
     print(f"Warning: Some Swarm Corporation routers not available: {e}")
     HDAM_AVAILABLE = False
@@ -47,6 +48,7 @@ except ImportError as e:
     SECURITY_AVAILABLE = False
     WORKFLOWS_AVAILABLE = False
     DATABASE_AVAILABLE = False
+    UNIFIED_AGENTS_AVAILABLE = False
     hdam = None
     swarms = None
     documents = None
@@ -55,6 +57,7 @@ except ImportError as e:
     security = None
     workflows = None
     database = None
+    unified_agents = None
 
 app = FastAPI(
     title="PolyMathOS Genius Engine",
@@ -116,6 +119,22 @@ if WORKFLOWS_AVAILABLE and workflows:
     app.include_router(workflows.router)
     print("[OK] Workflows routes registered")
 
+# Include Dynamic Workflows routes
+try:
+    from app.api import dynamic_workflows
+    app.include_router(dynamic_workflows.router)
+    print("[OK] Dynamic Workflows routes registered")
+except ImportError as e:
+    print(f"Warning: Dynamic Workflows router not available: {e}")
+
+# Include Workflow Orchestrator routes
+try:
+    from app.api import workflow_orchestrator
+    app.include_router(workflow_orchestrator.router)
+    print("[OK] Workflow Orchestrator routes registered")
+except ImportError as e:
+    print(f"Warning: Workflow Orchestrator router not available: {e}")
+
 # Include Database routes
 if DATABASE_AVAILABLE and database:
     app.include_router(database.router)
@@ -128,6 +147,11 @@ try:
     print("[OK] Health check routes registered")
 except ImportError as e:
     print(f"Warning: Health check router not available: {e}")
+
+# Include Unified Agents routes
+if UNIFIED_AGENTS_AVAILABLE and unified_agents:
+    app.include_router(unified_agents.router)
+    print("[OK] Unified Agents routes registered")
 
 class UserEnrollment(BaseModel):
     user_id: str
@@ -201,6 +225,15 @@ class LearningPathRequest(BaseModel):
 @app.get("/")
 def read_root():
     return {"status": "active", "system": "PolyMathOS Genius Engine"}
+
+@app.get("/health")
+async def health():
+    """Health check endpoint"""
+    return {
+        "status": "healthy",
+        "service": "PolyMathOS API",
+        "version": "2.0.0"
+    }
 
 @app.post("/learning/onboard")
 async def onboard_learning(

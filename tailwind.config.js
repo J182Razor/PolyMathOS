@@ -8,6 +8,15 @@ export default {
   theme: {
     extend: {
       colors: {
+        primary: '#3c83f6', // Electric Blue
+        accent: '#00FFFF', // Quantum Teal/Cyan
+        'background-light': '#f5f7f8',
+        'background-dark': '#101722', // Deep charcoal
+        'surface-dark': '#1a1a1a', // Card backgrounds
+        'text-primary-dark': '#EAEAEA', // Off-white text
+        'text-secondary-dark': '#888888', // Muted grey
+        'quantum-teal': '#00FFFF',
+        'deep-charcoal': '#0A0A0A',
         // Keep slate as primary
         slate: {
           50: '#f8fafc',
@@ -24,8 +33,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
-        display: ['Outfit', 'system-ui', 'sans-serif'],
+        sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
+        display: ['Space Grotesk', 'system-ui', 'sans-serif'],
         mono: ['Fira Code', 'Consolas', 'monospace'],
       },
       fontSize: {

@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { DocumentService } from '../../services/DocumentService';
+import { ApiErrorHandler, ApiError } from '../../utils/apiErrorHandler';
+import { LoadingSpinner } from '../ui/LoadingSpinner';
+import { ErrorMessage } from '../ui/ErrorMessage';
 
 interface ResourceScannerProps {
   userData: any;
@@ -8,164 +11,229 @@ interface ResourceScannerProps {
 }
 
 const ResourceScanner: React.FC<ResourceScannerProps> = ({ userData, onNext, onBack }) => {
-  const [scanProgress, setScanProgress] = useState(0);
-  const [currentTask, setCurrentTask] = useState('Initializing discovery engines...');
-  const [foundResources, setFoundResources] = useState(0);
-  const [discoveredPaths, setDiscoveredPaths] = useState<any[]>([]);
+  const [sourceType, setSourceType] = useState<'upload' | 'url'>('upload');
+  const [file, setFile] = useState<File | null>(null);
+  const [url, setUrl] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState<ApiError | null>(null);
+  const documentService = new DocumentService();
 
-  // Simulate scanning process
-  useEffect(() => {
-    const tasks = [
-      { task: 'Scanning academic databases...', duration: 2000 },
-      { task: 'Discovering online courses...', duration: 1500 },
-      { task: 'Finding research papers...', duration: 1800 },
-      { task: 'Identifying datasets...', duration: 1200 },
-      { task: 'Mapping learning pathways...', duration: 2500 },
-      { task: 'Creating personalized curriculum...', duration: 2000 }
-    ];
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      handleProcess(selectedFile);
+    }
+  };
 
-    let progress = 0;
-    let taskIndex = 0;
+  const handleProcess = async (fileToProcess?: File | null) => {
+    setIsProcessing(true);
+    setProgress(0);
+    setError(null);
 
-    const executeTasks = async () => {
-      for (const task of tasks) {
-        setCurrentTask(task.task);
-        const increment = 100 / tasks.length;
-        
-        // Animate progress
-        const startTime = Date.now();
-        while (Date.now() - startTime < task.duration) {
-          const elapsed = Date.now() - startTime;
-          const taskProgress = (elapsed / task.duration) * increment;
-          setScanProgress(Math.min(progress + taskProgress, 100));
-          setFoundResources(Math.floor((progress + taskProgress) * 2.3));
-          await new Promise(resolve => setTimeout(resolve, 50));
+    try {
+      // Simulate processing progress
+      const interval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            return 100;
+          }
+          return prev + 2;
+        });
+      }, 100);
+
+      // Integrate with DocumentService API
+      let result;
+      if (fileToProcess) {
+        try {
+          result = await documentService.readFile(fileToProcess);
+        } catch (err) {
+          clearInterval(interval);
+          const apiError = ApiErrorHandler.handleError(err);
+          setError(apiError);
+          setIsProcessing(false);
+          return;
         }
-        
-        progress += increment;
-        setScanProgress(progress);
-        
-        const randomDomain = userData.domains && userData.domains.length > 0 
-          ? userData.domains[Math.floor(Math.random() * userData.domains.length)]
-          : 'General';
-
-        setDiscoveredPaths(prev => [...prev, {
-          id: Date.now(),
-          title: `Learning Path ${taskIndex + 1}`,
-          domain: randomDomain,
-          resources: Math.floor(Math.random() * 15) + 5
-        }]);
-        taskIndex++;
+      } else if (url) {
+        try {
+          // For URL, we'd need a readFromUrl method or use parse
+          result = await documentService.parse({ content: url, document_type: 'url' });
+        } catch (err) {
+          clearInterval(interval);
+          const apiError = ApiErrorHandler.handleError(err);
+          setError(apiError);
+          setIsProcessing(false);
+          return;
+        }
       }
-      
-      // Final completion
+
+      // Complete processing
       setTimeout(() => {
+        clearInterval(interval);
+        setProgress(100);
+        setIsProcessing(false);
         onNext({
           ...userData,
-          resourcesFound: Math.floor(scanProgress * 2.3),
-          learningPaths: discoveredPaths
+          documentsProcessed: fileToProcess ? [fileToProcess.name] : [url],
+          documentData: result,
         });
       }, 1000);
-    };
+    } catch (error) {
+      const apiError = ApiErrorHandler.handleError(error);
+      setError(apiError);
+      setIsProcessing(false);
+    }
+  };
 
-    executeTasks();
-  }, [userData, onNext]); // Removed discoveredPaths from dependency array to avoid infinite loop
+  const handleUrlSubmit = () => {
+    if (url) {
+      handleProcess();
+    }
+  };
 
   return (
-    <motion.div 
-      className="poly-card poly-card-elevated max-w-3xl mx-auto px-6 py-8 md:p-8"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="text-center mb-6 sm:mb-8">
-        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-poly-primary-500 to-poly-secondary-500 rounded-2xl mx-auto mb-4 sm:mb-6 flex items-center justify-center">
-          <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
+    <div className="relative flex h-auto min-h-screen w-full flex-col bg-background-dark text-text-primary-dark font-display">
+      {/* Top App Bar */}
+      <div className="flex items-center p-4 pb-2">
+        <div className="flex size-12 shrink-0 items-center justify-start">
+          <button onClick={onBack} className="material-symbols-outlined text-text-primary-dark">arrow_back</button>
         </div>
-        <h2 className="text-xl sm:text-display-3 mb-2 sm:mb-3 text-poly-text-primary">Discovering Learning Resources</h2>
-        <p className="text-sm sm:text-body-large text-poly-text-secondary">
-          We're scanning thousands of sources to find the best content for your interests.
-        </p>
+        <h1 className="flex-1 text-center text-lg font-bold tracking-tight">Add Knowledge</h1>
+        <div className="size-12 shrink-0"></div>
       </div>
 
-      {/* Progress Bar */}
-      <div className="mb-6">
-        <div className="flex justify-between text-sm sm:text-body-medium text-poly-text-secondary mb-2">
-          <span className="truncate pr-2">{currentTask}</span>
-          <span className="flex-shrink-0">{Math.round(scanProgress)}%</span>
-        </div>
-        <div className="h-3 bg-poly-neutral-200 dark:bg-poly-neutral-700 rounded-full overflow-hidden">
-          <motion.div 
-            className="h-full bg-gradient-to-r from-poly-primary-500 to-poly-secondary-500"
-            style={{ width: `${scanProgress}%` }}
-            initial={{ width: 0 }}
-            animate={{ width: `${scanProgress}%` }}
-            transition={{ duration: 0.3 }}
-          />
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
-        <div className="text-center poly-panel p-3 sm:p-4">
-          <div className="text-xl sm:text-2xl font-bold text-poly-primary-600">{foundResources}</div>
-          <div className="text-xs sm:text-sm text-poly-text-tertiary mt-1">Resources Found</div>
-        </div>
-        <div className="text-center poly-panel p-3 sm:p-4">
-          <div className="text-xl sm:text-2xl font-bold text-poly-secondary-600">{userData.domains?.length || 0}</div>
-          <div className="text-xs sm:text-sm text-poly-text-tertiary mt-1">Domains</div>
-        </div>
-        <div className="text-center poly-panel p-3 sm:p-4">
-          <div className="text-xl sm:text-2xl font-bold text-poly-accent-600">{discoveredPaths.length}</div>
-          <div className="text-xs sm:text-sm text-poly-text-tertiary mt-1">Learning Paths</div>
-        </div>
-      </div>
-
-      {/* Discovered Paths Preview */}
-      {discoveredPaths.length > 0 && (
-        <div className="mb-8">
-          <h3 className="text-heading-3 mb-4">Discovered Learning Paths</h3>
-          <div className="space-y-3 max-h-60 overflow-y-auto">
-            {discoveredPaths.map((path) => (
-              <motion.div 
-                key={path.id}
-                className="flex items-center p-3 bg-poly-neutral-50 rounded-lg border border-poly-neutral-200"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 }}
-              >
-                <div className="w-10 h-10 rounded-lg bg-poly-primary-100 flex items-center justify-center mr-3">
-                  <svg className="w-5 h-5 text-poly-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <div className="text-body-medium font-medium text-poly-neutral-900">
-                    {path.title}
-                  </div>
-                  <div className="poly-caption text-poly-neutral-600">
-                    {path.domain} • {path.resources} resources
-                  </div>
-                </div>
-                <div className="w-6 h-6 rounded-full bg-poly-success text-white flex items-center justify-center">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-              </motion.div>
-            ))}
+      {/* Main Content */}
+      <main className="flex flex-1 flex-col px-4 pt-4">
+        {/* Segmented Buttons */}
+        <div className="flex py-3">
+          <div className="flex h-12 flex-1 items-center justify-center rounded-lg bg-surface-dark p-1">
+            <label className="flex h-full grow cursor-pointer items-center justify-center overflow-hidden rounded-md px-2 text-sm font-medium leading-normal text-text-secondary-dark has-[:checked]:bg-background-dark has-[:checked]:text-primary has-[:checked]:shadow-[0_0_8px_rgba(0,255,255,0.3)]">
+              <span className="truncate">Upload File</span>
+              <input
+                checked={sourceType === 'upload'}
+                onChange={() => setSourceType('upload')}
+                className="invisible w-0"
+                name="source_type"
+                type="radio"
+                value="Upload File"
+              />
+            </label>
+            <label className="flex h-full grow cursor-pointer items-center justify-center overflow-hidden rounded-md px-2 text-sm font-medium leading-normal text-text-secondary-dark has-[:checked]:bg-background-dark has-[:checked]:text-primary has-[:checked]:shadow-[0_0_8px_rgba(0,255,255,0.3)]">
+              <span className="truncate">Add URL</span>
+              <input
+                checked={sourceType === 'url'}
+                onChange={() => setSourceType('url')}
+                className="invisible w-0"
+                name="source_type"
+                type="radio"
+                value="Add URL"
+              />
+            </label>
           </div>
         </div>
-      )}
 
-      <div className="text-center text-body-small text-poly-neutral-500">
-        This may take a few moments. We're building something special just for you.
-      </div>
-    </motion.div>
+        {/* Upload File Zone */}
+        {sourceType === 'upload' && (
+          <div className="flex flex-col pt-8">
+            <div className="flex flex-col items-center gap-6 rounded-lg border-2 border-dashed border-surface-dark px-6 py-14">
+              <span className="material-symbols-outlined text-4xl text-primary">upload_file</span>
+              <div className="flex max-w-[480px] flex-col items-center gap-2 text-center">
+                <p className="text-lg font-bold leading-tight tracking-tight text-text-primary-dark">Upload Document</p>
+                <p className="text-sm font-normal leading-normal text-text-secondary-dark">Tap to select PDF, DOCX, or TXT file</p>
+              </div>
+              <label>
+                <input
+                  type="file"
+                  accept=".pdf,.docx,.txt"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+                <button className="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-surface-dark text-sm font-bold leading-normal tracking-wide text-text-primary-dark">
+                  <span className="truncate">Select File</span>
+                </button>
+              </label>
+            </div>
+          </div>
+        )}
+
+        {/* URL Input */}
+        {sourceType === 'url' && (
+          <div className="flex flex-col gap-6 pt-8">
+            <div className="flex flex-col items-start gap-2">
+              <p className="text-lg font-bold leading-tight tracking-tight text-text-primary-dark">Scan Web Page</p>
+              <p className="text-sm font-normal leading-normal text-text-secondary-dark">Paste a URL to add it to your knowledge base.</p>
+            </div>
+            <div className="relative">
+              <input
+                type="url"
+                placeholder="https://..."
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleUrlSubmit()}
+                className="w-full rounded-lg border border-surface-dark bg-surface-dark py-3 pl-4 pr-12 text-text-primary-dark placeholder:text-text-secondary-dark focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+              <button
+                onClick={handleUrlSubmit}
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-primary"
+              >
+                <span className="material-symbols-outlined">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <div className="px-4 mt-4">
+            <ErrorMessage 
+              error={error} 
+              onDismiss={() => setError(null)}
+              retryable={ApiErrorHandler.isRetryable(error)}
+              onRetry={() => handleProcess(file)}
+            />
+          </div>
+        )}
+
+        {/* Progress Bar */}
+        {isProcessing && (
+          <div className="flex flex-col gap-3 p-4 mt-8">
+            <div className="flex items-center justify-between">
+              <p className="text-base font-medium leading-normal text-text-primary-dark">Analyzing...</p>
+              <p className="text-sm font-medium text-primary">{progress}%</p>
+            </div>
+            <div className="h-2 rounded-full bg-surface-dark">
+              <div className="h-2 rounded-full bg-primary transition-all duration-300" style={{ width: `${progress}%` }}></div>
+            </div>
+            <p className="text-sm font-normal leading-normal text-text-secondary-dark">This may take a moment</p>
+          </div>
+        )}
+      </main>
+
+      {/* Bottom Navigation Bar */}
+      <footer className="mt-auto border-t border-surface-dark bg-background-dark">
+        <div className="flex gap-2 px-4 pb-3 pt-2">
+          <a className="flex flex-1 flex-col items-center justify-end gap-1" href="#">
+            <span className="material-symbols-outlined text-text-secondary-dark">dashboard</span>
+            <p className="text-xs font-medium tracking-wide text-text-secondary-dark">Dashboard</p>
+          </a>
+          <a className="flex flex-1 flex-col items-center justify-end gap-1" href="#">
+            <span className="material-symbols-outlined font-bold text-primary">center_focus_strong</span>
+            <p className="text-xs font-bold tracking-wide text-primary">Scanner</p>
+          </a>
+          <a className="flex flex-1 flex-col items-center justify-end gap-1" href="#">
+            <span className="material-symbols-outlined text-text-secondary-dark">forum</span>
+            <p className="text-xs font-medium tracking-wide text-text-secondary-dark">Chat</p>
+          </a>
+          <a className="flex flex-1 flex-col items-center justify-end gap-1" href="#">
+            <span className="material-symbols-outlined text-text-secondary-dark">person</span>
+            <p className="text-xs font-medium tracking-wide text-text-secondary-dark">Profile</p>
+          </a>
+        </div>
+      </footer>
+    </div>
   );
 };
 
 export default ResourceScanner;
-

@@ -398,6 +398,9 @@ CREATE TABLE IF NOT EXISTS learning_plans (
     phases JSONB NOT NULL,
     current_phase_index INTEGER DEFAULT 0,
     archetype VARCHAR(50),
+    workflow_id VARCHAR(255),
+    multi_phase_workflow_id VARCHAR(255),
+    assessment_workflow_id VARCHAR(255),
     start_date TIMESTAMPTZ DEFAULT NOW(),
     estimated_end_date TIMESTAMPTZ,
     actual_end_date TIMESTAMPTZ,
@@ -405,8 +408,24 @@ CREATE TABLE IF NOT EXISTS learning_plans (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Add workflow columns if they don't exist (for existing tables)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'learning_plans' AND column_name = 'workflow_id') THEN
+        ALTER TABLE learning_plans ADD COLUMN workflow_id VARCHAR(255);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'learning_plans' AND column_name = 'multi_phase_workflow_id') THEN
+        ALTER TABLE learning_plans ADD COLUMN multi_phase_workflow_id VARCHAR(255);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'learning_plans' AND column_name = 'assessment_workflow_id') THEN
+        ALTER TABLE learning_plans ADD COLUMN assessment_workflow_id VARCHAR(255);
+    END IF;
+END $$;
+
 CREATE INDEX IF NOT EXISTS idx_plans_user ON learning_plans(user_id);
 CREATE INDEX IF NOT EXISTS idx_plans_status ON learning_plans(status);
+CREATE INDEX IF NOT EXISTS idx_plans_workflow ON learning_plans(workflow_id);
 
 -- Learning progress tracking (time-series)
 CREATE TABLE IF NOT EXISTS learning_progress (
@@ -542,12 +561,74 @@ CREATE TABLE IF NOT EXISTS workflow_definitions (
     name VARCHAR(255) NOT NULL,
     description TEXT,
     workflow_def JSONB NOT NULL,
+    workflow_type VARCHAR(100),
+    learning_plan_id VARCHAR(255),
     status VARCHAR(50) DEFAULT 'active',
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX IF NOT EXISTS idx_workflows_user ON workflow_definitions(user_id);
 CREATE INDEX IF NOT EXISTS idx_workflows_status ON workflow_definitions(status);
+CREATE INDEX IF NOT EXISTS idx_workflows_type ON workflow_definitions(workflow_type);
+CREATE INDEX IF NOT EXISTS idx_workflows_plan ON workflow_definitions(learning_plan_id);
+
+-- Workflow executions (time-series)
+CREATE TABLE IF NOT EXISTS workflow_executions (
+    execution_id VARCHAR(255),
+    workflow_id VARCHAR(255) REFERENCES workflow_definitions(workflow_id) ON DELETE SET NULL,
+    user_id VARCHAR(255),
+    trigger_data JSONB,
+    result JSONB,
+    status VARCHAR(50),
+    error TEXT,
+    execution_time_seconds FLOAT,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (execution_id, created_at)
+);
+-- Make workflow_id nullable to allow pattern executions without workflow definitions
+ALTER TABLE workflow_executions ALTER COLUMN workflow_id DROP NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_workflow_exec_workflow ON workflow_executions(workflow_id);
+CREATE INDEX IF NOT EXISTS idx_workflow_exec_user ON workflow_executions(user_id);
+CREATE INDEX IF NOT EXISTS idx_workflow_exec_status ON workflow_executions(status);
+SELECT create_hypertable('workflow_executions', 'created_at', if_not_exists => TRUE);
+
+-- Workflow adaptations (time-series)
+CREATE TABLE IF NOT EXISTS workflow_adaptations (
+    adaptation_id VARCHAR(255),
+    workflow_id VARCHAR(255) REFERENCES workflow_definitions(workflow_id),
+    user_id VARCHAR(255),
+    learning_plan_id VARCHAR(255),
+    adaptation_type VARCHAR(100),
+    reason TEXT,
+    changes JSONB,
+    progress_data JSONB,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (adaptation_id, created_at)
+);
+CREATE INDEX IF NOT EXISTS idx_workflow_adapt_workflow ON workflow_adaptations(workflow_id);
+CREATE INDEX IF NOT EXISTS idx_workflow_adapt_user ON workflow_adaptations(user_id);
+CREATE INDEX IF NOT EXISTS idx_workflow_adapt_plan ON workflow_adaptations(learning_plan_id);
+SELECT create_hypertable('workflow_adaptations', 'created_at', if_not_exists => TRUE);
+
+-- Workflow progress tracking (time-series)
+CREATE TABLE IF NOT EXISTS workflow_progress (
+    progress_id VARCHAR(255),
+    workflow_id VARCHAR(255) REFERENCES workflow_definitions(workflow_id),
+    learning_plan_id VARCHAR(255),
+    user_id VARCHAR(255),
+    progress_percentage FLOAT,
+    comprehension FLOAT,
+    target_comprehension FLOAT,
+    activities_completed INTEGER,
+    total_activities INTEGER,
+    efficiency_score FLOAT,
+    recorded_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (progress_id, recorded_at)
+);
+CREATE INDEX IF NOT EXISTS idx_workflow_prog_workflow ON workflow_progress(workflow_id);
+CREATE INDEX IF NOT EXISTS idx_workflow_prog_user ON workflow_progress(user_id);
+CREATE INDEX IF NOT EXISTS idx_workflow_prog_plan ON workflow_progress(learning_plan_id);
+SELECT create_hypertable('workflow_progress', 'recorded_at', if_not_exists => TRUE);
 
 -- Custom swarm specifications
 CREATE TABLE IF NOT EXISTS custom_swarm_specs (
@@ -604,10 +685,60 @@ class TigerDBInitializer:
             logger.error(f"Failed to initialize schema: {e}")
             return False
     
+    def check_connection_health(self) -> bool:
+        """Check if database connection is healthy"""
+        if not self.available or not self.conn:
+            return False
+        
+        try:
+            # Check if connection is closed
+            if self.conn.closed:
+                return False
+            
+            # Test connection with a simple query
+            with self.conn.cursor() as cur:
+                cur.execute("SELECT 1")
+                cur.fetchone()
+            return True
+        except Exception as e:
+            logger.warning(f"Connection health check failed: {e}")
+            return False
+    
+    def reconnect(self) -> bool:
+        """Reconnect to the database"""
+        if not self.connection_string:
+            logger.error("Cannot reconnect: No connection string available")
+            return False
+        
+        try:
+            # Close existing connection if it exists
+            if self.conn and not self.conn.closed:
+                try:
+                    self.conn.close()
+                except:
+                    pass
+            
+            # Reconnect
+            self.conn = psycopg2.connect(self.connection_string)
+            self.conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+            self.available = True
+            logger.info("Successfully reconnected to TigerDB")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to reconnect to TigerDB: {e}")
+            self.available = False
+            return False
+    
     def verify_tables(self) -> dict:
         """Verify that all required tables exist"""
         if not self.available or not self.conn:
             return {"status": "error", "message": "Database not available"}
+        
+        # Check connection health first
+        if not self.check_connection_health():
+            logger.warning("Connection unhealthy, attempting to reconnect...")
+            if not self.reconnect():
+                return {"status": "error", "message": "Database connection failed"}
         
         required_tables = [
             'users', 'tasks', 'learning_sessions', 'rpe_events',
@@ -622,7 +753,9 @@ class TigerDBInitializer:
             'comprehension_metrics',
             # Swarm Corporation integration tables
             'swarm_conversations', 'document_metadata', 'research_papers',
-            'rag_vectors', 'workflow_definitions', 'custom_swarm_specs'
+            'rag_vectors', 'workflow_definitions', 'custom_swarm_specs',
+            # Dynamic workflow tables
+            'workflow_executions', 'workflow_adaptations', 'workflow_progress'
         ]
         
         try:
