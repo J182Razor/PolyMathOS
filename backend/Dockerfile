@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Install system dependencies
 # - build-essential: for compiling Python packages
-# - libgl1, libglib2.0-0: for OpenCV if needed (libgl1 replaces deprecated libgl1-mesa-glx)
+# - libgl1, libglib2.0-0: for OpenCV if needed
 # - portaudio19-dev: for PyAudio (voice features)
 # - git: for installing packages from git and swarms/lemon-ai evolution
 # - curl: for healthchecks
@@ -25,7 +25,7 @@ COPY requirements.txt .
 # Upgrade pip first
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Install core requirements (these should all be available on PyPI)
+# Install core requirements (all available on PyPI)
 RUN pip install --no-cache-dir \
     fastapi \
     uvicorn \
@@ -61,7 +61,6 @@ RUN pip install --no-cache-dir \
     networkx \
     swarms>=2.0.0 \
     psycopg2-binary \
-    supabase \
     PyPDF2 \
     python-docx \
     httpx>=0.24.0 \
@@ -71,24 +70,31 @@ RUN pip install --no-cache-dir \
     llama-index>=0.10.0 \
     llama-index-core>=0.10.0 \
     chromadb>=0.4.0 \
-    swarms-tools>=0.3.0
+    swarms-tools>=0.3.0 \
+    supabase
 
-# Install optional Swarm Corporation components from source
-# These are optional - app will work without them
-# Using || true to continue even if installation fails
-RUN pip install --no-cache-dir git+https://github.com/The-Swarm-Corporation/doc-master.git || true && \
-    pip install --no-cache-dir git+https://github.com/The-Swarm-Corporation/omniparse.git || true && \
-    pip install --no-cache-dir git+https://github.com/The-Swarm-Corporation/agentparse.git || true && \
-    pip install --no-cache-dir git+https://github.com/The-Swarm-Corporation/research-paper-hive.git || true && \
-    pip install --no-cache-dir git+https://github.com/The-Swarm-Corporation/advanced-research.git || true && \
-    pip install --no-cache-dir git+https://github.com/The-Swarm-Corporation/agent-rag-protocol.git || true && \
-    pip install --no-cache-dir git+https://github.com/The-Swarm-Corporation/multi-agent-rag-template.git || true && \
-    pip install --no-cache-dir git+https://github.com/The-Swarm-Corporation/zero.git || true && \
-    pip install --no-cache-dir git+https://github.com/The-Swarm-Corporation/swarms-utils.git || true && \
-    pip install --no-cache-dir git+https://github.com/The-Swarm-Corporation/swarms-memory.git || true
+# Install Swarm Corporation components from source
+# These enhance functionality but are optional - app works without them
+RUN set -e; \
+    for repo in \
+        "doc-master" \
+        "omniparse" \
+        "agentparse" \
+        "research-paper-hive" \
+        "advanced-research" \
+        "agent-rag-protocol" \
+        "multi-agent-rag-template" \
+        "zero" \
+        "swarms-utils" \
+        "swarms-memory"; \
+    do \
+        echo "Installing $repo..."; \
+        pip install --no-cache-dir "git+https://github.com/The-Swarm-Corporation/${repo}.git" || \
+        echo "Warning: Failed to install $repo (optional component)"; \
+    done
 
-# Create necessary directories for agent workspaces and data
-RUN mkdir -p /app/agent_workspace /app/data /app/workspace/agents /app/workspace/swarms
+# Create necessary directories for agent workspaces, data, and ChromaDB
+RUN mkdir -p /app/agent_workspace /app/data /app/workspace/agents /app/workspace/swarms /app/data/chromadb
 
 # Copy application code
 COPY . .

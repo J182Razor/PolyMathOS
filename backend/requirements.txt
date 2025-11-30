@@ -47,9 +47,17 @@ networkx
 swarms>=2.0.0
 # Database & Storage
 # TigerDB (TimescaleDB) - PRIMARY DATABASE (Required)
+# This is the main database for all application data
 psycopg2-binary
-# Supabase - Optional, only used for HDAM vector storage if configured
-# If not configured, HDAM will use ChromaDB-only mode
+
+# Vector Storage
+# ChromaDB - PRIMARY vector storage (Default, automatically used)
+# ChromaDB is used by default for HDAM vector storage - no configuration needed
+chromadb>=0.4.0
+
+# Supabase - ALTERNATIVE vector storage (Optional)
+# Only used if SUPABASE_URL and SUPABASE_KEY are configured
+# If not configured, HDAM uses ChromaDB-only mode (default)
 supabase
 PyPDF2
 python-docx
