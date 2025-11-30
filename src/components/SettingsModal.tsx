@@ -620,18 +620,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                                     </h3>
                                     <ConnectionStatus />
                                 </section>
-                            <div className="space-y-6">
-                                <h3 className="text-lg font-semibold text-text-primary dark:text-white">Data Sets</h3>
-                                <p className="text-text-secondary">Manage your local and remote datasets here.</p>
-                                <div className="p-12 text-center border-2 border-dashed border-silver-300 dark:border-silver-700 rounded-xl bg-light-surface/50 dark:bg-dark-surface/50">
-                                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-silver-100 dark:bg-silver-800 flex items-center justify-center">
-                                        <Icon icon={Database} size="lg" className="text-silver-400" />
+                                
+                                {/* Data Sets */}
+                                <div className="space-y-6">
+                                    <h3 className="text-lg font-semibold text-text-primary dark:text-white">Data Sets</h3>
+                                    <p className="text-text-secondary">Manage your local and remote datasets here.</p>
+                                    <div className="p-12 text-center border-2 border-dashed border-silver-300 dark:border-silver-700 rounded-xl bg-light-surface/50 dark:bg-dark-surface/50">
+                                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-silver-100 dark:bg-silver-800 flex items-center justify-center">
+                                            <Icon icon={Database} size="lg" className="text-silver-400" />
+                                        </div>
+                                        <p className="text-text-primary font-medium">No datasets configured</p>
+                                        <p className="text-text-tertiary mt-1">Drag and drop files or click to upload.</p>
+                                        <Button variant="outline" className="mt-4">
+                                            Upload Dataset
+                                        </Button>
                                     </div>
-                                    <p className="text-text-primary font-medium">No datasets configured</p>
-                                    <p className="text-text-tertiary mt-1">Drag and drop files or click to upload.</p>
-                                    <Button variant="outline" className="mt-4">
-                                        Upload Dataset
-                                    </Button>
                                 </div>
                             </div>
                         )}
