@@ -40,13 +40,13 @@ export const MemoryPalaceBuilder: React.FC<MemoryPalaceBuilderProps> = ({ onComp
     setItems(items.filter((_, i) => i !== index));
   };
 
-  const handleCreatePalace = () => {
+  const handleCreatePalace = async () => {
     if (!palaceName || items.length === 0) {
       setMessages(['Please provide a palace name and at least one item']);
       return;
     }
 
-    const result = featuresService.createMemoryPalace(
+    const result = await featuresService.createMemoryPalace(
       palaceName,
       items.map(item => ({
         loci: item.loci || '',
@@ -115,8 +115,8 @@ export const MemoryPalaceBuilder: React.FC<MemoryPalaceBuilderProps> = ({ onComp
             <h2 className="text-xl font-display font-semibold text-text-primary">
               Memory Locations ({items.length})
             </h2>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={() => setShowAddForm(true)}
             >
@@ -133,8 +133,8 @@ export const MemoryPalaceBuilder: React.FC<MemoryPalaceBuilderProps> = ({ onComp
           ) : (
             <div className="space-y-3">
               {items.map((item, index) => (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className="glass p-4 rounded-lg border border-silver-dark/20 flex items-start justify-between"
                 >
                   <div className="flex-1">
@@ -225,8 +225,8 @@ export const MemoryPalaceBuilder: React.FC<MemoryPalaceBuilderProps> = ({ onComp
               Cancel
             </Button>
           )}
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             onClick={handleCreatePalace}
             disabled={!palaceName || items.length === 0}
             className="ml-auto"

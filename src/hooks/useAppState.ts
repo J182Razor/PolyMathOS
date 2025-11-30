@@ -13,9 +13,9 @@ export function useUser(): PolymathUser | null {
 
   useEffect(() => {
     const appState = AppStateService.getInstance();
-    
+
     // Load initial user
-    setUser(appState.getUser());
+    appState.getUser().then(setUser);
 
     // Subscribe to changes
     const unsubscribe = appState.subscribeToUser((updatedUser) => {
@@ -36,7 +36,7 @@ export function useSettings(): AppSettings {
 
   useEffect(() => {
     const appState = AppStateService.getInstance();
-    
+
     // Subscribe to changes
     const unsubscribe = appState.subscribeToSettings((updatedSettings) => {
       setSettings(updatedSettings);
@@ -50,7 +50,7 @@ export function useSettings(): AppSettings {
 
 export function useCustomModels(provider?: string): CustomModel[] {
   const settings = useSettings();
-  
+
   if (provider) {
     return settings.customModels.filter(m => m.provider === provider);
   }

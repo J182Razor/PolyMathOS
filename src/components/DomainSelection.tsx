@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Brain, Target, ArrowRight, Check } from 'lucide-react';
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
 import { Icon } from './ui/Icon';
 import { PolymathUserService } from '../services/PolymathUserService';
-import { DomainType, LearningStyle } from '../types/polymath';
+import { DomainType, LearningStyle, PolymathUser } from '../types/polymath';
 
 interface DomainSelectionProps {
   onComplete: () => void;
@@ -19,11 +19,21 @@ export const DomainSelection: React.FC<DomainSelectionProps> = ({ onComplete, on
   const [learningStyle, setLearningStyle] = useState<LearningStyle>(LearningStyle.VISUAL);
   const [dailyCommitment, setDailyCommitment] = useState(60);
 
+  const [user, setUser] = useState<PolymathUser | null>(null);
+  const [loading, setLoading] = useState(true);
   const userService = PolymathUserService.getInstance();
 
+  useEffect(() => {
+    const loadUser = async () => {
+      const currentUser = await userService.getCurrentUser();
+      setUser(currentUser);
+      setLoading(false);
+    };
+    loadUser();
+  }, []);
+
   const handleComplete = () => {
-    const user = userService.getCurrentUser();
-    if (!user) return;
+    if (!user) return; // Use the state variable 'user'
 
     // Add domains
     if (primaryDomain) {
@@ -65,7 +75,7 @@ export const DomainSelection: React.FC<DomainSelectionProps> = ({ onComplete, on
             </span>
           </div>
           <div className="w-full bg-dark-elevated rounded-full h-2 border border-silver-dark/20">
-            <div 
+            <div
               className="bg-shimmer h-2 rounded-full transition-all duration-300"
               style={{ width: `${step === 'domains' ? 33 : step === 'learning_style' ? 66 : 100}%` }}
             />
@@ -155,11 +165,10 @@ export const DomainSelection: React.FC<DomainSelectionProps> = ({ onComplete, on
                 <button
                   key={style}
                   onClick={() => setLearningStyle(style)}
-                  className={`w-full p-4 text-left rounded-lg border-2 transition-all duration-200 ${
-                    learningStyle === style
-                      ? 'border-silver-base/50 bg-silver-base/10 text-silver-light'
-                      : 'border-silver-dark/30 hover:border-silver-base/50 text-text-secondary hover:text-text-primary bg-dark-surface/50'
-                  }`}
+                  className={`w-full p-4 text-left rounded-lg border-2 transition-all duration-200 ${learningStyle === style
+                    ? 'border-silver-base/50 bg-silver-base/10 text-silver-light'
+                    : 'border-silver-dark/30 hover:border-silver-base/50 text-text-secondary hover:text-text-primary bg-dark-surface/50'
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-medium">{style}</span>
@@ -257,8 +266,8 @@ export const DomainSelection: React.FC<DomainSelectionProps> = ({ onComplete, on
               <Icon icon={Check} size="sm" className="ml-2" />
             </Button>
           ) : (
-            <Button 
-              variant="primary" 
+            <Button
+              variant="primary"
               onClick={() => {
                 if (step === 'domains') setStep('learning_style');
                 else if (step === 'learning_style') setStep('commitment');

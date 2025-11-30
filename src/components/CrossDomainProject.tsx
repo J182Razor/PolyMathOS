@@ -5,7 +5,7 @@ import { Button } from './ui/Button';
 import { Icon } from './ui/Icon';
 import { PolymathFeaturesService } from '../services/PolymathFeaturesService';
 import { PolymathUserService } from '../services/PolymathUserService';
-import { Project, DomainType } from '../types/polymath';
+import { Project, DomainType, PolymathUser } from '../types/polymath';
 
 interface CrossDomainProjectProps {
   onComplete?: () => void;
@@ -22,30 +22,44 @@ export const CrossDomainProject: React.FC<CrossDomainProjectProps> = ({ onComple
   const featuresService = PolymathFeaturesService.getInstance();
   const userService = PolymathUserService.getInstance();
 
-  const user = userService.getCurrentUser();
+  const [user, setUser] = useState<PolymathUser | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const currentUser = await userService.getCurrentUser();
+      setUser(currentUser);
+      setLoading(false);
+    };
+    loadUser();
+  }, []);
+
   const domains = user ? Object.values(user.domains) : [];
 
   useEffect(() => {
     if (user) {
-      setProjects(user.projects);
+      setProjects(user.projects || []);
     }
   }, [user]);
 
+  if (loading) return <div>Loading...</div>;
+  if (!user) return <div>Please log in to create projects.</div>;
+
   const handleToggleDomain = (domainName: string) => {
-    setSelectedDomains(prev => 
+    setSelectedDomains(prev =>
       prev.includes(domainName)
         ? prev.filter(d => d !== domainName)
         : [...prev, domainName]
     );
   };
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!title || !description || selectedDomains.length < 2) {
       setMessages(['Please provide a title, description, and select at least 2 domains']);
       return;
     }
 
-    const result = featuresService.createCrossDomainProject(title, description, selectedDomains);
+    const result = await featuresService.createCrossDomainProject(title, description, selectedDomains);
     setMessages(result);
 
     setTimeout(() => {
@@ -124,11 +138,10 @@ export const CrossDomainProject: React.FC<CrossDomainProjectProps> = ({ onComple
                       <button
                         key={domain.name}
                         onClick={() => handleToggleDomain(domain.name)}
-                        className={`w-full p-3 text-left rounded-lg border-2 transition-all duration-200 ${
-                          selectedDomains.includes(domain.name)
-                            ? 'border-silver-base/50 bg-silver-base/10 text-silver-light'
-                            : 'border-silver-dark/30 hover:border-silver-base/50 text-text-secondary hover:text-text-primary bg-dark-surface/50'
-                        }`}
+                        className={`w-full p-3 text-left rounded-lg border-2 transition-all duration-200 ${selectedDomains.includes(domain.name)
+                          ? 'border-silver-base/50 bg-silver-base/10 text-silver-light'
+                          : 'border-silver-dark/30 hover:border-silver-base/50 text-text-secondary hover:text-text-primary bg-dark-surface/50'
+                          }`}
                       >
                         <div className="flex items-center justify-between">
                           <span>
@@ -143,9 +156,9 @@ export const CrossDomainProject: React.FC<CrossDomainProjectProps> = ({ onComple
                   </div>
                 </div>
 
-                <Button 
-                  variant="primary" 
-                  size="lg" 
+                <Button
+                  variant="primary"
+                  size="lg"
                   onClick={handleCreate}
                   disabled={!title || !description || selectedDomains.length < 2}
                   className="w-full"
@@ -175,11 +188,10 @@ export const CrossDomainProject: React.FC<CrossDomainProjectProps> = ({ onComple
                         <span className="text-sm font-medium text-text-primary">
                           {project.title}
                         </span>
-                        <span className={`text-xs px-2 py-1 rounded ${
-                          project.status === 'completed' ? 'bg-green-500/20 text-green-400' :
+                        <span className={`text-xs px-2 py-1 rounded ${project.status === 'completed' ? 'bg-green-500/20 text-green-400' :
                           project.status === 'in_progress' ? 'bg-silver-base/20 text-silver-base' :
-                          'bg-yellow-500/20 text-yellow-400'
-                        }`}>
+                            'bg-yellow-500/20 text-yellow-400'
+                          }`}>
                           {project.status}
                         </span>
                       </div>

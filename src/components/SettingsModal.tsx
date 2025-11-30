@@ -31,24 +31,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     });
 
     const [customModels, setCustomModels] = useState<CustomModel[]>([]);
-    
+
     // SwarmShield settings
     const [swarmShieldEnabled, setSwarmShieldEnabled] = useState(true);
     const [encryptionStrength, setEncryptionStrength] = useState<'STANDARD' | 'ENHANCED' | 'MAXIMUM'>('MAXIMUM');
-    
+
     // Zero workflow settings
     const [zeroEnabled, setZeroEnabled] = useState(false);
     const [zeroServiceUrl, setZeroServiceUrl] = useState('');
-    
+
     // Document processing settings
     const [documentProcessingEnabled, setDocumentProcessingEnabled] = useState(true);
     const [preferredParser, setPreferredParser] = useState<'doc-master' | 'omniparse'>('omniparse');
-    
+
     // RAG settings
     const [ragEnabled, setRagEnabled] = useState(true);
     const [ragVectorStore, setRagVectorStore] = useState<'tigerdb' | 'supabase'>('tigerdb');
     const [ragTopK, setRagTopK] = useState(5);
-    
+
     // Custom swarms
     const [customSwarmsEnabled, setCustomSwarmsEnabled] = useState(true);
 
@@ -62,7 +62,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             setN8nUrl(settings.n8nUrl);
             setEnvVars(settings.envVars);
             setCustomModels(settings.customModels);
-            
+
             // Load Swarm Corporation settings
             if (settings.swarmShield) {
                 setSwarmShieldEnabled(settings.swarmShield.enabled ?? true);
@@ -89,10 +89,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 checkN8nConnection(settings.n8nUrl);
             }
 
-            if (currentUser) {
-                setUserName(currentUser.name);
-                setUserEmail(currentUser.email);
-            }
+            appState.getUser().then(currentUser => {
+                if (currentUser) {
+                    setUserName(currentUser.name);
+                    setUserEmail(currentUser.email);
+                }
+            });
         }
     }, [isOpen]);
 
@@ -141,7 +143,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
         // Update user name if changed (will notify all listeners)
         if (userName) {
-            const currentUser = appState.getUser();
+            const currentUser = await appState.getUser();
             if (currentUser) {
                 currentUser.name = userName;
                 appState.updateUser(currentUser);
@@ -407,14 +409,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                                             </div>
                                             <button
                                                 onClick={() => setSwarmShieldEnabled(!swarmShieldEnabled)}
-                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                                                    swarmShieldEnabled ? 'bg-green-500' : 'bg-slate-600'
-                                                }`}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${swarmShieldEnabled ? 'bg-green-500' : 'bg-slate-600'
+                                                    }`}
                                             >
                                                 <span
-                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                                        swarmShieldEnabled ? 'translate-x-6' : 'translate-x-1'
-                                                    }`}
+                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${swarmShieldEnabled ? 'translate-x-6' : 'translate-x-1'
+                                                        }`}
                                                 />
                                             </button>
                                         </div>
@@ -449,14 +449,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                                             </div>
                                             <button
                                                 onClick={() => setZeroEnabled(!zeroEnabled)}
-                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                                                    zeroEnabled ? 'bg-purple-500' : 'bg-slate-600'
-                                                }`}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${zeroEnabled ? 'bg-purple-500' : 'bg-slate-600'
+                                                    }`}
                                             >
                                                 <span
-                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                                        zeroEnabled ? 'translate-x-6' : 'translate-x-1'
-                                                    }`}
+                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${zeroEnabled ? 'translate-x-6' : 'translate-x-1'
+                                                        }`}
                                                 />
                                             </button>
                                         </div>
@@ -490,14 +488,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                                             </div>
                                             <button
                                                 onClick={() => setDocumentProcessingEnabled(!documentProcessingEnabled)}
-                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                                                    documentProcessingEnabled ? 'bg-blue-500' : 'bg-slate-600'
-                                                }`}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${documentProcessingEnabled ? 'bg-blue-500' : 'bg-slate-600'
+                                                    }`}
                                             >
                                                 <span
-                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                                        documentProcessingEnabled ? 'translate-x-6' : 'translate-x-1'
-                                                    }`}
+                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${documentProcessingEnabled ? 'translate-x-6' : 'translate-x-1'
+                                                        }`}
                                                 />
                                             </button>
                                         </div>
@@ -531,14 +527,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                                             </div>
                                             <button
                                                 onClick={() => setRagEnabled(!ragEnabled)}
-                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                                                    ragEnabled ? 'bg-cyan-500' : 'bg-slate-600'
-                                                }`}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${ragEnabled ? 'bg-cyan-500' : 'bg-slate-600'
+                                                    }`}
                                             >
                                                 <span
-                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                                        ragEnabled ? 'translate-x-6' : 'translate-x-1'
-                                                    }`}
+                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${ragEnabled ? 'translate-x-6' : 'translate-x-1'
+                                                        }`}
                                                 />
                                             </button>
                                         </div>
@@ -586,14 +580,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                                             </div>
                                             <button
                                                 onClick={() => setCustomSwarmsEnabled(!customSwarmsEnabled)}
-                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                                                    customSwarmsEnabled ? 'bg-yellow-500' : 'bg-slate-600'
-                                                }`}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${customSwarmsEnabled ? 'bg-yellow-500' : 'bg-slate-600'
+                                                    }`}
                                             >
                                                 <span
-                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                                        customSwarmsEnabled ? 'translate-x-6' : 'translate-x-1'
-                                                    }`}
+                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${customSwarmsEnabled ? 'translate-x-6' : 'translate-x-1'
+                                                        }`}
                                                 />
                                             </button>
                                         </div>
@@ -620,7 +612,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                                     </h3>
                                     <ConnectionStatus />
                                 </section>
-                                
+
                                 {/* Data Sets */}
                                 <div className="space-y-6">
                                     <h3 className="text-lg font-semibold text-text-primary dark:text-white">Data Sets</h3>

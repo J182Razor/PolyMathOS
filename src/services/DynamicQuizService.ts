@@ -218,6 +218,19 @@ export class DynamicQuizService {
   }
 
   /**
+   * Get user's quiz attempts history
+   */
+  public async getUserAttempts(userId: string): Promise<QuizAttempt[]> {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/quiz/history/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching quiz attempts:', error);
+      return [];
+    }
+  }
+
+  /**
    * Get adaptive next question based on performance
    * (Currently client-side logic, can be moved to backend later)
    */

@@ -371,4 +371,21 @@ export class PolymathUserService {
     // Since this is often used in "First Use", we might want to just register them.
     return this.register(email, 'Welcome123!', firstName, lastName);
   }
+
+  /**
+   * Update user (Alias for saveUser)
+   */
+  public async updateUser(user: PolymathUser): Promise<void> {
+    await this.saveUser(user);
+  }
+
+  /**
+   * Check for new achievements
+   */
+  public checkAchievements(user: PolymathUser): string[] {
+    const newAchievements: string[] = [];
+    // TODO: Implement actual achievement logic
+    // For now, just return empty array or mock
+    return newAchievements;
+  }
 }

@@ -5,7 +5,7 @@ import { Button } from './ui/Button';
 import { Icon } from './ui/Icon';
 import { PolymathFeaturesService } from '../services/PolymathFeaturesService';
 import { PolymathUserService } from '../services/PolymathUserService';
-import { DomainType } from '../types/polymath';
+import { DomainType, PolymathUser } from '../types/polymath';
 
 interface DeepWorkBlockProps {
   onComplete?: () => void;
@@ -23,7 +23,18 @@ export const DeepWorkBlock: React.FC<DeepWorkBlockProps> = ({ onComplete, onBack
   const featuresService = PolymathFeaturesService.getInstance();
   const userService = PolymathUserService.getInstance();
 
-  const user = userService.getCurrentUser();
+  const [user, setUser] = useState<PolymathUser | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const currentUser = await userService.getCurrentUser();
+      setUser(currentUser);
+      setLoading(false);
+    };
+    loadUser();
+  }, []);
+
   const domains = user ? Object.values(user.domains) : [];
 
   useEffect(() => {
@@ -35,7 +46,7 @@ export const DeepWorkBlock: React.FC<DeepWorkBlockProps> = ({ onComplete, onBack
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
-    
+
     if (isRunning && timeRemaining > 0) {
       interval = setInterval(() => {
         setTimeRemaining(prev => {
@@ -61,12 +72,12 @@ export const DeepWorkBlock: React.FC<DeepWorkBlockProps> = ({ onComplete, onBack
     setIsRunning(false);
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     setIsRunning(false);
     if (!selectedDomain) return;
 
     const minutes = Math.floor((duration * 60 - timeRemaining) / 60);
-    const result = featuresService.startDeepWorkBlock(selectedDomain, minutes, activityType);
+    const result = await featuresService.startDeepWorkBlock(selectedDomain, minutes, activityType);
     setMessages(result);
 
     setTimeout(() => {
@@ -171,11 +182,10 @@ export const DeepWorkBlock: React.FC<DeepWorkBlockProps> = ({ onComplete, onBack
                     <button
                       key={type.value}
                       onClick={() => setActivityType(type.value as any)}
-                      className={`p-3 rounded-lg border-2 transition-all duration-200 ${
-                        activityType === type.value
-                          ? 'border-silver-base/50 bg-silver-base/10 text-silver-light'
-                          : 'border-silver-dark/30 hover:border-silver-base/50 text-text-secondary hover:text-text-primary bg-dark-surface/50'
-                      }`}
+                      className={`p-3 rounded-lg border-2 transition-all duration-200 ${activityType === type.value
+                        ? 'border-silver-base/50 bg-silver-base/10 text-silver-light'
+                        : 'border-silver-dark/30 hover:border-silver-base/50 text-text-secondary hover:text-text-primary bg-dark-surface/50'
+                        }`}
                     >
                       {type.label}
                     </button>

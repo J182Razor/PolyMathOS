@@ -15,7 +15,7 @@ export interface AgentParseRequest {
   format?: 'json' | 'yaml' | 'csv' | 'pydantic';
 }
 
-class DocumentService {
+export class DocumentService {
   private baseUrl: string;
 
   constructor() {
@@ -25,7 +25,7 @@ class DocumentService {
   async readFile(file: File) {
     const formData = new FormData();
     formData.append('file', file);
-    
+
     const response = await fetch(`${this.baseUrl}/read`, {
       method: 'POST',
       body: formData,

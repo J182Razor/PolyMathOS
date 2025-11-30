@@ -29,11 +29,22 @@ export interface GenerateMultiPhaseWorkflowRequest {
   topic: string;
 }
 
-class DynamicWorkflowService {
+export class DynamicWorkflowService {
   private baseUrl: string;
 
   constructor() {
     this.baseUrl = `${API_BASE_URL}/api/workflows/dynamic`;
+  }
+
+  async generateWorkflow(params: any) {
+    if (params.type === 'learning_plan') {
+      return this.generateLessonPlanWorkflow({
+        topic: params.topic,
+        user_id: params.user_id,
+        goals: { timeline: params.timeline, modules: params.modules }
+      });
+    }
+    throw new Error(`Unknown workflow type: ${params.type}`);
   }
 
   async generateLessonPlanWorkflow(request: GenerateLessonPlanWorkflowRequest) {

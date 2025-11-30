@@ -5,7 +5,7 @@ import { Button } from './ui/Button';
 import { Icon } from './ui/Icon';
 import { PolymathFeaturesService } from '../services/PolymathFeaturesService';
 import { PolymathUserService } from '../services/PolymathUserService';
-import { ReflectionEntry } from '../types/polymath';
+import { ReflectionEntry, PolymathUser } from '../types/polymath';
 
 interface ReflectionJournalProps {
   onComplete?: () => void;
@@ -30,29 +30,41 @@ export const ReflectionJournal: React.FC<ReflectionJournalProps> = ({ onComplete
   const [mood, setMood] = useState(5);
   const [messages, setMessages] = useState<string[]>([]);
 
-  const featuresService = PolymathFeaturesService.getInstance();
+  const [user, setUser] = useState<PolymathUser | null>(null);
+  const [loading, setLoading] = useState(true);
   const userService = PolymathUserService.getInstance();
+  const featuresService = PolymathFeaturesService.getInstance();
 
   useEffect(() => {
-    loadEntries();
+    const loadUser = async () => {
+      const currentUser = await userService.getCurrentUser();
+      setUser(currentUser);
+      setLoading(false);
+    };
+    loadUser();
   }, []);
 
+  useEffect(() => {
+    if (!loading && user) { // Only load entries if not loading and user is available
+      loadEntries();
+    }
+  }, [loading, user]); // Depend on loading and user state
+
   const loadEntries = () => {
-    const user = userService.getCurrentUser();
-    if (user) {
+    if (user) { // Use the user from state
       setEntries(user.reflectionJournal);
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => { // Made handleSubmit async
     if (!selectedPrompt || !response) {
       setMessages(['Please select a prompt and write your reflection']);
       return;
     }
 
-    const result = featuresService.logReflection(selectedPrompt, response, mood);
+    const result = await featuresService.logReflection(selectedPrompt, response, mood); // Await the result and use selectedPrompt
     setMessages(result);
-    
+
     setTimeout(() => {
       setMessages([]);
       setSelectedPrompt('');

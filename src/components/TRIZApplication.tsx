@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Lightbulb, Check, ArrowRight } from 'lucide-react';
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
 import { Icon } from './ui/Icon';
 import { PolymathFeaturesService } from '../services/PolymathFeaturesService';
 import { PolymathUserService } from '../services/PolymathUserService';
-import { DomainType } from '../types/polymath';
+import { DomainType, PolymathUser } from '../types/polymath';
 
 interface TRIZApplicationProps {
   onComplete?: () => void;
@@ -19,9 +19,19 @@ export const TRIZApplication: React.FC<TRIZApplicationProps> = ({ onComplete, on
   const [messages, setMessages] = useState<string[]>([]);
 
   const featuresService = PolymathFeaturesService.getInstance();
+  const [user, setUser] = useState<PolymathUser | null>(null);
+  const [loading, setLoading] = useState(true);
   const userService = PolymathUserService.getInstance();
 
-  const user = userService.getCurrentUser();
+  useEffect(() => {
+    const loadUser = async () => {
+      const currentUser = await userService.getCurrentUser();
+      setUser(currentUser);
+      setLoading(false);
+    };
+    loadUser();
+  }, []);
+
   const domains = user ? Object.values(user.domains) : [];
   const trizPrinciples = featuresService.getTRIZPrinciples();
 
@@ -32,13 +42,13 @@ export const TRIZApplication: React.FC<TRIZApplicationProps> = ({ onComplete, on
     }
   }, [domains, selectedDomain]);
 
-  const handleApply = () => {
+  const handleApply = async () => {
     if (!problemDescription || !selectedDomain) {
       setMessages(['Please provide a problem description and select a domain']);
       return;
     }
 
-    const result = featuresService.applyTRIZPrinciple(principleNumber, problemDescription, selectedDomain);
+    const result = await featuresService.applyTRIZPrinciple(principleNumber, problemDescription, selectedDomain);
     setMessages(result);
 
     setTimeout(() => {
@@ -142,11 +152,10 @@ export const TRIZApplication: React.FC<TRIZApplicationProps> = ({ onComplete, on
             {Object.entries(trizPrinciples).map(([num, name]) => (
               <div
                 key={num}
-                className={`p-2 rounded-lg border ${
-                  parseInt(num) === principleNumber
-                    ? 'border-silver-base/50 bg-silver-base/10'
-                    : 'border-silver-dark/20'
-                }`}
+                className={`p-2 rounded-lg border ${parseInt(num) === principleNumber
+                  ? 'border-silver-base/50 bg-silver-base/10'
+                  : 'border-silver-dark/20'
+                  }`}
               >
                 <div className="font-medium text-text-primary">#{num}</div>
                 <div className="text-xs text-text-secondary">{name}</div>

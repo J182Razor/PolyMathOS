@@ -39,7 +39,7 @@ interface MemoryPalaceAIServiceType {
 
 // Types for the Genius Professor
 export type LearningGoalType = 'mastery' | 'familiarity' | 'awareness';
-export type LearningStyleArchetype = 
+export type LearningStyleArchetype =
   | 'physicist'     // Feynman - Teach to learn
   | 'engineer'      // Musk - First principles
   | 'artist'        // Da Vinci - Visual-mechanical
@@ -106,6 +106,7 @@ export interface LearningActivity {
     score: number;
     timeSpent: number;
     notes: string;
+    correct?: boolean;
   };
 }
 
@@ -237,18 +238,18 @@ const POLYMATH_ARCHETYPES = {
 
 export class GeniusProfessorService {
   private static instance: GeniusProfessorService;
-  
+
   // Core services
   private llmService: LLMService;
   private fsrsService: FSRSService;
   private quizService: DynamicQuizService;
   private rlService: ReinforcementLearningService;
-  
+
   // Optional services (will be initialized when available)
   private zettelkastenService?: ZettelkastenServiceType;
   private feynmanService?: FeynmanEngineServiceType;
   private memoryPalaceService?: MemoryPalaceAIServiceType;
-  
+
   // Data storage
   private learningPlans: Map<string, LearningPlan> = new Map();
   private progressHistory: Map<string, ProgressReport[]> = new Map();
@@ -405,7 +406,7 @@ Respond in JSON format:
 }`;
 
       const response = await this.llmService.generateQuickResponse(prompt);
-      
+
       const jsonMatch = response.content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
@@ -712,17 +713,17 @@ Respond in JSON format:
       previousSuccess: true,
       topicDifficulty: 5
     });
-    
+
     // Record that we're using quiz method
     // (The actual outcome will be recorded after quiz completion)
     // Get user's current progress
     const userPlans = Array.from(this.learningPlans.values())
       .filter(p => p.userId === userId);
-    
+
     // Determine weak areas to focus on
     let bloomDistribution = undefined;
     const latestPlan = userPlans[userPlans.length - 1];
-    
+
     if (latestPlan && options?.focusAreas) {
       bloomDistribution = {
         remember: options.focusAreas.includes('remember') ? 0.3 : 0.1,
@@ -751,11 +752,11 @@ Respond in JSON format:
   ): Promise<ComprehensionReport> {
     // Gather data from various sources
     const fsrsStats = this.fsrsService.getStatistics();
-    const quizAttempts = this.quizService.getUserAttempts(userId);
-    
+    const quizAttempts = await this.quizService.getUserAttempts(userId);
+
     // Calculate dimension scores
     const recentAttempts = quizAttempts
-      .filter(a => Date.now() - a.startTime.getTime() < 30 * 24 * 60 * 60 * 1000) // Last 30 days
+      .filter((a: QuizAttempt) => Date.now() - new Date(a.startTime).getTime() < 30 * 24 * 60 * 60 * 1000) // Last 30 days
       .slice(-10);
 
     // Aggregate Bloom scores from quiz attempts
@@ -778,8 +779,8 @@ Respond in JSON format:
 
     // Map to comprehension dimensions
     const dimensions = {
-      memory: bloomTotals.remember.count > 0 
-        ? bloomTotals.remember.sum / bloomTotals.remember.count 
+      memory: bloomTotals.remember.count > 0
+        ? bloomTotals.remember.sum / bloomTotals.remember.count
         : fsrsStats.averageRetention * 100,
       understanding: bloomTotals.understand.count > 0
         ? bloomTotals.understand.sum / bloomTotals.understand.count
@@ -791,8 +792,8 @@ Respond in JSON format:
         ? bloomTotals.analyze.sum / bloomTotals.analyze.count
         : 50,
       synthesis: bloomTotals.evaluate.count > 0
-        ? (bloomTotals.evaluate.sum / bloomTotals.evaluate.count + 
-           bloomTotals.create.sum / Math.max(1, bloomTotals.create.count)) / 2
+        ? (bloomTotals.evaluate.sum / bloomTotals.evaluate.count +
+          bloomTotals.create.sum / Math.max(1, bloomTotals.create.count)) / 2
         : 50,
       creation: bloomTotals.create.count > 0
         ? bloomTotals.create.sum / bloomTotals.create.count
@@ -932,7 +933,7 @@ What is the single most impactful thing this learner should do next? Be specific
     // Check learning plans
     const userPlans = Array.from(this.learningPlans.values())
       .filter(p => p.userId === userId);
-    
+
     for (const plan of userPlans) {
       const currentPhase = plan.phases[plan.currentPhaseIndex];
       if (currentPhase && currentPhase.status === 'in_progress') {
@@ -956,7 +957,7 @@ What is the single most impactful thing this learner should do next? Be specific
     if (dimensions) {
       const weakestDimension = Object.entries(dimensions)
         .sort(([, a], [, b]) => a - b)[0];
-      
+
       if (weakestDimension[1] < 60) {
         const dimensionRecommendations: Record<string, LearningRecommendation> = {
           memory: {
@@ -1116,7 +1117,7 @@ What is the single most impactful thing this learner should do next? Be specific
       try {
         const { workflowOrchestratorService } = await import('./WorkflowOrchestratorService');
         const score = performance.score || (performance.correct ? 100 : 0);
-        
+
         await workflowOrchestratorService.updateProgress({
           learning_plan_id: planId,
           activity_id: activityId,
@@ -1141,7 +1142,39 @@ What is the single most impactful thing this learner should do next? Be specific
   ): Promise<ProgressReport> {
     const now = new Date();
     const startDate = new Date(now);
-    
+
+    // Initialize metrics
+    let studyTimeMinutes = 0;
+    let activitiesCompleted = 0;
+    let quizzesCompleted = 0;
+    let totalQuizScore = 0;
+    let insights: string[] = [];
+    let areasForImprovement: string[] = [];
+
+    // Get FSRS stats
+    const fsrsStats = this.fsrsService.getStatistics();
+
+    // Calculate metrics from learning plans
+    const plans = this.getUserLearningPlans(userId);
+    for (const plan of plans) {
+      for (const phase of plan.phases) {
+        for (const activity of phase.activities) {
+          if (activity.completedAt && activity.completedAt >= startDate) {
+            activitiesCompleted++;
+            if (activity.performance) {
+              studyTimeMinutes += activity.performance.timeSpent;
+              if (activity.type === 'quiz') {
+                quizzesCompleted++;
+                totalQuizScore += activity.performance.score || (activity.performance.correct ? 100 : 0);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    const averageQuizScore = quizzesCompleted > 0 ? totalQuizScore / quizzesCompleted : 0;
+
     switch (period) {
       case 'daily':
         startDate.setDate(startDate.getDate() - 1);
@@ -1151,42 +1184,8 @@ What is the single most impactful thing this learner should do next? Be specific
         break;
       case 'monthly':
         startDate.setMonth(startDate.getMonth() - 1);
-        break;
-    }
-
-    // Gather metrics
-    const userPlans = this.getUserLearningPlans(userId);
-    const quizAttempts = this.quizService.getUserAttempts(userId)
-      .filter(a => a.startTime >= startDate);
-    const fsrsStats = this.fsrsService.getStatistics();
-
-    // Calculate study time from plans
-    let studyTimeMinutes = 0;
-    let activitiesCompleted = 0;
-    
-    for (const plan of userPlans) {
-      for (const phase of plan.phases) {
-        for (const activity of phase.activities) {
-          if (activity.completedAt && activity.completedAt >= startDate) {
-            activitiesCompleted++;
-            studyTimeMinutes += activity.performance?.timeSpent || activity.estimatedMinutes;
-          }
-        }
-      }
-    }
-
-    // Calculate quiz metrics
-    const quizzesCompleted = quizAttempts.length;
-    const averageQuizScore = quizAttempts.length > 0
-      ? quizAttempts.reduce((sum, a) => sum + a.percentCorrect, 0) / quizAttempts.length
-      : 0;
-
-    // Generate insights using AI
-    let insights: string[] = [];
-    let areasForImprovement: string[] = [];
-
-    try {
-      const prompt = `Based on this learning data for the past ${period}:
+        try {
+          const prompt = `Based on this learning data for the past ${period}:
 - Study time: ${studyTimeMinutes} minutes
 - Activities completed: ${activitiesCompleted}
 - Quizzes completed: ${quizzesCompleted}
@@ -1197,16 +1196,18 @@ What is the single most impactful thing this learner should do next? Be specific
 Provide 2-3 insights about their learning and 2-3 areas for improvement.
 Respond in JSON: {"insights": ["..."], "improvements": ["..."]}`;
 
-      const response = await this.llmService.generateQuickResponse(prompt);
-      const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        insights = parsed.insights || [];
-        areasForImprovement = parsed.improvements || [];
-      }
-    } catch (error) {
-      insights = ['Keep up the consistent study!'];
-      areasForImprovement = ['Consider increasing review frequency'];
+          const response = await this.llmService.generateQuickResponse(prompt);
+          const jsonMatch = response.content.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0]);
+            insights = parsed.insights || [];
+            areasForImprovement = parsed.improvements || [];
+          }
+        } catch (error) {
+          insights = ['Keep up the consistent study!'];
+          areasForImprovement = ['Consider increasing review frequency'];
+        }
+        break;
     }
 
     const report: ProgressReport = {
@@ -1218,10 +1219,10 @@ Respond in JSON: {"insights": ["..."], "improvements": ["..."]}`;
       activitiesCompleted,
       quizzesCompleted,
       averageQuizScore,
-      feynmanSessionsCompleted: 0, // Would come from FeynmanService
-      notesCreated: 0, // Would come from ZettelkastenService
+      feynmanSessionsCompleted: 0,
+      notesCreated: 0,
       memoriesStrengthened: fsrsStats.reviewsToday,
-      comprehensionChange: 0, // Calculate from previous report
+      comprehensionChange: 0,
       achievements: this.calculateAchievements(studyTimeMinutes, activitiesCompleted, fsrsStats),
       insights,
       areasForImprovement

@@ -45,7 +45,7 @@ const ResourceScanner: React.FC<ResourceScannerProps> = ({ userData, onNext, onB
       }, 100);
 
       // Integrate with DocumentService API
-      let result;
+      let result: any;
       if (fileToProcess) {
         try {
           result = await documentService.readFile(fileToProcess);
@@ -187,8 +187,8 @@ const ResourceScanner: React.FC<ResourceScannerProps> = ({ userData, onNext, onB
         {/* Error Message */}
         {error && (
           <div className="px-4 mt-4">
-            <ErrorMessage 
-              error={error} 
+            <ErrorMessage
+              error={error}
               onDismiss={() => setError(null)}
               retryable={ApiErrorHandler.isRetryable(error)}
               onRetry={() => handleProcess(file)}

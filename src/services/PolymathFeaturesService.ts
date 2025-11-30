@@ -3,10 +3,10 @@
  * Service for managing advanced Polymath OS features
  */
 
-import { 
-  PolymathUser, 
-  Flashcard, 
-  MemoryPalace, 
+import {
+  PolymathUser,
+  Flashcard,
+  MemoryPalace,
   MemoryPalaceItem,
   MindMap,
   Project,
@@ -54,14 +54,14 @@ export class PolymathFeaturesService {
   /**
    * Image Streaming Session
    */
-  public startImageStreamingSession(durationMinutes: number = 10): string[] {
-    const user = this.userService.getCurrentUser();
+  public async startImageStreamingSession(durationMinutes: number = 10): Promise<string[]> {
+    const user = await this.userService.getCurrentUser();
     if (!user) return ["Please register first!"];
 
     user.imageStreamSessions += 1;
     const xpGained = durationMinutes * 2;
-    const { leveledUp, levelsGained } = this.userService.gainXP(user, xpGained);
-    this.userService.updateStreak(user);
+    const { leveledUp, levelsGained } = await this.userService.gainXP(user, xpGained);
+    await this.userService.updateStreak(user);
     user.totalStudyTime += durationMinutes;
 
     const messages = [`👁️ Image Streaming Session Completed (${durationMinutes} mins) (+${xpGained} XP)`];
@@ -72,15 +72,15 @@ export class PolymathFeaturesService {
     const achievementMessages = this.userService.checkAchievements(user);
     messages.push(...achievementMessages);
 
-    this.userService.updateUser(user);
+    await this.userService.updateUser(user);
     return messages;
   }
 
   /**
    * Create Flashcard
    */
-  public createFlashcard(question: string, answer: string, domain: string): Flashcard {
-    const user = this.userService.getCurrentUser();
+  public async createFlashcard(question: string, answer: string, domain: string): Promise<Flashcard> {
+    const user = await this.userService.getCurrentUser();
     if (!user) throw new Error("Please register first!");
 
     const card: Flashcard = {
@@ -97,15 +97,15 @@ export class PolymathFeaturesService {
     };
 
     user.flashcards.push(card);
-    this.userService.updateUser(user);
+    await this.userService.updateUser(user);
     return card;
   }
 
   /**
    * Review Flashcards
    */
-  public getDueFlashcards(limit: number = 5): Flashcard[] {
-    const user = this.userService.getCurrentUser();
+  public async getDueFlashcards(limit: number = 5): Promise<Flashcard[]> {
+    const user = await this.userService.getCurrentUser();
     if (!user) return [];
 
     const now = new Date();
@@ -116,8 +116,8 @@ export class PolymathFeaturesService {
   /**
    * Rate Flashcard Answer
    */
-  public rateFlashcard(cardId: string, confidence: number, correct: boolean): string[] {
-    const user = this.userService.getCurrentUser();
+  public async rateFlashcard(cardId: string, confidence: number, correct: boolean): Promise<string[]> {
+    const user = await this.userService.getCurrentUser();
     if (!user) return ["Please register first!"];
 
     const card = user.flashcards.find(c => c.id === cardId);
@@ -145,7 +145,7 @@ export class PolymathFeaturesService {
     card.nextReview.setDate(card.nextReview.getDate() + card.interval);
 
     const xpGained = 5 + (confidence * 2);
-    const { leveledUp, levelsGained } = this.userService.gainXP(user, xpGained);
+    const { leveledUp, levelsGained } = await this.userService.gainXP(user, xpGained);
 
     const messages = [
       `✅ Flashcard reviewed: ${correct ? 'Correct' : 'Incorrect'} (Confidence: ${confidence}/2) (+${xpGained} XP)`,
@@ -154,15 +154,15 @@ export class PolymathFeaturesService {
       messages.push(`📈 LEVEL UP! Gained ${levelsGained} level(s) - Now Level ${user.level}`);
     }
 
-    this.userService.updateUser(user);
+    await this.userService.updateUser(user);
     return messages;
   }
 
   /**
    * Create Memory Palace
    */
-  public createMemoryPalace(name: string, items: Omit<MemoryPalaceItem, 'createdAt'>[]): string[] {
-    const user = this.userService.getCurrentUser();
+  public async createMemoryPalace(name: string, items: Omit<MemoryPalaceItem, 'createdAt'>[]): Promise<string[]> {
+    const user = await this.userService.getCurrentUser();
     if (!user) return ["Please register first!"];
 
     const palace: MemoryPalace = {
@@ -178,8 +178,8 @@ export class PolymathFeaturesService {
     user.memoryPalaces[name] = palace;
 
     const xpGained = items.length * 10;
-    const { leveledUp, levelsGained } = this.userService.gainXP(user, xpGained);
-    this.userService.updateStreak(user);
+    const { leveledUp, levelsGained } = await this.userService.gainXP(user, xpGained);
+    await this.userService.updateStreak(user);
 
     const messages = [`🏰 Memory Palace '${name}' created with ${items.length} items (+${xpGained} XP)`];
     if (leveledUp) {
@@ -189,15 +189,15 @@ export class PolymathFeaturesService {
     const achievementMessages = this.userService.checkAchievements(user);
     messages.push(...achievementMessages);
 
-    this.userService.updateUser(user);
+    await this.userService.updateUser(user);
     return messages;
   }
 
   /**
    * Create Mind Map
    */
-  public createMindMap(topic: string, nodes: any[], domain: string): MindMap {
-    const user = this.userService.getCurrentUser();
+  public async createMindMap(topic: string, nodes: any[], domain: string): Promise<MindMap> {
+    const user = await this.userService.getCurrentUser();
     if (!user) throw new Error("Please register first!");
 
     const mindMap: MindMap = {
@@ -217,23 +217,23 @@ export class PolymathFeaturesService {
     user.mindMapsCreated += 1;
 
     const xpGained = 20 + nodes.length * 3;
-    this.userService.gainXP(user, xpGained);
-    this.userService.updateStreak(user);
+    await this.userService.gainXP(user, xpGained);
+    await this.userService.updateStreak(user);
     this.userService.checkAchievements(user);
 
-    this.userService.updateUser(user);
+    await this.userService.updateUser(user);
     return mindMap;
   }
 
   /**
    * Deep Work Block
    */
-  public startDeepWorkBlock(
+  public async startDeepWorkBlock(
     domain: string,
     durationMinutes: number = 25,
     activityType: "active_recall" | "problem_solving" | "reading" | "writing" = "active_recall"
-  ): string[] {
-    const user = this.userService.getCurrentUser();
+  ): Promise<string[]> {
+    const user = await this.userService.getCurrentUser();
     if (!user) return ["Please register first!"];
 
     user.deepWorkBlocks += 1;
@@ -246,8 +246,8 @@ export class PolymathFeaturesService {
     }
 
     const xpGained = durationMinutes * 3;
-    const { leveledUp, levelsGained } = this.userService.gainXP(user, xpGained);
-    this.userService.updateStreak(user);
+    const { leveledUp, levelsGained } = await this.userService.gainXP(user, xpGained);
+    await this.userService.updateStreak(user);
 
     const activityNames = {
       active_recall: "Active Recall Practice",
@@ -268,15 +268,15 @@ export class PolymathFeaturesService {
     const achievementMessages = this.userService.checkAchievements(user);
     messages.push(...achievementMessages);
 
-    this.userService.updateUser(user);
+    await this.userService.updateUser(user);
     return messages;
   }
 
   /**
    * Apply TRIZ Principle
    */
-  public applyTRIZPrinciple(principleNumber: number, problemDescription: string, domain: string): string[] {
-    const user = this.userService.getCurrentUser();
+  public async applyTRIZPrinciple(principleNumber: number, problemDescription: string, domain: string): Promise<string[]> {
+    const user = await this.userService.getCurrentUser();
     if (!user) return ["Please register first!"];
 
     if (!this.trizPrinciples[principleNumber]) {
@@ -287,8 +287,8 @@ export class PolymathFeaturesService {
     user.trizApplications += 1;
 
     const xpGained = 25;
-    const { leveledUp, levelsGained } = this.userService.gainXP(user, xpGained);
-    this.userService.updateStreak(user);
+    const { leveledUp, levelsGained } = await this.userService.gainXP(user, xpGained);
+    await this.userService.updateStreak(user);
 
     const principleName = this.trizPrinciples[principleNumber];
 
@@ -307,15 +307,15 @@ export class PolymathFeaturesService {
     const achievementMessages = this.userService.checkAchievements(user);
     messages.push(...achievementMessages);
 
-    this.userService.updateUser(user);
+    await this.userService.updateUser(user);
     return messages;
   }
 
   /**
    * Create Cross-Domain Project
    */
-  public createCrossDomainProject(title: string, description: string, domains: string[]): string[] {
-    const user = this.userService.getCurrentUser();
+  public async createCrossDomainProject(title: string, description: string, domains: string[]): Promise<string[]> {
+    const user = await this.userService.getCurrentUser();
     if (!user) return ["Please register first!"];
 
     const project: Project = {
@@ -331,8 +331,8 @@ export class PolymathFeaturesService {
     user.crossDomainProjects += 1;
 
     const xpGained = 100 + domains.length * 50;
-    const { leveledUp, levelsGained } = this.userService.gainXP(user, xpGained);
-    this.userService.updateStreak(user);
+    const { leveledUp, levelsGained } = await this.userService.gainXP(user, xpGained);
+    await this.userService.updateStreak(user);
 
     const messages = [
       `🌐 Cross-Domain Project Started:`,
@@ -349,15 +349,15 @@ export class PolymathFeaturesService {
     const achievementMessages = this.userService.checkAchievements(user);
     messages.push(...achievementMessages);
 
-    this.userService.updateUser(user);
+    await this.userService.updateUser(user);
     return messages;
   }
 
   /**
    * Add to Portfolio
    */
-  public addToPortfolio(projectTitle: string, reflection: string, tags: string[]): string[] {
-    const user = this.userService.getCurrentUser();
+  public async addToPortfolio(projectTitle: string, reflection: string, tags: string[]): Promise<string[]> {
+    const user = await this.userService.getCurrentUser();
     if (!user) return ["Please register first!"];
 
     const portfolioItem: PortfolioItem = {
@@ -371,7 +371,7 @@ export class PolymathFeaturesService {
     user.portfolio.push(portfolioItem);
 
     const xpGained = 75;
-    const { leveledUp, levelsGained } = this.userService.gainXP(user, xpGained);
+    const { leveledUp, levelsGained } = await this.userService.gainXP(user, xpGained);
 
     const messages = [
       `🖼️ Project Added to Portfolio:`,
@@ -387,15 +387,15 @@ export class PolymathFeaturesService {
     const achievementMessages = this.userService.checkAchievements(user);
     messages.push(...achievementMessages);
 
-    this.userService.updateUser(user);
+    await this.userService.updateUser(user);
     return messages;
   }
 
   /**
    * Log Reflection
    */
-  public logReflection(prompt: string, response: string, mood: number = 5): string[] {
-    const user = this.userService.getCurrentUser();
+  public async logReflection(prompt: string, response: string, mood: number = 5): Promise<string[]> {
+    const user = await this.userService.getCurrentUser();
     if (!user) return ["Please register first!"];
 
     const entry: ReflectionEntry = {
@@ -409,7 +409,7 @@ export class PolymathFeaturesService {
     user.reflectionJournal.push(entry);
 
     const xpGained = 15;
-    const { leveledUp, levelsGained } = this.userService.gainXP(user, xpGained);
+    const { leveledUp, levelsGained } = await this.userService.gainXP(user, xpGained);
 
     const messages = [`📖 Reflection Logged (+${xpGained} XP)`];
     if (leveledUp) {
@@ -419,7 +419,7 @@ export class PolymathFeaturesService {
     const achievementMessages = this.userService.checkAchievements(user);
     messages.push(...achievementMessages);
 
-    this.userService.updateUser(user);
+    await this.userService.updateUser(user);
     return messages;
   }
 
@@ -435,8 +435,8 @@ export class PolymathFeaturesService {
    * 
    * This uncertainty generates higher tonic dopamine than fixed rewards
    */
-  public rollDiceReward(): string[] {
-    const user = this.userService.getCurrentUser();
+  public async rollDiceReward(): Promise<string[]> {
+    const user = await this.userService.getCurrentUser();
     if (!user) return ["Please register first!"];
 
     const roll = Math.floor(Math.random() * 100) + 1;
@@ -456,7 +456,7 @@ export class PolymathFeaturesService {
       // Small reward
       rewardType = 'small';
       // Select from small rewards (coffee, social media)
-      reward = this.lootTable.find(item => 
+      reward = this.lootTable.find(item =>
         item.item.includes('Coffee') || item.item.includes('Social Media')
       ) || this.lootTable[0];
       xpGained = 15;
@@ -464,7 +464,7 @@ export class PolymathFeaturesService {
       // Medium reward
       rewardType = 'medium';
       // Select from medium rewards (episode, book)
-      reward = this.lootTable.find(item => 
+      reward = this.lootTable.find(item =>
         item.item.includes('Episode') || item.item.includes('Book')
       ) || this.lootTable[2];
       xpGained = 35;
@@ -482,15 +482,15 @@ export class PolymathFeaturesService {
       ];
     }
 
-    const { leveledUp, levelsGained } = this.userService.gainXP(user, xpGained);
+    const { leveledUp, levelsGained } = await this.userService.gainXP(user, xpGained);
 
     const messages = [
       `🎲 Dice Roll: ${roll}`,
-      rewardType === 'jackpot' 
+      rewardType === 'jackpot'
         ? `🎰 JACKPOT! REWARD UNLOCKED: ${reward.item} (+${xpGained} XP)`
         : rewardType === 'medium'
-        ? `✨ MEDIUM REWARD: ${reward.item} (+${xpGained} XP)`
-        : `👍 SMALL REWARD: ${reward.item} (+${xpGained} XP)`,
+          ? `✨ MEDIUM REWARD: ${reward.item} (+${xpGained} XP)`
+          : `👍 SMALL REWARD: ${reward.item} (+${xpGained} XP)`,
     ];
 
     if (leveledUp) {
@@ -501,15 +501,15 @@ export class PolymathFeaturesService {
       messages.push(`🔥 The uncertainty of variable rewards keeps your dopamine system engaged!`);
     }
 
-    this.userService.updateUser(user);
+    await this.userService.updateUser(user);
     return messages;
   }
 
   /**
    * Get 3×3 Session Plan
    */
-  public get3x3SessionPlan(): SessionPlan | null {
-    const user = this.userService.getCurrentUser();
+  public async get3x3SessionPlan(): Promise<SessionPlan | null> {
+    const user = await this.userService.getCurrentUser();
     if (!user) return null;
 
     const primaryDomain = Object.values(user.domains).find(d => d.type === DomainType.PRIMARY);
@@ -551,8 +551,8 @@ export class PolymathFeaturesService {
   /**
    * Get Analytics
    */
-  public getAnalytics() {
-    const user = this.userService.getCurrentUser();
+  public async getAnalytics() {
+    const user = await this.userService.getCurrentUser();
     if (!user) return null;
 
     const totalReviews = user.flashcards.reduce((sum, card) => sum + card.confidenceRatings.length, 0);

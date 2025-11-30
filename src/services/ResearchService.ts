@@ -17,7 +17,7 @@ export interface OrchestrateResearchRequest {
   strategy?: 'comprehensive' | 'focused' | 'exploratory';
 }
 
-class ResearchService {
+export class ResearchService {
   private baseUrl: string;
 
   constructor() {

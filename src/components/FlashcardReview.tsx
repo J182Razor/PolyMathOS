@@ -25,8 +25,8 @@ export const FlashcardReview: React.FC<FlashcardReviewProps> = ({ onComplete, on
     loadCards();
   }, []);
 
-  const loadCards = () => {
-    const dueCards = featuresService.getDueFlashcards(10);
+  const loadCards = async () => {
+    const dueCards = await featuresService.getDueFlashcards(10);
     setCards(dueCards);
   };
 
@@ -34,13 +34,13 @@ export const FlashcardReview: React.FC<FlashcardReviewProps> = ({ onComplete, on
     setShowAnswer(true);
   };
 
-  const handleRate = (isCorrect: boolean, conf: number) => {
+  const handleRate = async (isCorrect: boolean, conf: number) => {
     if (cards.length === 0) return;
 
     const card = cards[currentIndex];
-    const result = featuresService.rateFlashcard(card.id, conf, isCorrect);
+    const result = await featuresService.rateFlashcard(card.id, conf, isCorrect);
     setMessages(result);
-    
+
     setCorrect(isCorrect);
     setConfidence(conf);
 
@@ -101,7 +101,7 @@ export const FlashcardReview: React.FC<FlashcardReviewProps> = ({ onComplete, on
             </span>
           </div>
           <div className="w-full bg-dark-elevated rounded-full h-2 border border-silver-dark/20">
-            <div 
+            <div
               className="bg-shimmer h-2 rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
             />

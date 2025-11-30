@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Map, Plus, X, Network } from 'lucide-react';
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
 import { Icon } from './ui/Icon';
 import { PolymathFeaturesService } from '../services/PolymathFeaturesService';
 import { PolymathUserService } from '../services/PolymathUserService';
-import { DomainType } from '../types/polymath';
+import { DomainType, PolymathUser } from '../types/polymath';
 
 interface MindMapBuilderProps {
   onComplete?: () => void;
@@ -21,11 +21,21 @@ export const MindMapBuilder: React.FC<MindMapBuilderProps> = ({ onComplete, onBa
 
   const featuresService = PolymathFeaturesService.getInstance();
   const userService = PolymathUserService.getInstance();
+  const [user, setUser] = useState<PolymathUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const user = userService.getCurrentUser();
+  useEffect(() => {
+    const loadUser = async () => {
+      const currentUser = await userService.getCurrentUser();
+      setUser(currentUser);
+      setLoading(false);
+    };
+    loadUser();
+  }, []);
+
   const domains = user ? Object.values(user.domains) : [];
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (domains.length > 0 && !selectedDomain) {
       const primary = domains.find(d => d.type === DomainType.PRIMARY);
       setSelectedDomain(primary ? primary.name : domains[0].name);
@@ -42,7 +52,7 @@ export const MindMapBuilder: React.FC<MindMapBuilderProps> = ({ onComplete, onBa
     };
 
     if (currentNode.parentId) {
-      setNodes(prev => prev.map(node => 
+      setNodes(prev => prev.map(node =>
         node.id === currentNode.parentId
           ? { ...node, children: [...node.children, newNode.id] }
           : node
@@ -53,16 +63,17 @@ export const MindMapBuilder: React.FC<MindMapBuilderProps> = ({ onComplete, onBa
     setCurrentNode({ label: '', parentId: '' });
   };
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!topic || nodes.length === 0) {
       setMessages(['Please provide a topic and add at least one node']);
       return;
     }
 
     try {
-      const mindMap = featuresService.createMindMap(topic, nodes, selectedDomain);
+      const mindMap = await featuresService.createMindMap(topic, nodes, selectedDomain);
+      alert('Mind Map Saved!');
       setMessages([`🗺️ Mind Map created: ${mindMap.topic} (+${20 + nodes.length * 3} XP)`]);
-      
+
       setTimeout(() => {
         setMessages([]);
         setTopic('');
@@ -73,6 +84,9 @@ export const MindMapBuilder: React.FC<MindMapBuilderProps> = ({ onComplete, onBa
       setMessages([error.message || 'Error creating mind map']);
     }
   };
+
+  if (loading) return <div className="min-h-screen bg-dark-base p-4 text-text-primary flex items-center justify-center">Loading...</div>;
+  if (!user) return <div className="min-h-screen bg-dark-base p-4 text-text-primary flex items-center justify-center">Please log in to create mind maps.</div>;
 
   return (
     <div className="min-h-screen bg-dark-base p-4">
@@ -192,8 +206,8 @@ export const MindMapBuilder: React.FC<MindMapBuilderProps> = ({ onComplete, onBa
               Cancel
             </Button>
           )}
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             onClick={handleCreate}
             disabled={!topic || nodes.length === 0}
             className="ml-auto"

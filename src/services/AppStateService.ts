@@ -73,7 +73,7 @@ class AppStateService {
   // Settings Management
   public loadSettings(): AppSettings {
     const n8nUrl = localStorage.getItem('n8n_webhook_url') || '';
-    
+
     const savedEnv = localStorage.getItem('polymathos_env');
     const envVars = savedEnv ? JSON.parse(savedEnv) : {
       NVIDIA_API_KEY: '',
@@ -97,7 +97,7 @@ class AppStateService {
       ...swarmSettings,
     };
 
-    return this.currentSettings;
+    return this.currentSettings!;
   }
 
   public getSettings(): AppSettings {
@@ -123,7 +123,7 @@ class AppStateService {
     if (updated.customModels) {
       localStorage.setItem('polymathos_custom_models', JSON.stringify(updated.customModels));
     }
-    
+
     // Save Swarm Corporation settings
     const swarmSettings = {
       swarmShield: updated.swarmShield,
@@ -142,7 +142,7 @@ class AppStateService {
     this.settingsListeners.add(listener);
     // Immediately notify with current settings
     listener(this.getSettings());
-    
+
     // Return unsubscribe function
     return () => {
       this.settingsListeners.delete(listener);
@@ -160,23 +160,23 @@ class AppStateService {
   }
 
   // User Management
-  public loadUser(): PolymathUser | null {
+  public async loadUser(): Promise<PolymathUser | null> {
     const userService = PolymathUserService.getInstance();
-    this.currentUser = userService.getCurrentUser();
+    this.currentUser = await userService.getCurrentUser();
     this.notifyUserListeners(this.currentUser);
     return this.currentUser;
   }
 
-  public getUser(): PolymathUser | null {
+  public async getUser(): Promise<PolymathUser | null> {
     if (!this.currentUser) {
       return this.loadUser();
     }
     return this.currentUser;
   }
 
-  public updateUser(user: PolymathUser): void {
+  public async updateUser(user: PolymathUser): Promise<void> {
     const userService = PolymathUserService.getInstance();
-    userService.updateUser(user);
+    await userService.updateUser(user);
     this.currentUser = user;
     this.notifyUserListeners(user);
   }
@@ -184,8 +184,8 @@ class AppStateService {
   public subscribeToUser(listener: UserChangeListener): () => void {
     this.userListeners.add(listener);
     // Immediately notify with current user
-    listener(this.getUser());
-    
+    this.getUser().then(user => listener(user));
+
     // Return unsubscribe function
     return () => {
       this.userListeners.delete(listener);
