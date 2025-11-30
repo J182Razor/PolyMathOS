@@ -26,6 +26,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
 # Install core requirements (all available on PyPI)
+# Install pydantic v2 first to ensure compatibility with supabase/postgrest
+RUN pip install --no-cache-dir "pydantic>=2.4.0"
+
 # Install core requirements from requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
