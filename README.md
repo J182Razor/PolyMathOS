@@ -165,7 +165,7 @@ Full API docs are available at `http://localhost:8000/docs` when the backend is 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## 📄 License
-MIT License. See [LICENSE](LICENSE).
+See [LICENSE](LICENSE).
 
 ---
 **PolyMathOS** - *Where Science Meets Learning, Quantum Meets Intelligence.*
