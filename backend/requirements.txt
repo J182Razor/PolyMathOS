@@ -46,7 +46,10 @@ networkx
 # Reference: https://github.com/kyegomez/swarms.git
 swarms>=2.0.0
 # Database & Storage
+# TigerDB (TimescaleDB) - PRIMARY DATABASE (Required)
 psycopg2-binary
+# Supabase - Optional, only used for HDAM vector storage if configured
+# If not configured, HDAM will use ChromaDB-only mode
 supabase
 PyPDF2
 python-docx
@@ -71,37 +74,43 @@ orjson>=3.9.0
 # pip install -e .
 
 # Swarm Corporation Components
+# Note: Many of these packages may need to be installed from source
+# If installation fails, install from GitHub:
+# pip install git+https://github.com/The-Swarm-Corporation/<component>.git
+
 # Security
 swarm-shield>=0.0.1
 
 # Document Processing
-doc-master>=1.0.0
-omniparse>=1.0.0
-agentparse>=1.0.0
+# doc-master only has versions 0.0.1, 0.0.2 available - install from source if needed
+doc-master>=0.0.1
+# omniparse, agentparse - install from source if not available on PyPI
+# pip install git+https://github.com/The-Swarm-Corporation/omniparse.git
+# pip install git+https://github.com/The-Swarm-Corporation/agentparse.git
 
 # Research
-research-paper-hive>=1.0.0
-advanced-research>=1.0.0
+# research-paper-hive, advanced-research - install from source if not available
+# pip install git+https://github.com/The-Swarm-Corporation/research-paper-hive.git
+# pip install git+https://github.com/The-Swarm-Corporation/advanced-research.git
 exa-py>=1.0.0  # For AdvancedResearch web search
 
 # RAG & Memory
-agent-rag-protocol>=1.0.0
-multi-agent-rag-template>=1.0.0
+# agent-rag-protocol, multi-agent-rag-template - install from source if not available
+# pip install git+https://github.com/The-Swarm-Corporation/agent-rag-protocol.git
+# pip install git+https://github.com/The-Swarm-Corporation/multi-agent-rag-template.git
 llama-index>=0.10.0
 llama-index-core>=0.10.0
 chromadb>=0.4.0
-swarms-memory>=1.0.0  # For ChromaDB integration
+# swarms-memory - install from source if not available
+# pip install git+https://github.com/The-Swarm-Corporation/swarms-memory.git
 
 # Workflow
-zero>=1.0.0
+# zero - install from source if not available
+# pip install git+https://github.com/The-Swarm-Corporation/zero.git
 
 # Utilities
-swarms-utils>=1.0.0
-
-# Note: Many components may need to be installed from source:
-# git clone https://github.com/The-Swarm-Corporation/<component>.git
-# cd <component>
-# pip install -e .
+# swarms-utils - install from source if not available
+# pip install git+https://github.com/The-Swarm-Corporation/swarms-utils.git
 
 # Additional dependencies
 pyyaml>=6.0
