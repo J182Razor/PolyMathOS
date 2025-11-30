@@ -20,11 +20,20 @@ PolyMathOS is a revolutionary learning platform that combines cutting-edge neuro
 
 ---
 
-## 🛠️ Complete Setup Guide
+## 📚 Documentation
+
+**Quick Links:**
+- **[Quick Start Guide](QUICKSTART.md)** - Get up and running in 5 minutes
+- **[Configuration Guide](CONFIGURATION.md)** - Complete configuration reference
+- **[Setup Guide](docs/SETUP_GUIDE.md)** - Comprehensive setup instructions
+- **[How-To Guides](docs/HOW_TO_GUIDES.md)** - Step-by-step guides for common tasks
+- **[Docker Setup](docs/DOCKER_SETUP.md)** - Containerized deployment guide
+
+## 🛠️ Quick Setup
 
 ### 1. Prerequisites
 *   **Node.js** 18+ ([Download](https://nodejs.org/))
-*   **Python** 3.9+ ([Download](https://www.python.org/))
+*   **Python** 3.11+ ([Download](https://www.python.org/))
 *   **Docker** (Optional, for containerized deployment)
 *   **Git**
 
@@ -47,37 +56,52 @@ PolyMathOS is a revolutionary learning platform that combines cutting-edge neuro
     pip install -r requirements.txt
     ```
 
-### 3. Database & Storage Setup (Supabase)
-PolyMathOS uses Supabase for vector storage and authentication.
+### 3. Configuration
 
-1.  Go to [Supabase](https://supabase.com/) and create a new project.
-2.  In the SQL Editor, run the script found in `backend/supabase_schema.sql` to set up tables and vector extensions.
-3.  Go to **Project Settings > API** and copy your `Project URL` and `anon public` key.
+**Backend Configuration:**
+```bash
+cp backend/env.example backend/.env
+# Edit backend/.env with your settings
+```
 
-### 4. API Key Configuration
-To unlock the full power of PolyMathOS, you need API keys. You can configure these in the `.env` file or via the **Settings** UI in the app.
+**Frontend Configuration:**
+```bash
+cp env.example .env
+# Edit .env with your settings
+```
 
-**Required Keys:**
-*   **OpenAI API Key**: For core reasoning ([Get Key](https://platform.openai.com/api-keys))
-*   **Supabase URL & Key**: For storage (From step 3)
+**Minimum Required Configuration:**
+- `DATABASE_URL` - Database connection string
+- `OPENAI_API_KEY` - At least one LLM API key
 
-**Optional (Recommended) Keys:**
-*   **Anthropic API Key**: For advanced reasoning (Claude) ([Get Key](https://console.anthropic.com/))
-*   **NVIDIA API Key**: For specialized models ([Get Key](https://build.nvidia.com/))
-*   **Groq API Key**: For ultra-fast inference ([Get Key](https://console.groq.com/))
-*   **Google Gemini API Key**: For multimodal processing ([Get Key](https://makersuite.google.com/app/apikey))
-*   **D-Wave Leap Token**: For real quantum hardware access ([Get Key](https://cloud.dwavesys.com/leap/))
+See [Configuration Guide](CONFIGURATION.md) for complete details.
 
-### 5. Environment Variables
-Create a `.env` file in the `backend` folder:
+### 4. Initialize Database
 
 ```bash
-# backend/.env
-SUPABASE_URL="your_supabase_project_url"
-SUPABASE_KEY="your_supabase_anon_key"
-OPENAI_API_KEY="sk-..."
-# Add other keys as needed
+cd backend
+python scripts/init_tigerdb.py
 ```
+
+### 5. Start Servers
+
+**Backend:**
+```bash
+cd backend
+python scripts/start_server.py
+```
+
+**Frontend:**
+```bash
+npm run dev
+```
+
+Access at:
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:8000
+- **API Docs**: http://localhost:8000/docs
+
+For detailed setup instructions, see the [Quick Start Guide](QUICKSTART.md) or [Complete Setup Guide](docs/SETUP_GUIDE.md).
 
 ---
 
