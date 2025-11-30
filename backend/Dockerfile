@@ -26,71 +26,27 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
 # Install core requirements (all available on PyPI)
-RUN pip install --no-cache-dir \
-    fastapi \
-    uvicorn \
-    "torch>=2.1.0,<2.4.0" \
-    "torchvision>=0.16.0,<0.19.0" \
-    "torchaudio>=2.1.0,<2.4.0" \
-    "transformers>=4.35.0,<5.0.0" \
-    "sentence-transformers>=2.2.2,<3.0.0" \
-    numpy \
-    scipy \
-    scikit-learn \
-    pandas \
-    requests \
-    beautifulsoup4 \
-    arxiv \
-    neurokit2 \
-    brian2 \
-    mediapipe \
-    opencv-python-headless \
-    websockets \
-    pyyaml \
-    python-multipart \
-    "python-jose[cryptography]" \
-    "passlib[bcrypt]" \
-    "pyasn1>=0.5.0" \
-    "pyasn1-modules>=0.3.0" \
-    dimod \
-    pennylane \
-    qiskit \
-    qiskit-algorithms \
-    qiskit-optimization \
-    qiskit-aer \
-    networkx \
-    "swarms>=2.0.0" \
-    psycopg2-binary \
-    PyPDF2 \
-    python-docx \
-    "httpx>=0.24.0" \
-    "orjson>=3.9.0" \
-    "swarm-shield>=0.0.1" \
-    "exa-py>=1.0.0" \
-    "llama-index>=0.10.0" \
-    "llama-index-core>=0.10.0" \
-    "chromadb>=0.4.0" \
-    "swarms-tools>=0.3.0" \
-    supabase
+# Install core requirements from requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Install Swarm Corporation components from source
 # These enhance functionality but are optional - app works without them
 RUN set -e; \
     for repo in \
-        "doc-master" \
-        "omniparse" \
-        "agentparse" \
-        "research-paper-hive" \
-        "advanced-research" \
-        "agent-rag-protocol" \
-        "multi-agent-rag-template" \
-        "zero" \
-        "swarms-utils" \
-        "swarms-memory"; \
+    "doc-master" \
+    "omniparse" \
+    "agentparse" \
+    "research-paper-hive" \
+    "advanced-research" \
+    "agent-rag-protocol" \
+    "multi-agent-rag-template" \
+    "zero" \
+    "swarms-utils" \
+    "swarms-memory"; \
     do \
-        echo "Installing $repo..."; \
-        pip install --no-cache-dir "git+https://github.com/The-Swarm-Corporation/${repo}.git" || \
-        echo "Warning: Failed to install $repo (optional component)"; \
+    echo "Installing $repo..."; \
+    pip install --no-cache-dir "git+https://github.com/The-Swarm-Corporation/${repo}.git" || \
+    echo "Warning: Failed to install $repo (optional component)"; \
     done
 
 # Create necessary directories for agent workspaces, data, and ChromaDB
